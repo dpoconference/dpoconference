@@ -1,0 +1,531 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-glow: var(--primary-glow);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.75rem;
+
+  --brand-deep: #063f2e;
+  --brand-green: #087a55;
+  --brand-emerald: #11a36a;
+  --brand-gold: #d6a84b;
+  --brand-navy: #102a43;
+  --brand-tint: #eef8f3;
+
+  --background: #f6faf8;
+  --foreground: #17221e;
+  --card: #ffffff;
+  --card-foreground: #17221e;
+  --popover: #ffffff;
+  --popover-foreground: #17221e;
+  --primary: #063f2e;
+  --primary-foreground: #ffffff;
+  --primary-glow: #087a55;
+  --secondary: #eef8f3;
+  --secondary-foreground: #063f2e;
+  --muted: #f5f7f8;
+  --muted-foreground: #61706a;
+  --accent: #11a36a;
+  --accent-foreground: #ffffff;
+  --destructive: #d32f2f;
+  --destructive-foreground: #ffffff;
+  --success: #087a55;
+  --warning: #f4b400;
+  --gold: #d6a84b;
+  --gold-foreground: #063f2e;
+  --border: #dde5e2;
+  --input: #dde5e2;
+  --ring: #087a55;
+  --sky: #087a55;
+  --cyan: #11a36a;
+  --emerald: #11a36a;
+  --violet: #102a43;
+  --chart-1: #063f2e;
+  --chart-2: #087a55;
+  --chart-3: #11a36a;
+  --chart-4: #102a43;
+  --chart-5: #d6a84b;
+  --sidebar: #063f2e;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #d6a84b;
+  --sidebar-primary-foreground: #063f2e;
+  --sidebar-accent: #0a5340;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #0a5340;
+  --sidebar-ring: #d6a84b;
+  --gradient-royal: linear-gradient(135deg, #063f2e, #087a55);
+  --gradient-brand: linear-gradient(135deg, #063f2e 0%, #087a55 55%, #11a36a 100%);
+  --gradient-gold: linear-gradient(135deg, #d6a84b, #e8c676);
+  --gradient-hero: linear-gradient(135deg, rgba(6, 63, 46, 0.92), rgba(8, 122, 85, 0.85));
+  --gradient-aurora:
+    radial-gradient(60% 60% at 10% 0%, rgba(8, 122, 85, 0.18), transparent 60%),
+    radial-gradient(50% 50% at 90% 10%, rgba(17, 163, 106, 0.16), transparent 60%),
+    radial-gradient(60% 60% at 50% 100%, rgba(6, 63, 46, 0.12), transparent 60%);
+}
+
+.dark {
+  --background: #041f18;
+  --foreground: #ffffff;
+  --card: #063f2e;
+  --card-foreground: #ffffff;
+  --popover: #063f2e;
+  --popover-foreground: #ffffff;
+  --primary: #11a36a;
+  --primary-foreground: #ffffff;
+  --primary-glow: #34c084;
+  --secondary: #0a5340;
+  --secondary-foreground: #ffffff;
+  --muted: #0a5340;
+  --muted-foreground: #b7d4c8;
+  --accent: #087a55;
+  --accent-foreground: #ffffff;
+  --destructive: #d32f2f;
+  --destructive-foreground: #ffffff;
+  --success: #66bb6a;
+  --warning: #f4b400;
+  --gold: #d6a84b;
+  --gold-foreground: #041f18;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #34c084;
+  --chart-1: #11a36a;
+  --chart-2: #34c084;
+  --chart-3: #d6a84b;
+  --chart-4: #087a55;
+  --chart-5: #e8c676;
+  --sidebar: #041f18;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #d6a84b;
+  --sidebar-primary-foreground: #041f18;
+  --sidebar-accent: #063f2e;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #063f2e;
+  --sidebar-ring: #d6a84b;
+  --gradient-brand: linear-gradient(135deg, #063f2e 0%, #087a55 50%, #11a36a 100%);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--primary-glow) 40%, transparent);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4 {
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+}
+
+.site {
+  --radius: 0.625rem;
+  --background: #ffffff;
+  --foreground: #17221e;
+  --card: #ffffff;
+  --card-foreground: #17221e;
+  --muted: #f5f7f8;
+  --muted-foreground: #61706a;
+  --border: #dde5e2;
+  --input: #dde5e2;
+  background-color: #ffffff;
+  color: #17221e;
+  font-family: Inter, system-ui, -apple-system, sans-serif;
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+}
+
+.site h1,
+.site h2,
+.site h3,
+.site h4,
+.site h5,
+.site h6 {
+  font-family: Manrope, Inter, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+html.dark .site {
+  --background: #ffffff;
+  --foreground: #17221e;
+  --card: #ffffff;
+  --card-foreground: #17221e;
+  --muted: #f5f7f8;
+  --muted-foreground: #61706a;
+  --border: #dde5e2;
+  --input: #dde5e2;
+  color-scheme: light;
+}
+
+@utility gradient-brand {
+  background-image: var(--gradient-brand);
+}
+
+@utility bg-royal-gradient {
+  background-image: var(--gradient-royal);
+}
+
+@utility bg-brand-gradient {
+  background-image: var(--gradient-brand);
+}
+
+@utility bg-gold-gradient {
+  background-image: var(--gradient-gold);
+}
+
+@utility bg-aurora {
+  background-image: var(--gradient-aurora);
+}
+
+@utility text-gradient {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility text-gradient-brand {
+  background-image: var(--gradient-brand);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: color-mix(in oklab, var(--background) 68%, transparent);
+  border-color: color-mix(in oklab, var(--border) 60%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+}
+
+@utility glass-dark {
+  background: color-mix(in oklab, #063f2e 55%, transparent);
+  border-color: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(18px);
+}
+
+@utility grid-fade {
+  background-image:
+    linear-gradient(color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in oklab, var(--primary) 6%, transparent) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: radial-gradient(ellipse at top, black, transparent 72%);
+}
+
+/* Vertical CR80-style membership digital card (mint stripe template) */
+.membership-id-card {
+  --card-mint: #83e8b0;
+  --card-stripe: #2ebd85;
+  position: relative;
+  display: flex;
+  width: 320px;
+  height: 500px;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--card-mint);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.membership-id-card__pattern {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+.membership-id-card__pattern--top {
+  top: -30px;
+  height: 180px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 12px,
+    var(--card-stripe) 12px,
+    var(--card-stripe) 18px
+  );
+  opacity: 0.8;
+  clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
+}
+
+.membership-id-card__pattern--bottom {
+  bottom: -20px;
+  height: 220px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent,
+    transparent 10px,
+    var(--card-stripe) 10px,
+    var(--card-stripe) 16px
+  );
+  opacity: 0.7;
+  clip-path: polygon(0 40%, 100% 0, 100% 100%, 0 100%);
+}
+
+.membership-id-card__brand {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px 0;
+}
+
+.membership-id-card__logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #fff;
+  object-fit: contain;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+.membership-id-card__brand-name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #063f2e;
+  line-height: 1.2;
+}
+
+.membership-id-card__brand-sub {
+  margin: 2px 0 0;
+  font-size: 10px;
+  font-weight: 600;
+  color: #1f6b4d;
+}
+
+.membership-id-card__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  height: 340px;
+  margin-top: 12px;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  clip-path: polygon(0 0, 100% 10%, 100% 100%, 0 90%);
+  padding: 18px 18px 28px;
+}
+
+.membership-id-card__photo {
+  width: 118px;
+  height: 140px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: #eef8f3;
+  flex-shrink: 0;
+}
+
+.membership-id-card__photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.membership-id-card__photo-fallback {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  font-size: 42px;
+  font-weight: 900;
+  color: var(--card-stripe);
+  background: linear-gradient(180deg, #f4fff9, #e2f7ec);
+}
+
+.membership-id-card__info {
+  width: 100%;
+  margin-top: 10px;
+  padding-left: 4px;
+  text-align: left;
+}
+
+.membership-id-card__name-first {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #000;
+}
+
+.membership-id-card__name-last {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+  color: var(--card-stripe);
+}
+
+.membership-id-card__role {
+  margin: 4px 0 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #666;
+}
+
+.membership-id-card__org {
+  margin: 2px 0 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #888;
+  line-height: 1.25;
+}
+
+.membership-id-card__meta {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 10px;
+  margin: 10px 0 0;
+}
+
+.membership-id-card__meta div {
+  min-width: 0;
+}
+
+.membership-id-card__meta dt {
+  margin: 0;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a9590;
+}
+
+.membership-id-card__meta dd {
+  margin: 1px 0 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: #16352a;
+  word-break: break-word;
+}
+
+.membership-id-card__qr {
+  position: absolute;
+  z-index: 3;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.membership-id-card__qr img {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  background: #fff;
+  padding: 3px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+}
+
+.membership-id-card__qr p {
+  margin: 0;
+  max-width: 72px;
+  text-align: center;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 1.15;
+  color: #063f2e;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+
+  .membership-id-card,
+  .membership-id-card * {
+    visibility: visible !important;
+  }
+
+  .membership-id-card {
+    position: absolute;
+    left: 50%;
+    top: 12mm;
+    transform: translateX(-50%);
+    box-shadow: none;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
+
+/* TipTap rich text editor */
+.tiptap p.is-editor-empty:first-child::before {
+  color: var(--muted-foreground);
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

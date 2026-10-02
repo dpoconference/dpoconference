@@ -1,4 +1,5 @@
 import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { SiteLayout } from "@/components/site/Layout";
 import { CheckList } from "@/components/site/CheckList";
 import { Calendar, MapPin, Users, Mic, Award, Ticket } from "lucide-react";
@@ -12,7 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/conference")({
   head: () => ({
     meta: [
-      { title: "DPO Conference Annual Conference" },
+      { title: "Data Protection Officers Conference Annual Conference" },
       {
         name: "description",
         content:
@@ -43,6 +44,16 @@ function ConferencePage() {
     queryKey: ["conferences"],
     queryFn: () => apiGet<PublicConference[]>("/public/conferences"),
   });
+
+  useEffect(() => {
+    const targetId = decodeURIComponent(window.location.hash.slice(1));
+    if (!targetId || !live.data) return;
+
+    const frameId = window.requestAnimationFrame(() => {
+      document.getElementById(targetId)?.scrollIntoView({ block: "start" });
+    });
+    return () => window.cancelAnimationFrame(frameId);
+  }, [live.data]);
 
   if (live.isPending) {
     return (
@@ -114,7 +125,7 @@ function ConferencePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-4xl px-6 py-16 text-[15px] leading-7">
+      <section id="overview" className="scroll-mt-40 mx-auto max-w-4xl px-6 py-16 text-[15px] leading-7">
         <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Conference Overview</h2>
         {c.bodyHtml?.trim() ? (
           <div className="mt-4">
@@ -128,7 +139,7 @@ function ConferencePage() {
         )}
       </section>
 
-      <section className="bg-[color:var(--brand-tint)]/50 py-16">
+      <section id="why-attend" className="scroll-mt-40 bg-[color:var(--brand-tint)]/50 py-16">
         <div className="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-2">
           <div>
             <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Why Attend?</h2>
@@ -148,7 +159,7 @@ function ConferencePage() {
               ]}
             />
           </div>
-          <div>
+          <div id="who-should-attend" className="scroll-mt-40">
             <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Who Should Attend?</h2>
             <CheckList
               className="mt-4"
@@ -175,7 +186,7 @@ function ConferencePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section id="themes" className="scroll-mt-40 mx-auto max-w-7xl px-6 py-16">
         <p className="text-sm font-semibold uppercase tracking-wider text-[color:var(--brand-green)]">Conference Themes</p>
         <h2 className="mt-3 text-3xl font-extrabold text-[color:var(--brand-deep)]">Topics may include:</h2>
         <div className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -201,7 +212,7 @@ function ConferencePage() {
         </div>
       </section>
 
-      <section className="bg-[color:var(--muted)] py-16">
+      <section id="activities" className="scroll-mt-40 bg-[color:var(--muted)] py-16">
         <div className="mx-auto max-w-7xl px-6">
           <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Conference Activities</h2>
           <CheckList
@@ -227,7 +238,7 @@ function ConferencePage() {
         <div className="rounded-2xl border bg-white p-8">
           <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">Speaker Invitation</h2>
           <p className="mt-3 text-sm leading-7">
-            DPO Conference welcomes experienced professionals, researchers, regulators and industry leaders who wish to share practical
+            Data Protection Officers Conference welcomes experienced professionals, researchers, regulators and industry leaders who wish to share practical
             knowledge and thought leadership. Prospective speakers may submit a presentation title, abstract, professional profile,
             learning objectives and supporting materials.
           </p>

@@ -1,6 +1,6 @@
 import { notify } from "./toast";
 
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api/v1";
+const BASE = import.meta.env.VITE_API_URL ?? "https://backend-dpoconference.onrender.com/api/v1";
 
 type Envelope<T> = {
   success: boolean;

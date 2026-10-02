@@ -68,16 +68,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DPO Conference | Professional Network for Data Protection Officers in Africa" },
+      { title: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa" },
       {
         name: "description",
         content:
           "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
       },
-      { name: "author", content: "DPO Conference" },
+      { name: "author", content: "Data Protection Officers Conference" },
       {
         property: "og:title",
-        content: "DPO Conference | Professional Network for Data Protection Officers in Africa",
+        content: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
       },
       {
         property: "og:description",
@@ -89,7 +89,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "DPO Conference | Professional Network for Data Protection Officers in Africa",
+        content: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
       },
       {
         name: "twitter:description",

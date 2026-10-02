@@ -8,7 +8,6 @@ import { apiGet } from "@/lib/api";
 const primary = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
-  { to: "/membership", label: "Membership" },
   { to: "/conferences", label: "Conference" },
   { to: "/training", label: "Training" },
 ] as const;
@@ -29,19 +28,14 @@ const navLink =
 const navActive =
   "px-2.5 py-1.5 rounded-md text-sm font-semibold text-[color:var(--brand-deep)] bg-[color:var(--brand-tint)]";
 
-function HeaderAuthLink({ className = "hover:text-[color:var(--brand-gold)]" }: { className?: string }) {
+function HeaderDashboardLink({ className = "hover:text-[color:var(--brand-gold)]" }: { className?: string }) {
   const { user } = useAuth();
-  if (user) {
-    const to = user.permissions.includes("admin.access") ? "/admin" : "/portal";
-    return (
-      <Link to={to} className={className}>
-        {user.firstName} · Dashboard
-      </Link>
-    );
-  }
+  if (!user) return null;
+
+  const to = user.permissions.includes("admin.access") ? "/admin" : "/portal";
   return (
-    <Link to="/login" search={{}} className={className}>
-      Login
+    <Link to={to} className={className}>
+      {user.firstName} · Dashboard
     </Link>
   );
 }
@@ -75,7 +69,6 @@ export function Header() {
     const term = q.trim();
     if (!term) {
       setHits([
-        { title: "Membership", href: "/membership" },
         { title: "Conferences", href: "/conferences" },
         { title: "Training", href: "/training" },
         { title: "Resources", href: "/resources" },
@@ -128,11 +121,11 @@ export function Header() {
       <div className="border-b border-[color:var(--border)] bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-5 lg:h-20">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src={logo} alt="DPO Conference" className="h-12 w-12  object-contain sm:h-16 sm:w-16" />
+            <img src={logo} alt="Data Protection Officers Conference" className="h-12 w-12  object-contain sm:h-16 sm:w-16" />
             <div className="leading-none">
-              <div className="text-[15px] font-bold tracking-tight text-[color:var(--brand-deep)]">DPO Conference</div>
+              <div className="text-[15px] font-bold tracking-tight text-[color:var(--brand-deep)]">Data Protection Officers Conference</div>
               <div className="mt-0.5 hidden text-[9px] uppercase tracking-[0.14em] text-[color:var(--brand-green)] sm:block">
-                Connect · Collaborate · Change
+                PROFESSIONAL NETWORK &amp; LEADERSHIP FORUM
               </div>
             </div>
           </Link>
@@ -184,7 +177,6 @@ export function Header() {
               onClick={() => {
                 setSearchOpen(true);
                 setHits([
-                  { title: "Membership", href: "/membership" },
                   { title: "Conference", href: "/conference" },
                   { title: "Training", href: "/training" },
                   { title: "News", href: "/news" },
@@ -193,7 +185,7 @@ export function Header() {
             >
               <Search className="h-4 w-4" />
             </button>
-            <HeaderAuthLink className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]" />
+            <HeaderDashboardLink className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]" />
             <Link
               to={conference ? "/conferences/$slug/register" : "/conferences"}
               params={conference ? { slug: conference.slug } : undefined}
@@ -227,9 +219,7 @@ export function Header() {
               <Link to="/members/directory" className="py-2 text-sm font-medium" onClick={() => setOpen(false)}>
                 Find a DPO
               </Link>
-              <div className="py-2 text-sm font-medium" onClick={() => setOpen(false)}>
-                <HeaderAuthLink className="hover:text-[color:var(--brand-green)]" />
-              </div>
+              <HeaderDashboardLink className="py-2 text-sm font-medium hover:text-[color:var(--brand-green)]" />
               <div className="mt-2">
                 <Link
                   to={conference ? "/conferences/$slug/register" : "/conferences"}

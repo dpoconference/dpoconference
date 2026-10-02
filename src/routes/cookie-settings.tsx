@@ -7,8 +7,8 @@ import { notify } from "@/lib/toast";
 export const Route = createFileRoute("/cookie-settings")({
   head: () => ({
     meta: [
-      { title: "Cookie settings | DPO Conference" },
-      { name: "description", content: "Choose whether DPO Conference may use analytics and marketing cookies." },
+      { title: "Cookie settings | Data Protection Officers Conference" },
+      { name: "description", content: "Choose whether Data Protection Officers Conference may use analytics and marketing cookies." },
     ],
   }),
   component: Page,
@@ -63,7 +63,7 @@ function Page() {
             <span>
               <span className="block font-semibold text-[color:var(--brand-deep)]">Analytics and marketing</span>
               <span className="mt-1 block text-sm text-[color:var(--muted-foreground)]">
-                Off until you accept. DPO Conference does not currently set extra marketing cookies; this preference is stored
+                Off until you accept. Data Protection Officers Conference does not currently set extra marketing cookies; this preference is stored
                 if those tools are added later.
               </span>
             </span>

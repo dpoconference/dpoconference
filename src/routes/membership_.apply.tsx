@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/membership_/apply")({
   validateSearch: (s: Record<string, unknown>): { category?: string } =>
     typeof s.category === "string" ? { category: s.category } : {},
-  head: () => ({ meta: [{ title: "Apply for Membership | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Apply for Membership | Data Protection Officers Conference" }] }),
   component: ApplyPage,
 });
 
@@ -18,7 +18,7 @@ function ApplyPage() {
   if (loading) {
     return (
       <SiteLayout>
-        <PageHero title="Apply for DPO Conference Membership" />
+        <PageHero title="Apply for Data Protection Officers Conference Membership" />
         <div className="mx-auto max-w-3xl px-6 py-12">
           <Skeleton className="h-96" />
         </div>
@@ -34,7 +34,7 @@ function ApplyPage() {
     <SiteLayout>
       <PageHero
         breadcrumb="Home / Membership / Apply"
-        title="Apply for DPO Conference Membership"
+        title="Apply for Data Protection Officers Conference Membership"
         subtitle="Join a professional community committed to excellence in privacy, data protection and digital governance."
       />
       <section className="mx-auto max-w-3xl px-6 py-12">

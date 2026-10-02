@@ -7,7 +7,7 @@ import { apiGet, apiPost } from "@/lib/api";
 import { notify } from "@/lib/toast";
 
 export const Route = createFileRoute("/awards_/nominate")({
-  head: () => ({ meta: [{ title: "Nominate | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Nominate | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

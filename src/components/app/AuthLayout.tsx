@@ -13,25 +13,25 @@ const copy: Record<
     title: "The professional command centre for Data Protection Officers.",
     body: "Membership, CPD, digital cards and conference access — in one institutional workspace.",
     trust: "Processed in line with the NDPA 2023. Payments via Paystack.",
-    footer: "© 2026 DPO Conference Secretariat, Abuja",
+    footer: "© 2026 Data Protection Officers Conference Secretariat, Abuja",
   },
   register: {
     title: "Join Africa’s privacy leadership network.",
     body: "Create an account to apply for membership, register for events and keep a verified CPD record.",
     trust: "Your data is processed under the NDPA. We never sell member records.",
-    footer: "© 2026 DPO Conference Secretariat, Abuja",
+    footer: "© 2026 Data Protection Officers Conference Secretariat, Abuja",
   },
   forgot: {
-    title: "Restore access to your DPO Conference workspace.",
+    title: "Restore access to your Data Protection Officers Conference workspace.",
     body: "We will send a reset link to the email on your account. The link expires for your protection.",
     trust: "Reset links are single-use and expire automatically.",
-    footer: "© 2026 DPO Conference Secretariat, Abuja",
+    footer: "© 2026 Data Protection Officers Conference Secretariat, Abuja",
   },
   admin: {
     title: "Restricted facility. Secretariat sign-in only.",
     body: "Administration of membership, fees, events and reports. Staff access is logged.",
     trust: "NDPA-aligned processing · audit trail enabled",
-    footer: "© 2026 DPO Conference Secretariat · Admin Control Suite",
+    footer: "© 2026 Data Protection Officers Conference Secretariat · Admin Control Suite",
   },
 };
 
@@ -40,13 +40,13 @@ export function AuthBrand({ compact = false, invert = false }: { compact?: boole
     <Link to="/" className="inline-flex items-center gap-3">
       <img
         src={logo}
-        alt="DPO Conference"
+        alt="Data Protection Officers Conference"
         className={compact ? "h-9 w-9 object-contain" : "h-11 w-11 object-contain"}
         style={invert ? { filter: "brightness(0) invert(1)" } : undefined}
       />
       <span className="leading-tight">
         <span className={`block text-sm font-semibold ${invert ? "text-primary-foreground" : "text-foreground"}`}>
-          DPO Conference
+          Data Protection Officers Conference
         </span>
         <span
           className={`block text-[10px] uppercase tracking-widest ${
@@ -65,13 +65,13 @@ export function AuthAdminMark({ invert = false }: { invert?: boolean }) {
     <div className="inline-flex items-center gap-3">
       <img
         src={logo}
-        alt="DPO Conference"
+        alt="Data Protection Officers Conference"
         className="h-9 w-9 object-contain"
         style={invert ? { filter: "brightness(0) invert(1)" } : undefined}
       />
       <span className="leading-tight">
         <span className={`block text-sm font-semibold ${invert ? "text-primary-foreground" : "text-foreground"}`}>
-          DPO Conference
+          Data Protection Officers Conference
         </span>
         <span
           className={`block text-[10px] uppercase tracking-widest ${

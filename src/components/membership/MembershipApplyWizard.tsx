@@ -769,7 +769,7 @@ export function MembershipApplyWizard({
                 onChange={(e) => setDeclared(e.target.checked)}
               />
               <span>
-                I declare that the information provided is accurate and complete. I agree to the DPO Conference Code of Ethics,
+                I declare that the information provided is accurate and complete. I agree to the Data Protection Officers Conference Code of Ethics,
                 Membership Terms and Privacy Notice
                 {embedded ? (
                   <>

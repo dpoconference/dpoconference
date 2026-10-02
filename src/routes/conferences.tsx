@@ -11,7 +11,7 @@ import conferenceImg from "@/assets/conference.jpg";
 export const Route = createFileRoute("/conferences")({
   head: () => ({
     meta: [
-      { title: "DPO Conference events" },
+      { title: "Data Protection Officers Conference events" },
       {
         name: "description",
         content:
@@ -63,7 +63,7 @@ function ConferencesCataloguePage() {
       <PageHero
         breadcrumb="Home / Conferences"
         eyebrow="Events"
-        title="DPO Conference events"
+        title="Data Protection Officers Conference events"
         subtitle="Flagship and special conferences for Data Protection Officers, regulators, researchers and organisational leaders."
       />
       <section className="mx-auto max-w-7xl px-6 py-12">

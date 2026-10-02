@@ -1,10 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useState } from "react";
-import { ArrowRight, Users, GraduationCap, Award, Scale, Compass, Network, Calendar, MapPin, CheckCircle2, Sparkles, BookOpen, Briefcase, Building2, Star } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, Users, GraduationCap, Award, Scale, Compass, Network, Calendar, MapPin, CheckCircle2, Sparkles, BookOpen, Briefcase, Building2, Star } from "lucide-react";
 import { SiteLayout } from "@/components/site/Layout";
-import hero from "@/assets/hero.jpg";
 import conferenceImg from "@/assets/conference.jpg";
-import trainingImg from "@/assets/training.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost } from "@/lib/api";
 import { cmsSection, useCmsPage } from "@/lib/cms";
@@ -12,12 +10,28 @@ import { formatConferenceDates, formatNaira } from "@/lib/format";
 import { notify } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 
+const DEFAULT_HERO_HEADLINE = "Strengthening the professionals who protect trust, privacy and data.";
+const BOARD_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790941351/board.png";
+const COMMISSIONER_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790937623/nc.jpg";
+
+const HERO_HEADLINES = [
+  { text: "Strengthening the professionals who protect trust.", tone: "hero-phrase--emerald" },
+  { text: "Championing professionals who safeguard privacy.", tone: "hero-phrase--gold" },
+  { text: "Empowering leaders to protect people and data.", tone: "hero-phrase--navy" },
+] as const;
+
+const HERO_METRICS = [
+  { value: 5, suffix: "", label: "Strategic pillars advancing privacy leadership across Africa" },
+  { value: 4, suffix: "×", label: "training cycles / year" },
+  { value: 1, suffix: "", label: "flagship conference" },
+] as const;
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DPO Conference | Professional Network for Data Protection Officers in Africa" },
+      { title: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa" },
       { name: "description", content: "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders." },
-      { property: "og:title", content: "DPO Conference | Professional Network for Data Protection Officers in Africa" },
+      { property: "og:title", content: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa" },
       { property: "og:description", content: "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders." },
     ],
   }),
@@ -31,7 +45,6 @@ function Home() {
       <PartnersStrip />
       <WhyMatters />
       <CoreBenefits />
-      <MembershipTiers />
       <ConferenceSpotlight />
       <TrainingSection />
       <Sectors />
@@ -46,86 +59,159 @@ function Home() {
 function Hero() {
   const cms = useCmsPage("home");
   const heroCms = cmsSection(cms.data, "hero");
+  const [headlineIndex, setHeadlineIndex] = useState(0);
+  const [typedLength, setTypedLength] = useState(HERO_HEADLINES[0].text.length);
+  const [isDeleting, setIsDeleting] = useState(false);
   const eyebrow = (heroCms?.eyebrow as string) || "Africa's Professional Community for Data Protection Officers";
   const headline =
-    heroCms?.headline || "Strengthening the professionals who protect trust, privacy and data.";
+    heroCms?.headline || DEFAULT_HERO_HEADLINE;
+  const usesTypewriter = headline === DEFAULT_HERO_HEADLINE;
   const subhead =
     heroCms?.subhead ||
-    "DPO Conference is a year-round professional network, leadership forum and conference platform advancing the competence, effectiveness and influence of Data Protection Officers in Nigeria, Africa and the global privacy ecosystem.";
+    "Data Protection Officers Conference is a year-round professional network, leadership forum and conference platform advancing the competence, effectiveness and influence of Data Protection Officers in Nigeria, Africa and the global privacy ecosystem.";
   const ctaLabel = heroCms?.ctaLabel || "Register for the Conference";
   const ctaHref = heroCms?.ctaHref || "/conferences";
-  const secondaryCtaLabel = (heroCms?.secondaryCtaLabel as string) || "Become a Member";
-  const secondaryCtaHref = (heroCms?.secondaryCtaHref as string) || "/membership";
+
+  useEffect(() => {
+    if (!usesTypewriter) return;
+
+    const phrase = HERO_HEADLINES[headlineIndex].text;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setTypedLength(phrase.length);
+      setIsDeleting(false);
+      return;
+    }
+
+    const finishedTyping = typedLength >= phrase.length;
+    const finishedDeleting = isDeleting && typedLength === 0;
+    const delay = finishedTyping && !isDeleting ? 1600 : finishedDeleting ? 280 : isDeleting ? 28 : 48;
+    const timeoutId = window.setTimeout(() => {
+      if (finishedTyping && !isDeleting) {
+        setIsDeleting(true);
+        return;
+      }
+      if (finishedDeleting) {
+        setHeadlineIndex((index) => (index + 1) % HERO_HEADLINES.length);
+        setIsDeleting(false);
+        return;
+      }
+      setTypedLength((length) => Math.max(0, Math.min(phrase.length, length + (isDeleting ? -1 : 1))));
+    }, delay);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [headlineIndex, isDeleting, typedLength, usesTypewriter]);
 
   return (
-    <section className="relative overflow-hidden bg-white">
-      <div className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full opacity-30 blur-3xl" style={{background: "radial-gradient(circle, #11A36A, transparent 70%)"}}/>
-      <div className="absolute -bottom-40 -left-20 w-[400px] h-[400px] rounded-full opacity-20 blur-3xl" style={{background: "radial-gradient(circle, #063F2E, transparent 70%)"}}/>
-      <div className="relative mx-auto max-w-7xl px-6 py-16 lg:py-24 grid lg:grid-cols-2 gap-12 items-center">
+    <section className="home-hero relative isolate overflow-hidden">
+      <div className="hero-sky pointer-events-none absolute inset-0" aria-hidden="true">
+        <span className="hero-light-ray hero-light-ray--emerald" />
+        <span className="hero-light-ray hero-light-ray--gold" />
+      </div>
+      <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
         <div>
-          <span className="inline-flex items-center gap-2 rounded-full bg-[color:var(--brand-tint)] px-3 py-1.5 text-xs font-semibold text-[color:var(--brand-deep)]">
+          <span className="hero-enter hero-enter--1 inline-flex items-center gap-2 rounded-full bg-white/75 px-3 py-1.5 text-xs font-semibold text-[color:var(--brand-deep)] shadow-sm backdrop-blur-sm">
             <Sparkles className="h-3.5 w-3.5 text-[color:var(--brand-emerald)]"/>
             {eyebrow}
           </span>
-          <h1 className="mt-5 text-4xl md:text-5xl lg:text-6xl font-extrabold leading-[1.05] text-[color:var(--brand-deep)]">
-            {headline.includes("trust, privacy and data") ? (
-              <>
-                Strengthening the professionals who protect{" "}
-                <span className="text-gradient-brand">trust, privacy and data.</span>
-              </>
+          <h1 className="hero-enter hero-enter--2 mt-5 text-4xl font-extrabold leading-[1.05] text-[color:var(--brand-deep)] md:text-5xl lg:text-6xl">
+            {usesTypewriter ? (
+              <span
+                key={headlineIndex}
+                className={`hero-typewriter-text ${HERO_HEADLINES[headlineIndex].tone}`}
+                aria-label={HERO_HEADLINES[headlineIndex].text}
+              >
+                {HERO_HEADLINES[headlineIndex].text.slice(0, typedLength)}
+                <span className="hero-typewriter-caret" aria-hidden="true" />
+              </span>
             ) : (
               headline
             )}
           </h1>
-          <p className="mt-6 text-lg text-[color:var(--muted-foreground)] max-w-xl leading-relaxed">{subhead}</p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <p className="hero-enter hero-enter--3 mt-6 max-w-xl text-lg leading-relaxed text-[color:var(--muted-foreground)]">{subhead}</p>
+          <div className="hero-enter hero-enter--4 mt-8 flex flex-wrap gap-3">
             <a href={ctaHref} className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold text-white gradient-brand  hover:opacity-95">
               {ctaLabel} <ArrowRight className="h-4 w-4"/>
             </a>
-            <a href={secondaryCtaHref} className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold border-2 border-[color:var(--brand-deep)] text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]">
-              {secondaryCtaLabel}
-            </a>
-            <Link to="/benefits" className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold border-2 border-[color:var(--brand-green)] text-[color:var(--brand-green)] hover:bg-[color:var(--brand-tint)]">
-              Explore Member Benefits
-            </Link>
             <Link to="/training" className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-green)] hover:text-[color:var(--brand-deep)]">
               Explore Training →
             </Link>
           </div>
-          <div className="mt-10 grid grid-cols-2 sm:grid-cols-5 gap-4 text-xs">
-            {["Professional Community","Quarterly Training","CPD Credits","Regulatory Engagement","Sector Networks"].map(t => (
-              <div key={t} className="flex items-start gap-1.5"><CheckCircle2 className="h-4 w-4 text-[color:var(--brand-emerald)] shrink-0 mt-0.5"/><span className="text-[color:var(--foreground)] font-medium">{t}</span></div>
+          <div className="hero-metrics-bar hero-enter hero-enter--5 mt-10 grid max-w-xl grid-cols-3 overflow-hidden rounded-lg">
+            {HERO_METRICS.map((metric) => (
+              <div key={metric.label} className="border-r border-white/20 px-3 py-4 last:border-r-0 sm:px-4 sm:py-5">
+                <AnimatedMetric value={metric.value} suffix={metric.suffix} label={metric.label} />
+              </div>
             ))}
           </div>
         </div>
         <div className="relative">
-          <div className="relative rounded-2xl overflow-hidden ">
-            <img src={hero} alt="African data protection professionals at DPO Conference" width={1600} height={1200} className="w-full h-64 sm:h-80 lg:h-[520px] object-cover"/>
-            <div className="absolute inset-0 bg-gradient-to-t from-[color:var(--brand-deep)]/50 via-transparent to-transparent"/>
-          </div>
-          <div className="hidden md:block absolute -left-8 top-10 bg-white rounded-xl  p-5 w-64 border border-[color:var(--border)]">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg gradient-brand grid place-items-center text-white"><Users className="h-5 w-5"/></div>
-              <div>
-                <p className="text-xs text-[color:var(--muted-foreground)]">Community</p>
-                <p className="font-bold text-[color:var(--brand-deep)]">DPO Network</p>
-              </div>
+          <figure className="hero-portrait-enter mx-auto w-full max-w-[640px]">
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--brand-tint)]">
+              <img
+                src={BOARD_IMAGE}
+                alt="Board members of the Data Protection Officers Conference"
+                width={1448}
+                height={1086}
+                className="h-full w-full object-cover object-center"
+              />
             </div>
-            <p className="mt-3 text-xs text-[color:var(--muted-foreground)]">Peer roundtables, mentorship, and sector working groups across Africa.</p>
-          </div>
-          <div className="hidden md:block absolute -right-6 bottom-8 bg-white rounded-xl  p-5 w-64 border border-[color:var(--border)]">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 rounded-lg bg-[color:var(--brand-gold)] grid place-items-center text-white"><Calendar className="h-5 w-5"/></div>
-              <div>
-                <p className="text-xs text-[color:var(--muted-foreground)]">Flagship Event</p>
-                <p className="font-bold text-[color:var(--brand-deep)]">Conference 2026</p>
-              </div>
-            </div>
-            <p className="mt-3 text-xs text-[color:var(--muted-foreground)]">Registration is now open — early-bird rates available.</p>
-          </div>
+          </figure>
         </div>
       </div>
     </section>
+  );
+}
+
+function AnimatedMetric({ value, suffix, label }: { value: number; suffix: string; label: string }) {
+  const metricRef = useRef<HTMLDivElement>(null);
+  const [count, setCount] = useState(0);
+  const [hasEnteredViewport, setHasEnteredViewport] = useState(false);
+
+  useEffect(() => {
+    const element = metricRef.current;
+    if (!element) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setHasEnteredViewport(true);
+        observer.disconnect();
+      },
+      { threshold: 0.6 },
+    );
+
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    if (!hasEnteredViewport) return;
+
+    let animationFrame = 0;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      animationFrame = window.requestAnimationFrame(() => setCount(value));
+      return () => window.cancelAnimationFrame(animationFrame);
+    }
+
+    const startedAt = window.performance.now();
+    const duration = 1000;
+    const updateCount = (now: number) => {
+      const progress = Math.min((now - startedAt) / duration, 1);
+      setCount(Math.round(value * progress));
+      if (progress < 1) animationFrame = window.requestAnimationFrame(updateCount);
+    };
+
+    animationFrame = window.requestAnimationFrame(updateCount);
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [value, hasEnteredViewport]);
+
+  return (
+    <div ref={metricRef}>
+      <p className="hero-metric-value tabular-nums" aria-label={`${value}${suffix} ${label}`}>
+        {String(count).padStart(2, "0")}{suffix}
+      </p>
+      <p className="mt-2 text-xs leading-snug text-[color:var(--muted-foreground)] sm:text-sm">{label}</p>
+    </div>
   );
 }
 
@@ -146,39 +232,91 @@ function PartnersStrip() {
 }
 
 function WhyMatters() {
-  const cards = [
-    { icon: Scale, title: "Growing Regulatory Responsibility", body: "DPOs interpret regulations, guide leadership and establish accountable privacy practices across the enterprise." },
-    { icon: Sparkles, title: "Rapid Technology Change", body: "Artificial intelligence, cloud computing, cybersecurity risks and digital platforms continue to expand DPO responsibilities." },
-    { icon: Network, title: "Need for Professional Community", body: "Professionals require trusted peer networks, continuous learning and access to practical guidance." },
+  const conferenceGuides = [
+    { title: "Who should attend?", description: "Find the professionals and leaders this gathering is for.", icon: Users, hash: "who-should-attend" },
+    { title: "Why attend?", description: "Explore the practical value, connections and CPD on offer.", icon: Sparkles, hash: "why-attend" },
+    { title: "Themes and topics", description: "See the issues shaping privacy and data governance.", icon: Compass, hash: "themes" },
+    { title: "Conference activities", description: "Preview the sessions, workshops and networking.", icon: Calendar, hash: "activities" },
   ];
   return (
-    <section className="mx-auto max-w-7xl px-6 py-20 lg:py-28 grid lg:grid-cols-2 gap-14 items-center">
-      <div className="relative">
-        <div className="rounded-2xl overflow-hidden ">
-          <img src={trainingImg} alt="DPO professionals collaborating" width={1200} height={900} loading="lazy" className="w-full h-[460px] object-cover"/>
+    <section className="mx-auto grid max-w-7xl grid-cols-1 items-stretch gap-x-14 gap-y-8 px-6 py-12 lg:grid-cols-2 lg:py-16">
+      <div>
+        <CommissionerPortrait />
+      </div>
+      <div className="flex h-full flex-col">
+        <div>
+          <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">Why Data Protection Officers Conference Matters</p>
+          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">A professional platform built for a defining moment in privacy.</h2>
         </div>
-        <div className="static mt-4 sm:absolute sm:-bottom-6 sm:-right-6 bg-[color:var(--brand-deep)] text-white p-6 rounded-2xl max-w-xs ">
-          <p className="text-3xl font-extrabold text-[color:var(--brand-gold)]">5</p>
-          <p className="text-sm">Strategic pillars advancing privacy leadership across Africa.</p>
+        <div className="mt-4 flex flex-1 flex-col justify-between text-sm leading-6 text-[color:var(--muted-foreground)]">
+          <p>
+            As organisations handle more personal data, the Data Protection Officer's role has become central to lawful, secure and responsible governance. The conference brings together DPOs, privacy professionals, regulators and organisational leaders to share knowledge and address the issues reshaping the profession.
+          </p>
+          <div>
+            <h3 className="font-bold text-[color:var(--brand-deep)]">Practical knowledge and professional growth</h3>
+            <p className="mt-1">
+              Go beyond compliance theory with real-world approaches to privacy risks, accountability and effective data protection programmes. Explore emerging regulation, implementation challenges and technology-driven risks while building skills and earning CPD.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-bold text-[color:var(--brand-deep)]">Connections across every discipline</h3>
+            <p className="mt-1">
+              Responsible data protection depends on collaboration across legal, compliance, IT, cybersecurity, human resources and leadership. The conference creates space for these perspectives to meet, exchange experience and build stronger professional networks.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-bold text-[color:var(--brand-deep)]">Trust today, readiness for what comes next</h3>
+            <p className="mt-1">
+              Examine how artificial intelligence, digital transformation, cyber threats and cross-border data flows are changing privacy. Share practical ways to move beyond reactive compliance and build lasting trust, resilience and responsible innovation.
+            </p>
+          </div>
+          <p className="font-semibold text-[color:var(--brand-deep)]">
+            More than a conference, it is a meeting point for the people protecting personal data and shaping the future of privacy.
+          </p>
         </div>
       </div>
-      <div>
-        <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">Why DPO Conference Matters</p>
-        <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">A professional platform built for a defining moment in privacy.</h2>
-        <p className="mt-4 text-[color:var(--muted-foreground)] leading-relaxed">The role of the Data Protection Officer has never been more strategic — or more demanding. DPO Conference connects the practitioners shaping how organisations, regulators and societies handle personal data.</p>
-        <div className="mt-8 space-y-4">
-          {cards.map(c => (
-            <div key={c.title} className="flex gap-4 p-5 rounded-xl border border-[color:var(--border)] bg-white  transition-">
-              <div className="h-11 w-11 rounded-lg bg-[color:var(--brand-tint)] grid place-items-center text-[color:var(--brand-deep)] shrink-0"><c.icon className="h-5 w-5"/></div>
-              <div>
-                <h3 className="font-bold text-[color:var(--brand-deep)]">{c.title}</h3>
-                <p className="text-sm text-[color:var(--muted-foreground)] mt-1">{c.body}</p>
-              </div>
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:col-span-2">
+        <article className="flex min-h-48 flex-col justify-between rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-4 text-white">
+          <div>
+            <p className="text-3xl font-extrabold text-[color:var(--brand-gold)]">5</p>
+            <h3 className="mt-2 font-bold">Strategic pillars</h3>
+            <p className="mt-1 text-sm leading-relaxed text-white/75">Advancing privacy leadership across Africa.</p>
+          </div>
+        </article>
+        {conferenceGuides.map(({ title, description, icon: Icon, hash }) => (
+          <Link
+            key={hash}
+            to="/conference"
+            hash={hash}
+            className="group flex min-h-48 flex-col justify-between rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-4 text-white transition-colors hover:bg-[color:var(--brand-green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-gold)]"
+          >
+            <div>
+              <Icon className="h-5 w-5 text-[color:var(--brand-gold)]" />
+              <h3 className="mt-3 font-bold">{title}</h3>
+              <p className="mt-1 text-sm leading-relaxed text-white/75">{description}</p>
             </div>
-          ))}
-        </div>
+            <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white group-hover:text-[color:var(--brand-gold)]">
+              View more <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
+        ))}
       </div>
     </section>
+  );
+}
+
+function CommissionerPortrait() {
+  return (
+    <figure className="commissioner-portrait">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-2xl bg-[color:var(--brand-deep)]">
+        <img
+          src={COMMISSIONER_IMAGE}
+          alt="National Commissioner of the Nigeria Data Protection Commission"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-contain"
+        />
+      </div>
+    </figure>
   );
 }
 
@@ -192,7 +330,7 @@ function CoreBenefits() {
     { icon: Network, title: "Sector-Based Collaboration", body: "Dedicated working groups across finance, health, tech and public sector." },
   ];
   return (
-    <section className="bg-[color:var(--brand-tint)]/40 py-20 lg:py-28">
+    <section className="bg-[color:var(--brand-tint)]/40 py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-6">
         <div className="max-w-2xl">
           <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">What you gain</p>
@@ -208,51 +346,6 @@ function CoreBenefits() {
             </div>
           ))}
         </div>
-      </div>
-    </section>
-  );
-}
-
-function MembershipTiers() {
-  const tiers = [
-    { name: "Student", for: "Students & aspiring privacy professionals", featured: false },
-    { name: "Associate", for: "Early-career practitioners building competence", featured: false },
-    { name: "Professional", for: "Certified & practising DPOs", featured: true, badge: "Most Popular" },
-    { name: "Fellow", for: "Senior privacy leaders & contributors", featured: false, gold: true },
-    { name: "Corporate", for: "Organisations & team memberships", featured: false },
-  ];
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
-      <div className="text-center max-w-2xl mx-auto">
-        <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">Membership</p>
-        <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">Choose the category that matches your journey.</h2>
-        <p className="mt-4 text-[color:var(--muted-foreground)]">Five membership categories designed for every stage of a privacy career — from student to fellow.</p>
-      </div>
-      <div className="mt-12 grid gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {tiers.map(t => (
-          <div key={t.name} className={`relative rounded-2xl p-6 border-2 bg-white transition-all ${t.featured ? "border-[color:var(--brand-emerald)]  lg:-translate-y-3" : t.gold ? "border-[color:var(--brand-gold)]" : "border-[color:var(--border)]"}`}>
-            {t.badge && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[color:var(--brand-emerald)] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">{t.badge}</span>}
-            {t.gold && <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[color:var(--brand-gold)] text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Distinguished</span>}
-            <h3 className="text-xl font-extrabold text-[color:var(--brand-deep)]">{t.name}</h3>
-            <p className="mt-2 text-xs text-[color:var(--muted-foreground)] min-h-[48px]">{t.for}</p>
-            <div className="mt-4 py-3 border-y border-[color:var(--border)]">
-              <p className="text-xs text-[color:var(--muted-foreground)]">Annual fee</p>
-              <p className="text-lg font-bold text-[color:var(--brand-deep)]">On application</p>
-            </div>
-            <ul className="mt-4 space-y-2 text-xs text-[color:var(--foreground)]">
-              {["Member directory", "Training access", "CPD credits", "Conference discount"].map(b => (
-                <li key={b} className="flex gap-2"><CheckCircle2 className="h-3.5 w-3.5 text-[color:var(--brand-emerald)] shrink-0 mt-0.5"/>{b}</li>
-              ))}
-            </ul>
-            <Link
-              to="/register"
-              search={{ redirect: "/portal/apply", category: t.name.toLowerCase() }}
-              className={`mt-5 block text-center rounded-md px-3 py-2.5 text-sm font-semibold ${t.featured ? "gradient-brand text-white" : "border border-[color:var(--brand-deep)] text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"}`}
-            >
-              Apply Now
-            </Link>
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -283,7 +376,6 @@ function ConferenceSpotlight() {
   const upcoming = (q.data ?? []).filter((c) => new Date(c.endsOn).getTime() >= now);
   const cards = (upcoming.length ? upcoming : q.data ?? []).slice(0, 3);
   const featured = cards[0];
-
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 gradient-brand" />
@@ -295,7 +387,7 @@ function ConferenceSpotlight() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)] border border-[color:var(--brand-gold)]/50 px-3 py-1 rounded-full">
-              DPO Conference
+              Data Protection Officers Conference
             </span>
             <h2 className="mt-5 text-4xl md:text-5xl font-extrabold leading-tight">
               The flagship gathering for Africa&apos;s privacy profession.
@@ -379,6 +471,7 @@ function ConferenceSpotlight() {
             </Link>
           </div>
         ) : null}
+
       </div>
     </section>
   );
@@ -462,7 +555,7 @@ function Insights() {
       <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
         <div>
           <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">Insights</p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">Latest thinking from the DPO Conference network.</h2>
+          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">Latest thinking from the Data Protection Officers Conference network.</h2>
         </div>
         <Link to="/news" className="text-sm font-semibold text-[color:var(--brand-green)] hover:text-[color:var(--brand-deep)]">All news →</Link>
       </div>
@@ -495,7 +588,7 @@ function Insights() {
 
 function Testimonials() {
   const t = [
-    { name: "Member", role: "Financial Services", body: "DPO Conference gave me a peer group I can actually pick up the phone to. The quarterly training is exactly what practising DPOs need." },
+    { name: "Member", role: "Financial Services", body: "Data Protection Officers Conference gave me a peer group I can actually pick up the phone to. The quarterly training is exactly what practising DPOs need." },
     { name: "Member", role: "Public Sector", body: "The sector community discussions are the most useful conversations I have all quarter — practical and unfiltered." },
     { name: "Member", role: "Technology", body: "The annual conference alone justifies membership. It's where regulators, DPOs and industry actually engage as equals." },
   ];
@@ -556,7 +649,7 @@ function Newsletter() {
           >
             <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email address" className="sm:col-span-2 rounded-md bg-white/10 border border-white/25 px-4 py-3 text-base md:text-sm placeholder:text-white/60 focus:outline-none focus:border-[color:var(--brand-gold)]"/>
             <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
-            <label className="sm:col-span-2 flex items-start gap-2 text-xs text-white/80"><input type="checkbox" required className="mt-1"/> I consent to receive updates from DPO Conference.</label>
+            <label className="sm:col-span-2 flex items-start gap-2 text-xs text-white/80"><input type="checkbox" required className="mt-1"/> I consent to receive updates from Data Protection Officers Conference.</label>
             <Button type="submit" loading={loading} className="sm:col-span-2 rounded-md bg-[color:var(--brand-gold)] text-[color:var(--brand-deep)] font-bold px-4 py-3 text-sm hover:opacity-95">Subscribe</Button>
           </form>
         </div>
@@ -571,7 +664,6 @@ function FinalCTA() {
       <h2 className="text-3xl md:text-5xl font-extrabold text-[color:var(--brand-deep)] max-w-3xl mx-auto leading-tight">Join the community shaping the future of privacy and data governance.</h2>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link to="/conferences" className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold text-white gradient-brand ">Register for the Conference <ArrowRight className="h-4 w-4"/></Link>
-        <Link to="/membership" className="rounded-md px-6 py-3.5 text-sm font-semibold border-2 border-[color:var(--brand-deep)] text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]">Become a Member</Link>
         <Link to="/contact" className="rounded-md px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-green)] hover:text-[color:var(--brand-deep)]">Speak with our team →</Link>
       </div>
     </section>

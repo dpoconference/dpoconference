@@ -1,7 +1,7 @@
 export const LEGAL_DOCS = [
   { slug: "privacy-notice", title: "Privacy Notice", blurb: "How we collect, use and protect personal data under the NDPA." },
   { slug: "cookie-notice", title: "Cookie Notice", blurb: "Cookies and similar technologies used on this site." },
-  { slug: "terms-of-use", title: "Terms of Use", blurb: "Rules for using the DPO Conference website and portal." },
+  { slug: "terms-of-use", title: "Terms of Use", blurb: "Rules for using the Data Protection Officers Conference website and portal." },
   { slug: "membership-terms", title: "Membership Terms", blurb: "Categories, fees, approval, cards and renewal." },
   { slug: "code-of-ethics", title: "Code of Ethics", blurb: "Conduct expected of members, speakers and participants." },
   { slug: "acceptable-use-policy", title: "Acceptable Use Policy", blurb: "What you must not do on the platform." },

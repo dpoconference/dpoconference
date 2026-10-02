@@ -13,7 +13,7 @@ export const Route = createFileRoute("/register_/verify")({
     email: typeof s.email === "string" ? s.email : "",
     ...parseAuthContinueSearch(s),
   }),
-  head: () => ({ meta: [{ title: "Verify email | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Verify email | Data Protection Officers Conference" }] }),
   component: VerifyEmailPage,
 });
 
@@ -43,7 +43,7 @@ function VerifyEmailPage() {
         { email, code: nextCode },
       );
       setSession(data.accessToken, data.user as never);
-      notify.success("Email verified. Welcome to DPO Conference.");
+      notify.success("Email verified. Welcome to Data Protection Officers Conference.");
       if (redirect?.startsWith("/membership/apply") || redirect?.startsWith("/portal/apply")) {
         await navigate({ to: "/portal/apply", search: category ? { category } : {} });
       } else if (redirect?.startsWith("/support")) {

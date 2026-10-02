@@ -21,10 +21,10 @@ export const Route = createFileRoute("/verify-member")({
   }),
   head: () => ({
     meta: [
-      { title: "Verify Member | DPO Conference" },
-      { name: "description", content: "Verify DPO Conference professional membership using membership number, certificate number or QR code." },
-      { property: "og:title", content: "Verify DPO Conference Membership" },
-      { property: "og:description", content: "Confirm the professional standing of a DPO Conference member." },
+      { title: "Verify Member | Data Protection Officers Conference" },
+      { name: "description", content: "Verify Data Protection Officers Conference professional membership using membership number, certificate number or QR code." },
+      { property: "og:title", content: "Verify Data Protection Officers Conference Membership" },
+      { property: "og:description", content: "Confirm the professional standing of a Data Protection Officers Conference member." },
     ],
   }),
   component: VerifyPage,
@@ -62,7 +62,7 @@ function VerifyPage() {
 
   return (
     <SiteLayout>
-      <PageHero breadcrumb="Home / Verify Member" eyebrow="Verification" title="Verify DPO Conference professional membership." subtitle="Confirm the professional standing and current status of any DPO Conference member." />
+      <PageHero breadcrumb="Home / Verify Member" eyebrow="Verification" title="Verify Data Protection Officers Conference professional membership." subtitle="Confirm the professional standing and current status of any Data Protection Officers Conference member." />
       <section className="mx-auto max-w-2xl px-6 py-20">
         <div className="p-8 rounded-2xl border border-[color:var(--border)] bg-white ">
           <div className="flex items-center gap-3">

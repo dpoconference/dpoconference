@@ -37,14 +37,14 @@ export function MembershipDigitalCard({
   const initial = (first[0] || last[0] || "M").toUpperCase();
 
   return (
-    <div className="membership-id-card" aria-label="DPO Conference digital membership card">
+    <div className="membership-id-card" aria-label="Data Protection Officers Conference digital membership card">
       <div className="membership-id-card__pattern membership-id-card__pattern--top" aria-hidden />
       <div className="membership-id-card__pattern membership-id-card__pattern--bottom" aria-hidden />
 
       <div className="membership-id-card__brand">
         <img src={logoUrl} alt="" className="membership-id-card__logo" />
         <div>
-          <p className="membership-id-card__brand-name">DPO Conference</p>
+          <p className="membership-id-card__brand-name">Data Protection Officers Conference</p>
           <p className="membership-id-card__brand-sub">Digital membership card</p>
         </div>
       </div>

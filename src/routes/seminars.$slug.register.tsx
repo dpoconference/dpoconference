@@ -17,7 +17,7 @@ import {
 } from "@/components/payments/PaymentMethodStep";
 
 export const Route = createFileRoute("/seminars/$slug/register")({
-  head: () => ({ meta: [{ title: "Seminar registration | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Seminar registration | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

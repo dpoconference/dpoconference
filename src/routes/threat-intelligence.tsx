@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/threat-intelligence")({
   head: () => ({
     meta: [
-      { title: "Threat Intelligence and Cybersecurity Advisory Platform | DPO Conference" },
+      { title: "Threat Intelligence and Cybersecurity Advisory Platform | Data Protection Officers Conference" },
       { name: "description", content: "Relevant cybersecurity information to support early identification and management of cybersecurity risks affecting personal data." },
     ],
   }),
@@ -34,7 +34,7 @@ function Page() {
       />
       <section className="mx-auto max-w-3xl space-y-6 px-6 py-12">
         <p className="text-[15px] leading-7">
-          The DPO Conference Threat Intelligence Platform provides members with relevant information to support early identification and
+          The Data Protection Officers Conference Threat Intelligence Platform provides members with relevant information to support early identification and
           management of cybersecurity risks.
         </p>
         <div className="rounded-2xl border bg-white p-6">

@@ -9,7 +9,7 @@ import { notify } from "@/lib/toast";
 export const Route = createFileRoute("/partnerships")({
   head: () => ({
     meta: [
-      { title: "Partner With DPO Conference" },
+      { title: "Partner With Data Protection Officers Conference" },
       { name: "description", content: "Collaboration with regulators, government institutions, professional bodies, universities, development organisations, technology companies, financial institutions and international privacy organisations." },
     ],
   }),
@@ -22,8 +22,8 @@ function Page() {
   return (
     <SiteLayout>
       <PageHero
-        title="Partner With DPO Conference"
-        subtitle="DPO Conference welcomes collaboration with regulators, government institutions, professional bodies, universities, development organisations, technology companies, financial institutions and international privacy organisations."
+        title="Partner With Data Protection Officers Conference"
+        subtitle="Data Protection Officers Conference welcomes collaboration with regulators, government institutions, professional bodies, universities, development organisations, technology companies, financial institutions and international privacy organisations."
       />
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-10 lg:grid-cols-2">
         <div className="space-y-8">

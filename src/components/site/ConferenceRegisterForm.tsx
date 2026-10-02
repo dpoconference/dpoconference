@@ -287,7 +287,7 @@ export function ConferenceRegisterForm({
       <label className="flex items-start gap-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
         <input type="checkbox" className="mt-1" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
         <span>
-          I agree that DPO Conference may use this information to issue my e-invite and process my registration in line with the{" "}
+          I agree that Data Protection Officers Conference may use this information to issue my e-invite and process my registration in line with the{" "}
           <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-semibold text-[color:var(--brand-green)]">
             Privacy Notice
           </Link>

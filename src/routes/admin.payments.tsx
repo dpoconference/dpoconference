@@ -45,7 +45,7 @@ type PaymentsConfig = {
 };
 
 async function fetchPayments(qs: string) {
-  const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api/v1";
+  const BASE = import.meta.env.VITE_API_URL ?? "https://backend-dpoconference.onrender.com/api/v1";
   const { getAccessToken } = await import("@/lib/api");
   const headers = new Headers({ Accept: "application/json" });
   const token = getAccessToken();

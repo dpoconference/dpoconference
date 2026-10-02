@@ -9,7 +9,7 @@ export const Route = createFileRoute("/portal/privacy")({
   component: Page,
 });
 
-const BASE = import.meta.env.VITE_API_URL ?? "http://localhost:4000/api/v1";
+const BASE = import.meta.env.VITE_API_URL ?? "https://backend-dpoconference.onrender.com/api/v1";
 
 function Page() {
   const [loadingExport, setLoadingExport] = useState(false);
@@ -19,7 +19,7 @@ function Page() {
     <div className="mx-auto max-w-xl space-y-6">
       <PageHeader
         title="Privacy & data"
-        subtitle="Download a copy of your DPO Conference data or request account deletion under the NDPA."
+        subtitle="Download a copy of your Data Protection Officers Conference data or request account deletion under the NDPA."
       />
       <div className="space-y-4 rounded-2xl border border-border bg-card p-6">
         <div>

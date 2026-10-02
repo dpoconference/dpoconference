@@ -12,9 +12,9 @@ import { useState } from "react";
 export const Route = createFileRoute("/communities")({
   head: () => ({
     meta: [
-      { title: "Sector Communities | DPO Conference" },
+      { title: "Sector Communities | Data Protection Officers Conference" },
       { name: "description", content: "Sector-specific communities for privacy professionals in financial services, public sector, healthcare, tech, education and more." },
-      { property: "og:title", content: "DPO Conference Sector Communities" },
+      { property: "og:title", content: "Data Protection Officers Conference Sector Communities" },
       { property: "og:description", content: "Peer-led networks shaping sector responses to emerging regulation." },
     ],
   }),
@@ -45,7 +45,7 @@ function CommunitiesPage() {
         breadcrumb="Home / Sector Communities"
         eyebrow="Sector Communities"
         title="Sector Communities and Professional Working Groups"
-        subtitle="Different sectors face different privacy, cybersecurity and regulatory challenges. DPO Conference sector communities create focused platforms where members can discuss sector-specific issues, share good practices and collaborate on practical solutions."
+        subtitle="Different sectors face different privacy, cybersecurity and regulatory challenges. Data Protection Officers Conference sector communities create focused platforms where members can discuss sector-specific issues, share good practices and collaborate on practical solutions."
       />
 
       <section className="mx-auto max-w-7xl px-6 py-20">

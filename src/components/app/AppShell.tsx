@@ -69,9 +69,9 @@ export function AppShell({
       <Sidebar collapsible="icon" className="border-sidebar-border">
         <SidebarHeader className="border-b border-sidebar-border">
           <Link to={homeTo} className="flex items-center gap-3 px-2 py-2">
-            <img src={logo} alt="DPO Conference" className="h-8 w-8 object-contain brightness-0 invert" />
+            <img src={logo} alt="Data Protection Officers Conference" className="h-8 w-8 object-contain brightness-0 invert" />
             <span className="min-w-0 group-data-[collapsible=icon]:hidden">
-              <span className="block text-sm font-semibold text-sidebar-foreground">DPO Conference</span>
+              <span className="block text-sm font-semibold text-sidebar-foreground">Data Protection Officers Conference</span>
               <span className="block text-[10px] uppercase tracking-widest text-sidebar-foreground/60">{subtitle}</span>
             </span>
           </Link>

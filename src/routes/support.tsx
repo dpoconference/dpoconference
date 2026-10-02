@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/support")({
-  head: () => ({ meta: [{ title: "Support | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Support | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

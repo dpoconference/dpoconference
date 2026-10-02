@@ -19,14 +19,14 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-2">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="DPO Conference" className="h-16 w-16  bg-white rounded-md p-1" />
+            <img src={logo} alt="Data Protection Officers Conference" className="h-16 w-16  bg-white rounded-md p-1" />
             <div>
-              <div className="text-white font-bold text-lg">DPO Conference</div>
+              <div className="text-white font-bold text-lg">Data Protection Officers Conference</div>
               <div className="text-xs tracking-widest uppercase text-[color:var(--brand-gold)]">Connect · Collaborate · Change</div>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed opacity-80 max-w-sm">
-            DPO Conference is a professional platform supporting the competence, leadership and continuous development of Data Protection Officers and privacy professionals.
+            Data Protection Officers Conference is a professional platform supporting the competence, leadership and continuous development of Data Protection Officers and privacy professionals.
           </p>
           {(linkedin || youtube || twitter) && (
             <div className="mt-4 flex gap-3 text-sm">
@@ -126,7 +126,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-xs opacity-70">
-          <p>© {new Date().getFullYear()} National Data Protection Officers Conference, Professional Network and Leadership Forum. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Data Protection Officers Conference, Professional Network and Leadership Forum. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <Link to="/legal/$slug" params={{ slug: "privacy-notice" }}>
               Privacy Notice
@@ -171,10 +171,6 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
               </a>
             ) : to === "/membership/apply" ? (
               <Link to="/membership/apply" search={{}} className="hover:text-[color:var(--brand-gold)]">
-                {label}
-              </Link>
-            ) : to === "/login" ? (
-              <Link to="/login" search={{}} className="hover:text-[color:var(--brand-gold)]">
                 {label}
               </Link>
             ) : (

@@ -10,9 +10,9 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/careers")({
   head: () => ({
     meta: [
-      { title: "Career Centre | DPO Conference" },
+      { title: "Career Centre | Data Protection Officers Conference" },
       { name: "description", content: "Jobs, mentorship, career pathways and internships for privacy and data-protection professionals." },
-      { property: "og:title", content: "DPO Conference Career Centre" },
+      { property: "og:title", content: "Data Protection Officers Conference Career Centre" },
       { property: "og:description", content: "Grow your career in privacy and data governance." },
     ],
   }),

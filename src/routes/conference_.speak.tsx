@@ -6,7 +6,7 @@ import { apiPost } from "@/lib/api";
 import { notify } from "@/lib/toast";
 
 export const Route = createFileRoute("/conference_/speak")({
-  head: () => ({ meta: [{ title: "Apply to Speak | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Apply to Speak | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

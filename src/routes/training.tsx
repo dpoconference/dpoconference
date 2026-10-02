@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/training")({
   head: () => ({
     meta: [
-      { title: "Professional Training and Continuing Professional Development | DPO Conference" },
+      { title: "Professional Training and Continuing Professional Development | Data Protection Officers Conference" },
       { name: "description", content: "Structured professional training and CPD opportunities designed to strengthen technical competence, practical implementation skills and leadership capacity." },
     ],
   }),
@@ -48,7 +48,7 @@ function TrainingPage() {
 
       <section className="mx-auto max-w-4xl px-6 pt-12 text-[15px] leading-7">
         <p>
-          DPO Conference provides structured professional training and CPD opportunities designed to strengthen technical competence,
+          Data Protection Officers Conference provides structured professional training and CPD opportunities designed to strengthen technical competence,
           practical implementation skills and leadership capacity.
         </p>
       </section>
@@ -151,7 +151,7 @@ function TrainingPage() {
             <p className="text-sm font-semibold text-[color:var(--brand-gold)] uppercase tracking-wider">CPD Framework</p>
             <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">Structured Continuing Professional Development.</h2>
             <p className="mt-4 text-white/80">
-              Members earn CPD credits through DPO Conference training, external accredited programmes, conferences, publications, mentoring and committee service.
+              Members earn CPD credits through Data Protection Officers Conference training, external accredited programmes, conferences, publications, mentoring and committee service.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">

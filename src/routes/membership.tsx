@@ -41,7 +41,7 @@ function ApplyCta({
 export const Route = createFileRoute("/membership")({
   head: () => ({
     meta: [
-      { title: "Become a Member of DPO Conference" },
+      { title: "Become a Member of Data Protection Officers Conference" },
       { name: "description", content: "Membership provides year-round access to professional learning, networking, mentorship, CPD programmes, regulatory updates, resources, career opportunities and the annual national conference." },
     ],
   }),
@@ -85,8 +85,8 @@ function MembershipPage() {
       <PageHero
         breadcrumb="Home / Membership"
         eyebrow="Membership"
-        title="Become a Member of DPO Conference"
-        subtitle="Membership of DPO Conference provides year-round access to professional learning, networking, mentorship, CPD programmes, regulatory updates, resources, career opportunities and the annual national conference."
+        title="Become a Member of Data Protection Officers Conference"
+        subtitle="Membership of Data Protection Officers Conference provides year-round access to professional learning, networking, mentorship, CPD programmes, regulatory updates, resources, career opportunities and the annual national conference."
       />
 
       <section className="mx-auto max-w-4xl px-6 pt-12 text-[15px] leading-7">

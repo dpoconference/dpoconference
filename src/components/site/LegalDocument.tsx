@@ -91,7 +91,7 @@ export function LegalDocument({
           <div className="rounded-2xl border border-[color:var(--border)] bg-white p-6  sm:p-8 lg:p-10">
             <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[color:var(--brand-green)]">
               <Scale className="h-3.5 w-3.5" />
-              DPO Conference Secretariat · Abuja
+              Data Protection Officers Conference Secretariat · Abuja
             </div>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[color:var(--brand-deep)] sm:text-4xl">
               {displayTitle}
@@ -157,7 +157,7 @@ export function LegalDocument({
                 <div>
                   <p className="font-semibold">This page is for transparency, not legal advice.</p>
                   <p className="mt-2 text-sm text-white/80">
-                    If you have a question about how DPO Conference handles your information, or you wish to exercise a right
+                    If you have a question about how Data Protection Officers Conference handles your information, or you wish to exercise a right
                     under the NDPA, write to the Secretariat.
                   </p>
                   <a

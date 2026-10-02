@@ -11,7 +11,7 @@ import { notify } from "@/lib/toast";
 
 export const Route = createFileRoute("/members/directory")({
   head: () => ({
-    meta: [{ title: "Member Directory | DPO Conference" }, { name: "description", content: "Find and verify DPO Conference professional members across Africa." }],
+    meta: [{ title: "Member Directory | Data Protection Officers Conference" }, { name: "description", content: "Find and verify Data Protection Officers Conference professional members across Africa." }],
   }),
   component: DirectoryPage,
 });

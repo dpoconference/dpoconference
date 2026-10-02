@@ -5,7 +5,7 @@ import { apiGet } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/news")({
-  head: () => ({ meta: [{ title: "News | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "News | Data Protection Officers Conference" }] }),
   component: Page,
 });
 
@@ -24,7 +24,7 @@ function Page() {
         subtitle="Stay informed about developments affecting data protection, privacy, cybersecurity, artificial intelligence governance and digital trust."
       />
       <section className="mx-auto max-w-3xl px-6 pt-8 text-sm text-[color:var(--muted-foreground)]">
-        Content may include DPO Conference announcements, regulatory developments, NDP Act implementation updates, guidance and
+        Content may include Data Protection Officers Conference announcements, regulatory developments, NDP Act implementation updates, guidance and
         directives, enforcement trends, conference information, training announcements, international privacy developments,
         research publications, career opportunities and member achievements.
       </section>

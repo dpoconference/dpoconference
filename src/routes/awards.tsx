@@ -8,8 +8,8 @@ import { apiGet } from "@/lib/api";
 export const Route = createFileRoute("/awards")({
   head: () => ({
     meta: [
-      { title: "DPO Conference Awards and Professional Recognition" },
-      { name: "description", content: "The DPO Conference Awards recognise individuals and organisations demonstrating leadership, innovation, professional excellence and measurable impact in privacy and data governance." },
+      { title: "Data Protection Officers Conference Awards and Professional Recognition" },
+      { name: "description", content: "The Data Protection Officers Conference Awards recognise individuals and organisations demonstrating leadership, innovation, professional excellence and measurable impact in privacy and data governance." },
     ],
   }),
   component: Page,
@@ -27,11 +27,11 @@ function Page() {
   return (
     <SiteLayout>
       <PageHero
-        title="DPO Conference Awards and Professional Recognition"
+        title="Data Protection Officers Conference Awards and Professional Recognition"
         subtitle={
           q.data?.cycle?.isOpen
             ? `Nominations are open for ${q.data.cycle.year}. The Awards recognise individuals and organisations demonstrating leadership, innovation, professional excellence and measurable impact in privacy and data governance.`
-            : "The DPO Conference Awards recognise individuals and organisations demonstrating leadership, innovation, professional excellence and measurable impact in privacy and data governance."
+            : "The Data Protection Officers Conference Awards recognise individuals and organisations demonstrating leadership, innovation, professional excellence and measurable impact in privacy and data governance."
         }
       />
       <section className="mx-auto max-w-5xl px-6 py-16">

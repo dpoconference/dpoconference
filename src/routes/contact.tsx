@@ -9,10 +9,10 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
-      { title: "Contact | DPO Conference" },
-      { name: "description", content: "Get in touch with DPO Conference for membership, training, conference, sponsorship, media and partnership enquiries." },
-      { property: "og:title", content: "Contact DPO Conference" },
-      { property: "og:description", content: "Reach the DPO Conference Secretariat." },
+      { title: "Contact | Data Protection Officers Conference" },
+      { name: "description", content: "Get in touch with Data Protection Officers Conference for membership, training, conference, sponsorship, media and partnership enquiries." },
+      { property: "og:title", content: "Contact Data Protection Officers Conference" },
+      { property: "og:description", content: "Reach the Data Protection Officers Conference Secretariat." },
     ],
   }),
   component: ContactPage,
@@ -43,7 +43,7 @@ function ContactPage() {
 
   return (
     <SiteLayout>
-      <PageHero breadcrumb="Home / Contact" eyebrow="Contact DPO Conference" title="Contact DPO Conference" subtitle="We welcome enquiries from professionals, organisations, partners, sponsors, speakers, researchers and members of the public." />
+      <PageHero breadcrumb="Home / Contact" eyebrow="Contact Data Protection Officers Conference" title="Contact Data Protection Officers Conference" subtitle="We welcome enquiries from professionals, organisations, partners, sponsors, speakers, researchers and members of the public." />
 
       <section className="mx-auto max-w-7xl px-6 py-20 grid lg:grid-cols-2 gap-10">
         <div className="space-y-4">
@@ -127,7 +127,7 @@ function ContactPage() {
           </div>
           <label className="mt-4 flex items-start gap-2 text-xs text-[color:var(--muted-foreground)]">
             <input type="checkbox" className="mt-1" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
-            By submitting this form, you acknowledge that the information provided will be processed for the purpose of responding to your enquiry in accordance with the DPO Conference Privacy Notice.
+            By submitting this form, you acknowledge that the information provided will be processed for the purpose of responding to your enquiry in accordance with the Data Protection Officers Conference Privacy Notice.
           </label>
           <Button type="submit" loading={loading} className="mt-6 w-full min-h-11 rounded-md gradient-brand text-white font-bold px-4 py-3 text-sm">
             Send message

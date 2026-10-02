@@ -9,9 +9,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/resources")({
   head: () => ({
     meta: [
-      { title: "Resource Centre | DPO Conference" },
+      { title: "Resource Centre | Data Protection Officers Conference" },
       { name: "description", content: "Regulatory updates, practice guides, templates, research and case studies for Data Protection Officers." },
-      { property: "og:title", content: "DPO Conference Resource Centre" },
+      { property: "og:title", content: "Data Protection Officers Conference Resource Centre" },
       { property: "og:description", content: "A trusted knowledge base for privacy and data-governance professionals." },
     ],
   }),
@@ -62,7 +62,7 @@ function ResourcesPage() {
         breadcrumb="Home / Resources"
         eyebrow="Resource Centre"
         title="Professional Resource Centre"
-        subtitle="The DPO Conference Resource Centre provides practical materials that support effective privacy governance and compliance implementation. Selected resources may be publicly available, while full access is reserved for registered members."
+        subtitle="The Data Protection Officers Conference Resource Centre provides practical materials that support effective privacy governance and compliance implementation. Selected resources may be publicly available, while full access is reserved for registered members."
       />
 
       <section className="mx-auto max-w-7xl px-6 py-16">

@@ -12,7 +12,7 @@ import conferenceImg from "@/assets/conference.jpg";
 
 export const Route = createFileRoute("/conferences_/$slug")({
   head: ({ params }) => ({
-    meta: [{ title: `${params.slug} | DPO Conference` }],
+    meta: [{ title: `${params.slug} | Data Protection Officers Conference` }],
   }),
   component: ConferenceDetailPage,
 });
@@ -137,7 +137,7 @@ function ConferenceDetailPage() {
         ) : (
           <p className="mt-4">
             {c.overview ||
-              "The DPO Conference gathering brings together Data Protection Officers, regulators, policymakers, privacy professionals, cybersecurity experts, researchers, legal practitioners and organisational leaders for regulatory engagement, networking and CPD."}
+              "The Data Protection Officers Conference gathering brings together Data Protection Officers, regulators, policymakers, privacy professionals, cybersecurity experts, researchers, legal practitioners and organisational leaders for regulatory engagement, networking and CPD."}
           </p>
         )}
       </section>

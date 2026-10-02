@@ -6,7 +6,7 @@ import { apiPost } from "@/lib/api";
 import { notify } from "@/lib/toast";
 
 export const Route = createFileRoute("/conference_/sponsor")({
-  head: () => ({ meta: [{ title: "Sponsor the Conference | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Sponsor the Conference | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

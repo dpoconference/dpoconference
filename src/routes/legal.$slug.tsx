@@ -9,10 +9,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 export const Route = createFileRoute("/legal/$slug")({
   head: ({ params }) => ({
     meta: [
-      { title: `${legalTitle(params.slug)} | DPO Conference` },
+      { title: `${legalTitle(params.slug)} | Data Protection Officers Conference` },
       {
         name: "description",
-        content: LEGAL_DOCS.find((d) => d.slug === params.slug)?.blurb ?? "DPO Conference legal and governance documents.",
+        content: LEGAL_DOCS.find((d) => d.slug === params.slug)?.blurb ?? "Data Protection Officers Conference legal and governance documents.",
       },
     ],
   }),
@@ -33,7 +33,7 @@ function LegalPage() {
         breadcrumb="Home / Legal"
         eyebrow="Legal & governance"
         title={q.data?.title ?? doc?.title ?? "Legal"}
-        subtitle={doc?.blurb ?? "Official notices published by the DPO Conference Secretariat."}
+        subtitle={doc?.blurb ?? "Official notices published by the Data Protection Officers Conference Secretariat."}
       />
       {q.isPending && (
         <div className="mx-auto max-w-7xl px-6 py-16">

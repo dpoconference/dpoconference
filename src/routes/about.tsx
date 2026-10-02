@@ -7,11 +7,11 @@ import { cmsSection, useCmsPage } from "@/lib/cms";
 export const Route = createFileRoute("/about")({
   head: () => ({
     meta: [
-      { title: "About DPO Conference" },
+      { title: "About Data Protection Officers Conference" },
       {
         name: "description",
         content:
-          "The National Data Protection Officers Conference, Professional Network and Leadership Forum strengthens the competence, effectiveness and professional standing of Data Protection Officers.",
+          "The Data Protection Officers Conference, Professional Network and Leadership Forum strengthens the competence, effectiveness and professional standing of Data Protection Officers.",
       },
     ],
   }),
@@ -37,8 +37,8 @@ function AboutPage() {
     <SiteLayout>
       <PageHero
         breadcrumb="Home / About"
-        eyebrow={(hero?.eyebrow as string) || "About DPO Conference"}
-        title={hero?.headline || "About DPO Conference"}
+        eyebrow={(hero?.eyebrow as string) || "About Data Protection Officers Conference"}
+        title={hero?.headline || "About Data Protection Officers Conference"}
         subtitle={
           hero?.subhead ||
           "A year-round professional platform established to strengthen the competence, effectiveness, leadership capacity and professional standing of Data Protection Officers."
@@ -47,12 +47,12 @@ function AboutPage() {
 
       <section className="mx-auto max-w-4xl px-6 py-16 space-y-4 text-[15px] leading-7">
         <p>
-          The National Data Protection Officers Conference, Professional Network and Leadership Forum is a year-round professional
+          The Data Protection Officers Conference, Professional Network and Leadership Forum is a year-round professional
           platform established to strengthen the competence, effectiveness, leadership capacity and professional standing of Data
           Protection Officers.
         </p>
         <p>
-          DPO Conference combines an annual flagship conference with continuous professional development, mentorship, networking,
+          Data Protection Officers Conference combines an annual flagship conference with continuous professional development, mentorship, networking,
           research, career opportunities, regulatory engagement and access to practical professional resources.
         </p>
         <p>The initiative is designed to support Data Protection Officers and other privacy professionals throughout their professional journey.</p>
@@ -77,7 +77,7 @@ function AboutPage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-16">
         <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Our Objectives</h2>
-        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">DPO Conference seeks to:</p>
+        <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">Data Protection Officers Conference seeks to:</p>
         <div className="mt-6 max-w-3xl">
           <CheckList
             items={[
@@ -117,11 +117,11 @@ function AboutPage() {
                 ]}
               />
             </div>
-            <p className="mt-4 text-sm">DPO Conference provides the professional structure required to address these challenges.</p>
+            <p className="mt-4 text-sm">Data Protection Officers Conference provides the professional structure required to address these challenges.</p>
           </div>
           <div>
             <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Expected National Impact</h2>
-            <p className="mt-4 text-sm">DPO Conference will contribute to:</p>
+            <p className="mt-4 text-sm">Data Protection Officers Conference will contribute to:</p>
             <div className="mt-4">
               <CheckList
                 items={[
@@ -159,7 +159,7 @@ function AboutPage() {
         <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Join the professional community</h2>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link to="/membership" className="rounded-md px-6 py-3.5 text-sm font-semibold text-white gradient-brand">
-            Join DPO Conference
+            Join Data Protection Officers Conference
           </Link>
           <Link to="/partnerships" className="rounded-md border-2 border-[color:var(--brand-deep)] px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-deep)]">
             Partner With Us

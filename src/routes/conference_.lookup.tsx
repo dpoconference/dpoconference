@@ -8,7 +8,7 @@ import { notify } from "@/lib/toast";
 import logo from "@/assets/logo.png";
 
 export const Route = createFileRoute("/conference_/lookup")({
-  head: () => ({ meta: [{ title: "Find my e-invite | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Find my e-invite | Data Protection Officers Conference" }] }),
   component: Page,
 });
 
@@ -125,8 +125,8 @@ function Page() {
             invite.isFree || invite.paymentLabel === "FREE" ? "FREE" : `${invite.paymentLabel} · ${formatNaira(Number(invite.amountNgn))}`;
           return (
             <div key={invite.registrationNumber} className="invite-card rounded-2xl border border-[color:var(--border)] bg-white p-8 text-center">
-              <img src={logo} alt="DPO Conference" className="mx-auto h-16 w-16 object-contain" />
-              <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--brand-green)]">DPO Conference</p>
+              <img src={logo} alt="Data Protection Officers Conference" className="mx-auto h-16 w-16 object-contain" />
+              <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--brand-green)]">Data Protection Officers Conference</p>
               <h2 className="mt-4 text-xl font-extrabold text-[color:var(--brand-deep)]">{invite.conferenceTitle}</h2>
               <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
                 {formatConferenceDates(invite.startsOn, invite.endsOn)} · {invite.venue}, {invite.city}

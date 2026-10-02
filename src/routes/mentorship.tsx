@@ -10,8 +10,8 @@ import { useAuth } from "@/lib/auth";
 export const Route = createFileRoute("/mentorship")({
   head: () => ({
     meta: [
-      { title: "Professional Mentorship Programme | DPO Conference" },
-      { name: "description", content: "The DPO Conference Mentorship Programme connects emerging professionals with experienced privacy and data governance leaders." },
+      { title: "Professional Mentorship Programme | Data Protection Officers Conference" },
+      { name: "description", content: "The Data Protection Officers Conference Mentorship Programme connects emerging professionals with experienced privacy and data governance leaders." },
     ],
   }),
   component: Page,
@@ -27,7 +27,7 @@ function Page() {
       <PageHero
         breadcrumb="Home / Mentorship"
         title="Professional Mentorship Programme"
-        subtitle="The DPO Conference Mentorship Programme connects emerging professionals with experienced privacy and data governance leaders. The programme provides practical support, professional guidance and structured knowledge transfer."
+        subtitle="The Data Protection Officers Conference Mentorship Programme connects emerging professionals with experienced privacy and data governance leaders. The programme provides practical support, professional guidance and structured knowledge transfer."
       />
       <section className="mx-auto max-w-7xl px-6 py-12 grid gap-10 lg:grid-cols-2">
         <div className="space-y-8">

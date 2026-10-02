@@ -529,3 +529,227 @@ html.dark .site {
   height: 0;
   pointer-events: none;
 }
+
+.home-hero {
+  background:
+    radial-gradient(ellipse at 76% 20%, rgba(17, 163, 106, 0.13), transparent 34%),
+    radial-gradient(ellipse at 18% 78%, rgba(214, 168, 75, 0.11), transparent 35%),
+    linear-gradient(115deg, #ffffff 5%, #f5fbf8 58%, #fffdf7 100%);
+}
+
+.hero-sky {
+  overflow: hidden;
+  background-image:
+    radial-gradient(1.5px 1.5px at 8% 14%, rgba(8, 122, 85, 0.48) 99%, transparent),
+    radial-gradient(1px 1px at 22% 57%, rgba(214, 168, 75, 0.7) 99%, transparent),
+    radial-gradient(2px 2px at 48% 24%, rgba(8, 122, 85, 0.3) 99%, transparent),
+    radial-gradient(1px 1px at 69% 72%, rgba(8, 122, 85, 0.48) 99%, transparent),
+    radial-gradient(1.5px 1.5px at 91% 40%, rgba(214, 168, 75, 0.68) 99%, transparent);
+  background-size: 320px 280px;
+  mask-image: linear-gradient(to bottom, black, transparent 96%);
+}
+
+.hero-sky::before,
+.hero-sky::after {
+  position: absolute;
+  inset: -30% -15%;
+  content: "";
+  pointer-events: none;
+}
+
+.hero-sky::before {
+  background-image: repeating-linear-gradient(
+    106deg,
+    transparent 0 42px,
+    rgba(8, 122, 85, 0.055) 43px,
+    transparent 44px 76px
+  );
+  background-size: 100% 240px;
+  mask-image: linear-gradient(to bottom, transparent, black 24%, black 78%, transparent);
+  animation: hero-rainfall 3.8s linear infinite;
+}
+
+.hero-sky::after {
+  background: conic-gradient(
+    from 222deg at 72% 36%,
+    transparent 0deg,
+    rgba(17, 163, 106, 0.075) 14deg,
+    transparent 28deg,
+    rgba(214, 168, 75, 0.07) 39deg,
+    transparent 54deg
+  );
+  filter: blur(14px);
+  opacity: 0.75;
+  animation: hero-galaxy-drift 28s ease-in-out infinite alternate;
+}
+
+.hero-light-ray {
+  position: absolute;
+  top: -20%;
+  left: 45%;
+  width: 65%;
+  height: 42%;
+  border-radius: 999px;
+  filter: blur(38px);
+  opacity: 0.3;
+  transform: rotate(-28deg);
+  transform-origin: center;
+}
+
+.hero-light-ray--emerald {
+  background: linear-gradient(90deg, transparent, rgba(17, 163, 106, 0.28), transparent);
+  animation: hero-ray-sweep 16s ease-in-out infinite alternate;
+}
+
+.hero-light-ray--gold {
+  top: 37%;
+  left: 66%;
+  width: 46%;
+  height: 24%;
+  background: linear-gradient(90deg, transparent, rgba(214, 168, 75, 0.22), transparent);
+  animation: hero-ray-sweep 21s ease-in-out -7s infinite alternate-reverse;
+}
+
+.hero-enter {
+  animation: hero-rise-in 760ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.hero-enter--1 { animation-delay: 80ms; }
+.hero-enter--2 { animation-delay: 160ms; }
+.hero-enter--3 { animation-delay: 240ms; }
+.hero-enter--4 { animation-delay: 320ms; }
+.hero-enter--5 { animation-delay: 400ms; }
+
+.hero-portrait-enter {
+  animation: hero-portrait-in 1050ms cubic-bezier(0.2, 0.7, 0.2, 1) 180ms both;
+}
+
+.hero-typewriter-text {
+  display: block;
+  min-height: 3.15em;
+}
+
+.hero-typewriter-caret {
+  display: inline-block;
+  width: 0.07em;
+  height: 0.82em;
+  margin-left: 0.06em;
+  vertical-align: -0.06em;
+  background: currentColor;
+  animation: hero-caret-blink 850ms steps(1, end) infinite;
+}
+
+.hero-phrase--emerald { color: #087a55; }
+.hero-phrase--gold { color: #b07b20; }
+.hero-phrase--navy { color: #245d78; }
+
+.hero-metric-value {
+  color: var(--brand-gold);
+  font-size: clamp(2.25rem, 4.5vw, 3.25rem);
+  font-weight: 800;
+  line-height: 1;
+}
+
+.hero-metrics-bar {
+  position: relative;
+  border: 1px solid rgba(17, 163, 106, 0.9);
+  border-bottom: 5px solid #043522;
+  background: linear-gradient(145deg, #0c8058 0%, #086744 48%, #06422f 100%);
+  box-shadow:
+    0 4px 0 rgba(4, 53, 34, 0.34),
+    0 14px 28px rgba(6, 63, 46, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+.hero-metrics-bar p:not(.hero-metric-value) {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.photo-control {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  border-radius: 9999px;
+  background: rgba(6, 63, 46, 0.62);
+  color: #fff;
+  transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.photo-control:hover {
+  transform: translateY(-1px);
+  background: rgba(6, 63, 46, 0.9);
+}
+
+.photo-control:focus-visible,
+.photo-dot:focus-visible {
+  outline: 2px solid var(--brand-gold);
+  outline-offset: 3px;
+}
+
+.photo-dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  flex: 0 0 auto;
+  border-radius: 9999px;
+  background: color-mix(in oklab, var(--brand-deep) 28%, transparent);
+  transition: width 180ms ease, background-color 180ms ease;
+}
+
+.photo-dot--active {
+  width: 1.5rem;
+  background: var(--brand-green);
+}
+
+@keyframes hero-rainfall {
+  from { background-position: 0 -240px; }
+  to { background-position: 0 0; }
+}
+
+@keyframes hero-galaxy-drift {
+  from { transform: translate3d(-2%, -1%, 0) rotate(-5deg) scale(1); }
+  to { transform: translate3d(2%, 2%, 0) rotate(5deg) scale(1.08); }
+}
+
+@keyframes hero-ray-sweep {
+  from { translate: -3% -2%; opacity: 0.18; }
+  to { translate: 5% 4%; opacity: 0.42; }
+}
+
+@keyframes hero-rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-portrait-in {
+  from { opacity: 0; transform: translateY(22px) scale(0.985); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes hero-word-in {
+  from { opacity: 0; transform: translateY(0.18em); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-caret-blink {
+  0%, 48% { opacity: 1; }
+  49%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-sky::before,
+  .hero-sky::after,
+  .hero-light-ray,
+  .hero-enter,
+  .hero-portrait-enter,
+  .hero-typewriter-caret {
+    animation: none !important;
+  }
+
+  .photo-control,
+  .photo-dot {
+    transition: none;
+  }
+}

@@ -11,7 +11,7 @@ import { notify } from "@/lib/toast";
 export const Route = createFileRoute("/register")({
   validateSearch: parseAuthContinueSearch,
   head: () => ({
-    meta: [{ title: "Create an Account | DPO Conference" }, { name: "description", content: "Create your DPO Conference account." }],
+    meta: [{ title: "Create an Account | Data Protection Officers Conference" }, { name: "description", content: "Create your Data Protection Officers Conference account." }],
   }),
   component: RegisterPage,
 });
@@ -89,7 +89,7 @@ function RegisterPage() {
       <AuthStepper step={1} steps={["Account details", "Verify email"]} />
       <h2 className="text-2xl font-semibold tracking-tight">Create an account</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Join DPO Conference to apply for membership, register for events and track your CPD.
+        Join Data Protection Officers Conference to apply for membership, register for events and track your CPD.
       </p>
       <AuthError message={error} />
       <form onSubmit={onSubmit} className="mt-8 space-y-4">

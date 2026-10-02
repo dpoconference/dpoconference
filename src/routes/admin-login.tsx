@@ -11,8 +11,8 @@ import { notify } from "@/lib/toast";
 export const Route = createFileRoute("/admin-login")({
   head: () => ({
     meta: [
-      { title: "Staff sign in | DPO Conference" },
-      { name: "description", content: "Secretariat access to the DPO Conference administration suite." },
+      { title: "Staff sign in | Data Protection Officers Conference" },
+      { name: "description", content: "Secretariat access to the Data Protection Officers Conference administration suite." },
     ],
   }),
   component: AdminLoginPage,
@@ -117,12 +117,6 @@ function AdminLoginPage() {
           <ArrowRight className="h-4 w-4" />
         </Button>
       </form>
-      <p className="mt-6 text-center text-sm text-muted-foreground">
-        Member or applicant?{" "}
-        <Link to="/login" search={{}} className="font-medium text-primary hover:underline">
-          Client sign in
-        </Link>
-      </p>
       <div className="mt-6 rounded-2xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground">
         Enterprise SSO is available for Secretariat tenants on request.
       </div>

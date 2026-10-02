@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { SiteLayout, PageHero } from "@/components/site/Layout";
 import { CheckList } from "@/components/site/CheckList";
 import { cmsSection, useCmsPage } from "@/lib/cms";
@@ -6,7 +6,7 @@ import { cmsSection, useCmsPage } from "@/lib/cms";
 export const Route = createFileRoute("/benefits")({
   head: () => ({
     meta: [
-      { title: "Membership Benefits | DPO Conference" },
+      { title: "Membership Benefits | Data Protection Officers Conference" },
       { name: "description", content: "Professional networking, threat intelligence, quarterly training, CPD, regulatory intelligence, resources, careers, mentorship and recognition." },
     ],
   }),
@@ -171,13 +171,13 @@ function Page() {
             {s.extra && <p className="mt-3 text-sm text-[color:var(--muted-foreground)]">{s.extra}</p>}
           </article>
         ))}
-        <Link
-          to="/register"
-          search={{ redirect: "/portal/apply" }}
-          className="inline-block rounded-md px-6 py-3 font-semibold text-white gradient-brand"
+        <button
+          type="button"
+          disabled
+          className="inline-block cursor-not-allowed rounded-md bg-[color:var(--brand-deep)]/55 px-6 py-3 font-semibold text-white opacity-75"
         >
-          Become a Member
-        </Link>
+          Membership coming soon
+        </button>
       </section>
     </SiteLayout>
   );

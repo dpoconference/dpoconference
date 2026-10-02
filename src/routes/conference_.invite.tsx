@@ -14,7 +14,7 @@ export const Route = createFileRoute("/conference_/invite")({
     number: typeof s.number === "string" ? s.number : "",
     email: typeof s.email === "string" ? s.email : "",
   }),
-  head: () => ({ meta: [{ title: "Conference e-invite | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Conference e-invite | Data Protection Officers Conference" }] }),
   component: ConferenceInvitePage,
 });
 
@@ -128,8 +128,8 @@ function ConferenceInvitePage() {
       `}</style>
       <section className="mx-auto flex max-w-lg flex-col items-center px-6 py-12">
         <div className="invite-card w-full max-w-[560px] rounded-2xl border border-[color:var(--border)] bg-white p-8 text-center shadow-sm">
-          <img src={logo} alt="DPO Conference" className="mx-auto h-16 w-16 object-contain" />
-          <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--brand-green)]">DPO Conference</p>
+          <img src={logo} alt="Data Protection Officers Conference" className="mx-auto h-16 w-16 object-contain" />
+          <p className="mt-3 text-xs font-bold uppercase tracking-[0.2em] text-[color:var(--brand-green)]">Data Protection Officers Conference</p>
           <h1 className="mt-4 text-2xl font-extrabold text-[color:var(--brand-deep)]">{invite.conferenceTitle}</h1>
           <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
             {formatConferenceDates(invite.startsOn, invite.endsOn)}

@@ -1,4 +1,4 @@
-/** Official DPO Conference public website copy. */
+/** Official Data Protection Officers Conference public website copy. */
 
 export const membershipCategories = {
   student: {

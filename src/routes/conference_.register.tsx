@@ -5,7 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { apiGet } from "@/lib/api";
 
 export const Route = createFileRoute("/conference_/register")({
-  head: () => ({ meta: [{ title: "Register for Conference | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Register for Conference | Data Protection Officers Conference" }] }),
   component: Page,
 });
 

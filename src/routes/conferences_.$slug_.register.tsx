@@ -3,7 +3,7 @@ import { SiteLayout, PageHero } from "@/components/site/Layout";
 import { ConferenceRegisterForm } from "@/components/site/ConferenceRegisterForm";
 
 export const Route = createFileRoute("/conferences_/$slug_/register")({
-  head: () => ({ meta: [{ title: "Register for Conference | DPO Conference" }] }),
+  head: () => ({ meta: [{ title: "Register for Conference | Data Protection Officers Conference" }] }),
   component: ConferenceRegisterPage,
 });
 

@@ -26,6 +26,18 @@ const HERO_METRICS = [
   { value: 1, suffix: "", label: "flagship conference" },
 ] as const;
 
+const STRATEGIC_PILLARS = [
+  "Professional capacity development",
+  "Regulatory engagement",
+  "Networking and collaboration",
+  "Leadership development",
+  "Research and innovation",
+  "Continuing professional development",
+  "Career advancement",
+  "International partnerships",
+  "Professional ethics and accountability",
+] as const;
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -46,7 +58,6 @@ function Home() {
       <WhyMatters />
       <CoreBenefits />
       <ConferenceSpotlight />
-      <TrainingSection />
       <Sectors />
       <Insights />
       <Testimonials />
@@ -275,13 +286,18 @@ function WhyMatters() {
           </p>
         </div>
       </div>
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-5 lg:col-span-2">
-        <article className="flex min-h-48 flex-col justify-between rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-4 text-white">
-          <div>
-            <p className="text-3xl font-extrabold text-[color:var(--brand-gold)]">5</p>
-            <h3 className="mt-2 font-bold">Strategic pillars</h3>
-            <p className="mt-1 text-sm leading-relaxed text-white/75">Advancing privacy leadership across Africa.</p>
-          </div>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 lg:col-span-2">
+        <article className="rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-5 text-white md:col-span-2 xl:col-span-4">
+          <h3 className="text-lg font-bold">Our Strategic Pillars</h3>
+          <p className="mt-1 text-sm text-white/75">Our programmes are built around:</p>
+          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm leading-relaxed sm:grid-cols-2 lg:grid-cols-3">
+            {STRATEGIC_PILLARS.map((pillar) => (
+              <li key={pillar} className="flex items-start gap-2 text-white/85">
+                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--brand-gold)]" aria-hidden="true" />
+                {pillar}
+              </li>
+            ))}
+          </ul>
         </article>
         {conferenceGuides.map(({ title, description, icon: Icon, hash }) => (
           <Link
@@ -374,7 +390,7 @@ function ConferenceSpotlight() {
 
   const now = Date.now();
   const upcoming = (q.data ?? []).filter((c) => new Date(c.endsOn).getTime() >= now);
-  const cards = (upcoming.length ? upcoming : q.data ?? []).slice(0, 3);
+  const cards = upcoming.slice(0, 3);
   const featured = cards[0];
   return (
     <section className="relative overflow-hidden">
@@ -387,13 +403,15 @@ function ConferenceSpotlight() {
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)] border border-[color:var(--brand-gold)]/50 px-3 py-1 rounded-full">
-              Data Protection Officers Conference
+              {featured ? "Data Protection Officers Conference" : "Coming Soon"}
             </span>
             <h2 className="mt-5 text-4xl md:text-5xl font-extrabold leading-tight">
-              The flagship gathering for Africa&apos;s privacy profession.
+              {featured ? "The flagship gathering for Africa's privacy profession." : "The DPO Conference is coming soon."}
             </h2>
             <p className="mt-4 text-white/85 text-lg max-w-lg">
-              Keynotes, workshops and cross-sector dialogue — register for upcoming conferences.
+              {featured
+                ? "Join DPOs, regulators and privacy leaders for practical learning, professional connections and cross-sector dialogue."
+                : "We are preparing a gathering for DPOs, regulators and privacy professionals to share practical insight, strengthen connections and advance trusted data protection across Africa. Dates, venue and programme details will be announced here."}
             </p>
           </div>
           <Link to="/conferences" className="text-sm font-semibold text-[color:var(--brand-gold)] hover:text-white">
@@ -408,7 +426,24 @@ function ConferenceSpotlight() {
             ))}
           </div>
         ) : cards.length === 0 ? (
-          <p className="mt-10 text-sm text-white/80">Published conferences will appear here.</p>
+          <article className="mt-10 max-w-2xl rounded-lg border border-white/20 bg-white/5 p-6">
+            <p className="text-sm font-bold uppercase tracking-wider text-[color:var(--brand-gold)]">Coming Soon</p>
+            <h3 className="mt-2 text-xl font-bold">A new chapter for Africa&apos;s privacy profession</h3>
+            <p className="mt-2 text-sm leading-relaxed text-white/80">
+              Expect practical sessions, conversations with regulators and privacy leaders, and fresh perspectives on the issues shaping data protection. Conference dates and registration details will be announced here once confirmed.
+            </p>
+            <div className="mt-5 flex flex-wrap items-center gap-3">
+              <Link to="/conference" className="inline-flex min-h-11 items-center gap-2 rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90">
+                Read more <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link to="/conferences" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/40 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10">
+                View all conferences <ArrowRight className="h-4 w-4" />
+              </Link>
+              <button type="button" disabled className="min-h-11 cursor-not-allowed rounded-md border border-white/20 px-4 py-2 text-sm font-semibold text-white/50">
+                Registration coming soon
+              </button>
+            </div>
+          </article>
         ) : (
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {cards.map((c) => (
@@ -472,44 +507,6 @@ function ConferenceSpotlight() {
           </div>
         ) : null}
 
-      </div>
-    </section>
-  );
-}
-
-function TrainingSection() {
-  const q = useQuery({
-    queryKey: ["home-seminars"],
-    queryFn: () =>
-      apiGet<{ slug: string; title: string; startsOn: string; format?: string | null; cpdPoints?: number | null }[]>(
-        "/public/seminars",
-      ),
-  });
-  const items = (q.data ?? []).slice(0, 3);
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
-      <div className="flex items-end justify-between flex-wrap gap-4 mb-10">
-        <div>
-          <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">Training & CPD</p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)] max-w-xl">Practical, accredited learning built by practitioners.</h2>
-        </div>
-        <Link to="/training" className="text-sm font-semibold text-[color:var(--brand-green)] hover:text-[color:var(--brand-deep)]">View training calendar →</Link>
-      </div>
-      <div className="grid md:grid-cols-3 gap-6">
-        {items.map((i) => (
-          <div key={i.slug} className="rounded-2xl border border-[color:var(--border)] p-6 bg-white  transition-">
-            <div className="flex items-center justify-between text-xs">
-              <span className="text-[color:var(--brand-green)] font-semibold">{i.format ?? "Training"}</span>
-              {i.cpdPoints ? <span className="bg-[color:var(--brand-tint)] text-[color:var(--brand-deep)] px-2 py-1 rounded-full font-semibold">{i.cpdPoints} CPD</span> : null}
-            </div>
-            <h3 className="mt-4 font-bold text-lg text-[color:var(--brand-deep)] leading-snug">{i.title}</h3>
-            <p className="mt-2 text-sm text-[color:var(--muted-foreground)] flex items-center gap-1.5"><Calendar className="h-4 w-4"/>{new Date(i.startsOn).toLocaleDateString("en-NG", { day: "numeric", month: "long", year: "numeric" })}</p>
-            <Link to="/seminars/$slug/register" params={{ slug: i.slug }} className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--brand-deep)] hover:gap-2 transition-all">Register <ArrowRight className="h-3.5 w-3.5"/></Link>
-          </div>
-        ))}
-        {!q.isPending && items.length === 0 && (
-          <p className="text-sm text-[color:var(--muted-foreground)]">Upcoming programmes will appear here when published.</p>
-        )}
       </div>
     </section>
   );

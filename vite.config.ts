@@ -26,6 +26,9 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    watch: {
+      ignored: ["**/upload-ready-dev/**", "**/upload-ready-dev.zip"],
+    },
   },
   preview: {
     port: 4173,

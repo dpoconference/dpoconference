@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 
 const linkedin = import.meta.env.VITE_SOCIAL_LINKEDIN as string | undefined;
 const youtube = import.meta.env.VITE_SOCIAL_YOUTUBE as string | undefined;
-const twitter = import.meta.env.VITE_SOCIAL_TWITTER as string | undefined;
+const tiktok = "https://www.tiktok.com/@dpo.conference";
+const x = (import.meta.env.VITE_SOCIAL_TWITTER as string | undefined) || "https://x.com/DPOConference";
 
 export function Footer() {
   const [email, setEmail] = useState("");
@@ -19,7 +20,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-16 grid gap-10 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6">
         <div className="lg:col-span-2">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Data Protection Officers Conference" className="h-16 w-16  bg-white rounded-md p-1" />
+            <img src={logo} alt="Data Protection Officers Conference" className="h-40 w-40 rounded-md bg-white p-1" />
             <div>
               <div className="text-white font-bold text-lg">Data Protection Officers Conference</div>
               <div className="text-xs tracking-widest uppercase text-[color:var(--brand-gold)]">Connect · Collaborate · Change</div>
@@ -28,8 +29,17 @@ export function Footer() {
           <p className="mt-4 text-sm leading-relaxed opacity-80 max-w-sm">
             Data Protection Officers Conference is a professional platform supporting the competence, leadership and continuous development of Data Protection Officers and privacy professionals.
           </p>
-          {(linkedin || youtube || twitter) && (
-            <div className="mt-4 flex gap-3 text-sm">
+          <div className="mt-4 flex items-center gap-3 text-sm">
+            <a href={tiktok} target="_blank" rel="noreferrer" aria-label="TikTok" title="TikTok" className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-lg font-bold hover:border-[color:var(--brand-gold)] hover:text-[color:var(--brand-gold)]">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.51v13.67a2.89 2.89 0 0 1-2.89 2.89 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.3 0 .59.05.87.14V9.35a6.4 6.4 0 0 0-.87-.06 6.38 6.38 0 0 0-6.38 6.38 6.38 6.38 0 0 0 6.38 6.38 6.38 6.38 0 0 0 6.38-6.38V8.71a8.27 8.27 0 0 0 4.8 1.53V6.73c-.35 0-.69-.01-1.01-.04z" />
+              </svg>
+            </a>
+            <a href={x} target="_blank" rel="noreferrer" aria-label="X" title="X" className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-base font-bold hover:border-[color:var(--brand-gold)] hover:text-[color:var(--brand-gold)]">
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                <path d="M18.901 1.153h3.68l-8.04 9.189 9.46 12.505h-7.406l-5.8-7.584-6.633 7.584H.48l8.6-9.83L.006 1.153h7.594l5.243 6.932zM17.61 19.647h2.039L6.486 3.24H4.298z" />
+              </svg>
+            </a>
               {linkedin && (
                 <a href={linkedin} target="_blank" rel="noreferrer" className="hover:text-[color:var(--brand-gold)]">
                   LinkedIn
@@ -40,13 +50,7 @@ export function Footer() {
                   YouTube
                 </a>
               )}
-              {twitter && (
-                <a href={twitter} target="_blank" rel="noreferrer" className="hover:text-[color:var(--brand-gold)]">
-                  X
-                </a>
-              )}
-            </div>
-          )}
+          </div>
         </div>
 
         <FooterCol

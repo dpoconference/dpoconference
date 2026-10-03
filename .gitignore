@@ -11,6 +11,8 @@ node_modules
 .env
 dist
 dist-ssr
+upload-ready-dev
+upload-ready-dev.zip
 cpanel-upload
 ndpo-cpanel-upload.zip
 .output

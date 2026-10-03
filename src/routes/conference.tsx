@@ -1,8 +1,8 @@
-import { createFileRoute, Link, Navigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SiteLayout } from "@/components/site/Layout";
 import { CheckList } from "@/components/site/CheckList";
-import { Calendar, MapPin, Users, Mic, Award, Ticket } from "lucide-react";
+import { ArrowRight, Calendar, MapPin, Users, Mic, Award, Ticket } from "lucide-react";
 import conferenceImg from "@/assets/conference.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
@@ -65,7 +65,52 @@ function ConferencePage() {
 
   const list = live.data ?? [];
   if (list.length === 0) {
-    return <Navigate to="/conferences" />;
+    return (
+      <SiteLayout>
+        <section className="relative overflow-hidden bg-[color:var(--brand-deep)] text-white">
+          <img src={conferenceImg} alt="" className="absolute inset-0 h-full w-full object-cover opacity-20" />
+          <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--brand-deep)]/95 via-[color:var(--brand-deep)]/90 to-[color:var(--brand-green)]/75" />
+          <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
+            <p className="mb-4 text-xs uppercase tracking-widest text-[color:var(--brand-gold)]">Home / Conference</p>
+            <p className="inline-flex rounded-full border border-[color:var(--brand-gold)]/50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)]">Coming Soon</p>
+            <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">The DPO Conference is coming soon.</h1>
+            <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/85 md:text-xl">
+              A gathering for the people responsible for protecting personal data and building trust. Join Data Protection Officers, regulators and privacy professionals for practical learning, candid conversations and connections that strengthen the profession across Africa.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <button type="button" disabled className="min-h-11 cursor-not-allowed rounded-md bg-white/15 px-5 py-3 text-sm font-semibold text-white/55">
+                Registration coming soon
+              </button>
+              <Link to="/conferences" className="inline-flex min-h-11 items-center gap-2 rounded-md border border-white/50 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10">
+                View all conferences <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <section className="mx-auto max-w-7xl px-6 py-16 lg:py-20">
+          <p className="text-sm font-semibold uppercase tracking-wider text-[color:var(--brand-green)]">The experience</p>
+          <h2 className="mt-3 max-w-3xl text-3xl font-extrabold text-[color:var(--brand-deep)] md:text-4xl">What to expect</h2>
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-[color:var(--muted-foreground)]">
+            The programme will bring together practical expertise and the people shaping data protection, helping participants turn emerging challenges into stronger professional practice.
+          </p>
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              { title: "Practical learning", description: "Explore real-world approaches to privacy governance, risk, accountability and incident response." },
+              { title: "Regulatory dialogue", description: "Hear perspectives on evolving requirements and responsible data use from across the ecosystem." },
+              { title: "Professional connection", description: "Meet DPOs, regulators, researchers and leaders working across sectors and disciplines." },
+              { title: "Emerging issues", description: "Discuss AI, cybersecurity, cross-border data flows and the future of the privacy profession." },
+            ].map((item) => (
+              <article key={item.title} className="rounded-lg border border-[color:var(--border)] p-5">
+                <h3 className="font-bold text-[color:var(--brand-deep)]">{item.title}</h3>
+                <p className="mt-2 text-sm leading-relaxed text-[color:var(--muted-foreground)]">{item.description}</p>
+              </article>
+            ))}
+          </div>
+          <p className="mt-8 text-sm text-[color:var(--muted-foreground)]">Dates, venue, speakers and registration details will be announced when confirmed.</p>
+        </section>
+      </SiteLayout>
+    );
   }
 
   const now = Date.now();

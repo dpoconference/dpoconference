@@ -119,11 +119,14 @@ export function Header() {
       </div>
 
       <div className="border-b border-[color:var(--border)] bg-white/95 backdrop-blur">
-        <div className="mx-auto flex h-14 max-w-7xl items-center gap-3 px-4 sm:px-5 lg:h-20">
+        <div className="mx-auto flex h-32 max-w-7xl items-center gap-3 px-4 sm:px-5 lg:h-44">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src={logo} alt="Data Protection Officers Conference" className="h-12 w-12  object-contain sm:h-16 sm:w-16" />
+            <img src={logo} alt="Data Protection Officers Conference" className="h-28 w-28 object-contain sm:h-40 sm:w-40" />
             <div className="leading-none">
-              <div className="text-[15px] font-bold tracking-tight text-[color:var(--brand-deep)]">Data Protection Officers Conference</div>
+              <div className="text-[13px] font-bold tracking-tight text-[color:var(--brand-deep)] sm:text-[15px]">
+                <span className="sm:hidden">DPO Conference</span>
+                <span className="hidden sm:inline">Data Protection Officers Conference</span>
+              </div>
               <div className="mt-0.5 hidden text-[9px] uppercase tracking-[0.14em] text-[color:var(--brand-green)] sm:block">
                 PROFESSIONAL NETWORK &amp; LEADERSHIP FORUM
               </div>

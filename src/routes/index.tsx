@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 const DEFAULT_HERO_HEADLINE = "Strengthening the professionals who protect trust, privacy and data.";
 const BOARD_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790941351/board.png";
 const COMMISSIONER_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790937623/nc.jpg";
+const CONFERENCE_SPOTLIGHT_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1791120794/photo_2026-10-04_14-24-55.jpg";
 
 const HERO_HEADLINES = [
   { text: "Strengthening the professionals who protect trust.", tone: "hero-phrase--emerald" },
@@ -424,7 +425,8 @@ function ConferenceSpotlight() {
         className="absolute inset-0 opacity-30"
         style={{ backgroundImage: "radial-gradient(circle at 15% 30%, rgba(214,168,75,0.4), transparent 40%)" }}
       />
-      <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28 text-white">
+      <div className="relative mx-auto grid max-w-7xl gap-10 px-6 py-20 text-white lg:grid-cols-2 lg:items-stretch lg:py-28">
+        <div className="min-w-0">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div className="max-w-2xl">
             <span className="inline-block text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)] border border-[color:var(--brand-gold)]/50 px-3 py-1 rounded-full">
@@ -470,7 +472,7 @@ function ConferenceSpotlight() {
             </div>
           </article>
         ) : (
-          <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-12 grid gap-6">
             {cards.map((c) => (
               <article key={c.slug} className="overflow-hidden rounded-2xl border border-white/20 bg-white/5 backdrop-blur">
                 <div className="aspect-video overflow-hidden">
@@ -532,6 +534,15 @@ function ConferenceSpotlight() {
           </div>
         ) : null}
 
+        </div>
+        <figure className="relative min-h-72 self-stretch overflow-hidden rounded-xl border border-white/20 bg-white/5 p-5">
+          <img
+            src={CONFERENCE_SPOTLIGHT_IMAGE}
+            alt="Data Protection Officers Conference"
+            className="h-full w-full object-contain"
+            loading="lazy"
+          />
+        </figure>
       </div>
     </section>
   );

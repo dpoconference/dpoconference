@@ -7,6 +7,7 @@
 - Replaced the homepage's duplicate strategic-pillar list with a large 1-to-9 counter card linking to `/about#pillars`. The counter advances quickly, pauses at nine for 10 seconds, then repeats; the hero metric now reports nine pillars.
 - Expanded visible `DPO Conference` brand wording to `Data Protection Officers Conference`, including text returned through the shared CMS section accessor.
 - Updated the homepage conference section with a Coming Soon state, a conference overview, and links to read more and view all conferences. Registration remains disabled until dates are announced; published conference data continues to come from the backend.
+- Added the supplied conference image to the spotlight's right column, stretched to match the text column and scaled to show the complete image.
 - Added a `/conference` Coming Soon page with a What to Expect section for when no conference has been published.
 - Removed the seminar preview from the homepage. The separate Training page remains available.
 

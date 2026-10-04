@@ -59,6 +59,7 @@ function PortalLayout() {
     { to: "/portal/careers", label: "Careers", icon: Briefcase, group: "Network" },
     { to: "/portal/communities", label: "Communities", icon: Users, group: "Network" },
     { to: "/portal/messages", label: "Messages", icon: MessageSquare, group: "Network", mobile: true },
+    { to: "/portal/chat", label: "Group chat", icon: MessageSquare, group: "Network", mobile: true },
     { to: "/portal/notifications", label: "Notifications", icon: Bell, group: "Network", mobile: true },
     { to: "/portal/corporate", label: "Corporate", icon: Building2, group: "Network" },
     { to: "/portal/employer/jobs", label: "Vacancies", icon: Briefcase, group: "Network" },

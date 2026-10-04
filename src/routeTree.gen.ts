@@ -40,6 +40,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminApplicationsRouteImport } from './routes/admin.applications'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAwardsRouteImport } from './routes/admin.awards'
+import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCheckInRouteImport } from './routes/admin.check-in'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
 import { Route as AdminCommunitiesRouteImport } from './routes/admin.communities'
@@ -77,6 +78,7 @@ import { Route as PortalApplyRouteImport } from './routes/portal.apply'
 import { Route as PortalCardRouteImport } from './routes/portal.card'
 import { Route as PortalCareersRouteImport } from './routes/portal.careers'
 import { Route as PortalCertificatesRouteImport } from './routes/portal.certificates'
+import { Route as PortalChatRouteImport } from './routes/portal.chat'
 import { Route as PortalCommunitiesRouteImport } from './routes/portal.communities'
 import { Route as PortalCorporateRouteImport } from './routes/portal.corporate'
 import { Route as PortalCpdRouteImport } from './routes/portal.cpd'
@@ -259,6 +261,11 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
 const AdminAwardsRoute = AdminAwardsRouteImport.update({
   id: '/awards',
   path: '/awards',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminChatRoute = AdminChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminCheckInRoute = AdminCheckInRouteImport.update({
@@ -446,6 +453,11 @@ const PortalCertificatesRoute = PortalCertificatesRouteImport.update({
   path: '/certificates',
   getParentRoute: () => PortalRoute,
 } as any)
+const PortalChatRoute = PortalChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
+  getParentRoute: () => PortalRoute,
+} as any)
 const PortalCommunitiesRoute = PortalCommunitiesRouteImport.update({
   id: '/communities',
   path: '/communities',
@@ -619,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communities': typeof AdminCommunitiesRoute
@@ -655,6 +668,7 @@ export interface FileRoutesByFullPath {
   '/portal/card': typeof PortalCardRoute
   '/portal/careers': typeof PortalCareersRoute
   '/portal/certificates': typeof PortalCertificatesRoute
+  '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
   '/portal/cpd': typeof PortalCpdRoute
@@ -715,6 +729,7 @@ export interface FileRoutesByTo {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communities': typeof AdminCommunitiesRoute
@@ -751,6 +766,7 @@ export interface FileRoutesByTo {
   '/portal/card': typeof PortalCardRoute
   '/portal/careers': typeof PortalCareersRoute
   '/portal/certificates': typeof PortalCertificatesRoute
+  '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
   '/portal/cpd': typeof PortalCpdRoute
@@ -813,6 +829,7 @@ export interface FileRoutesById {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
   '/admin/communities': typeof AdminCommunitiesRoute
@@ -849,6 +866,7 @@ export interface FileRoutesById {
   '/portal/card': typeof PortalCardRoute
   '/portal/careers': typeof PortalCareersRoute
   '/portal/certificates': typeof PortalCertificatesRoute
+  '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
   '/portal/cpd': typeof PortalCpdRoute
@@ -913,6 +931,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
     | '/admin/communities'
@@ -949,6 +968,7 @@ export interface FileRouteTypes {
     | '/portal/card'
     | '/portal/careers'
     | '/portal/certificates'
+    | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
     | '/portal/cpd'
@@ -1009,6 +1029,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
     | '/admin/communities'
@@ -1045,6 +1066,7 @@ export interface FileRouteTypes {
     | '/portal/card'
     | '/portal/careers'
     | '/portal/certificates'
+    | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
     | '/portal/cpd'
@@ -1106,6 +1128,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
     | '/admin/communities'
@@ -1142,6 +1165,7 @@ export interface FileRouteTypes {
     | '/portal/card'
     | '/portal/careers'
     | '/portal/certificates'
+    | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
     | '/portal/cpd'
@@ -1439,6 +1463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAwardsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/chat': {
+      id: '/admin/chat'
+      path: '/chat'
+      fullPath: '/admin/chat'
+      preLoaderRoute: typeof AdminChatRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/check-in': {
       id: '/admin/check-in'
       path: '/check-in'
@@ -1698,6 +1729,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortalCertificatesRouteImport
       parentRoute: typeof PortalRoute
     }
+    '/portal/chat': {
+      id: '/portal/chat'
+      path: '/chat'
+      fullPath: '/portal/chat'
+      preLoaderRoute: typeof PortalChatRouteImport
+      parentRoute: typeof PortalRoute
+    }
     '/portal/communities': {
       id: '/portal/communities'
       path: '/communities'
@@ -1901,6 +1939,7 @@ interface AdminRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminAwardsRoute: typeof AdminAwardsRoute
+  AdminChatRoute: typeof AdminChatRoute
   AdminCheckInRoute: typeof AdminCheckInRoute
   AdminCmsRoute: typeof AdminCmsRoute
   AdminCommunitiesRoute: typeof AdminCommunitiesRoute
@@ -1928,6 +1967,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminAwardsRoute: AdminAwardsRoute,
+  AdminChatRoute: AdminChatRoute,
   AdminCheckInRoute: AdminCheckInRoute,
   AdminCmsRoute: AdminCmsRoute,
   AdminCommunitiesRoute: AdminCommunitiesRoute,
@@ -1999,6 +2039,7 @@ interface PortalRouteChildren {
   PortalCardRoute: typeof PortalCardRoute
   PortalCareersRoute: typeof PortalCareersRoute
   PortalCertificatesRoute: typeof PortalCertificatesRoute
+  PortalChatRoute: typeof PortalChatRoute
   PortalCommunitiesRoute: typeof PortalCommunitiesRoute
   PortalCorporateRoute: typeof PortalCorporateRoute
   PortalCpdRoute: typeof PortalCpdRoute
@@ -2026,6 +2067,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalCardRoute: PortalCardRoute,
   PortalCareersRoute: PortalCareersRoute,
   PortalCertificatesRoute: PortalCertificatesRoute,
+  PortalChatRoute: PortalChatRoute,
   PortalCommunitiesRoute: PortalCommunitiesRoute,
   PortalCorporateRoute: PortalCorporateRoute,
   PortalCpdRoute: PortalCpdRoute,

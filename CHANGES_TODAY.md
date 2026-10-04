@@ -10,6 +10,7 @@
 - Added the supplied conference image to the spotlight's right column, stretched to match the text column and scaled to show the complete image.
 - Added a `/conference` Coming Soon page with a What to Expect section for when no conference has been published.
 - Removed the seminar preview from the homepage. The separate Training page remains available.
+- Added one authenticated group chat shared by portal and admin users, with text/image posting, five-second message refresh, and 300 KiB JPEG/PNG/WebP upload limit.
 
 ## Build And Development
 

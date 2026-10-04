@@ -11,6 +11,7 @@ import {
   Inbox,
   LayoutDashboard,
   Mic2,
+  MessageSquare,
   Newspaper,
   Receipt,
   ScanLine,
@@ -74,6 +75,7 @@ function AdminLayout() {
       ? [{ to: "/admin/mentorship", label: "Mentorship", icon: Handshake, group: "Delivery" } satisfies NavItem]
       : []),
     { to: "/admin/contacts", label: "Inbox", icon: Inbox, group: "Delivery" },
+    { to: "/admin/chat", label: "Group chat", icon: MessageSquare, group: "Delivery", mobile: true },
     ...(hasPermission("users.manage")
       ? [{ to: "/admin/users", label: "Staff", icon: Users, group: "Governance" } satisfies NavItem]
       : []),

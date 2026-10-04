@@ -21,21 +21,9 @@ const HERO_HEADLINES = [
 ] as const;
 
 const HERO_METRICS = [
-  { value: 5, suffix: "", label: "Strategic pillars advancing privacy leadership across Africa" },
+  { value: 9, suffix: "", label: "Strategic pillars advancing privacy leadership across Africa" },
   { value: 4, suffix: "×", label: "training cycles / year" },
   { value: 1, suffix: "", label: "flagship conference" },
-] as const;
-
-const STRATEGIC_PILLARS = [
-  "Professional capacity development",
-  "Regulatory engagement",
-  "Networking and collaboration",
-  "Leadership development",
-  "Research and innovation",
-  "Continuing professional development",
-  "Career advancement",
-  "International partnerships",
-  "Professional ethics and accountability",
 ] as const;
 
 export const Route = createFileRoute("/")({
@@ -243,12 +231,43 @@ function PartnersStrip() {
 }
 
 function WhyMatters() {
+  const [pillarCount, setPillarCount] = useState(1);
   const conferenceGuides = [
     { title: "Who should attend?", description: "Find the professionals and leaders this gathering is for.", icon: Users, hash: "who-should-attend" },
     { title: "Why attend?", description: "Explore the practical value, connections and CPD on offer.", icon: Sparkles, hash: "why-attend" },
     { title: "Themes and topics", description: "See the issues shaping privacy and data governance.", icon: Compass, hash: "themes" },
     { title: "Conference activities", description: "Preview the sessions, workshops and networking.", icon: Calendar, hash: "activities" },
   ];
+
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      setPillarCount(9);
+      return;
+    }
+
+    let count = 1;
+    let timeoutId: number;
+    const advance = () => {
+      if (count === 9) {
+        timeoutId = window.setTimeout(() => {
+          count = 1;
+          setPillarCount(count);
+          timeoutId = window.setTimeout(advance, 140);
+        }, 10_000);
+        return;
+      }
+
+      timeoutId = window.setTimeout(() => {
+        count += 1;
+        setPillarCount(count);
+        advance();
+      }, 140);
+    };
+
+    timeoutId = window.setTimeout(advance, 140);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
   return (
     <section className="mx-auto grid max-w-7xl grid-cols-1 items-stretch gap-x-14 gap-y-8 px-6 py-12 lg:grid-cols-2 lg:py-16">
       <div>
@@ -286,19 +305,25 @@ function WhyMatters() {
           </p>
         </div>
       </div>
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4 lg:col-span-2">
-        <article className="rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-5 text-white md:col-span-2 xl:col-span-4">
-          <h3 className="text-lg font-bold">Our Strategic Pillars</h3>
-          <p className="mt-1 text-sm text-white/75">Our programmes are built around:</p>
-          <ul className="mt-4 grid gap-x-6 gap-y-2 text-sm leading-relaxed sm:grid-cols-2 lg:grid-cols-3">
-            {STRATEGIC_PILLARS.map((pillar) => (
-              <li key={pillar} className="flex items-start gap-2 text-white/85">
-                <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[color:var(--brand-gold)]" aria-hidden="true" />
-                {pillar}
-              </li>
-            ))}
-          </ul>
-        </article>
+      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-6 lg:col-span-2">
+        <Link
+          to="/about"
+          hash="pillars"
+          className="group flex min-h-48 flex-col justify-between rounded-lg border border-white/20 bg-[color:var(--brand-deep)] p-4 text-white transition-colors hover:bg-[color:var(--brand-green)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-gold)] md:col-span-2 xl:col-span-2"
+        >
+          <div className="flex min-h-28 items-center gap-4">
+            <p className="shrink-0 text-8xl font-extrabold leading-none text-[color:var(--brand-gold)]" aria-label={`${pillarCount} strategic pillars`}>
+              {pillarCount}
+            </p>
+            <div className="min-w-0">
+              <h3 className="text-xl font-bold">Strategic Pillars</h3>
+              <p className="mt-1 text-sm leading-relaxed text-white/75">Explore all nine programme areas.</p>
+            </div>
+          </div>
+          <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-white group-hover:text-[color:var(--brand-gold)]">
+            View all <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+          </span>
+        </Link>
         {conferenceGuides.map(({ title, description, icon: Icon, hash }) => (
           <Link
             key={hash}
@@ -406,7 +431,7 @@ function ConferenceSpotlight() {
               {featured ? "Data Protection Officers Conference" : "Coming Soon"}
             </span>
             <h2 className="mt-5 text-4xl md:text-5xl font-extrabold leading-tight">
-              {featured ? "The flagship gathering for Africa's privacy profession." : "The DPO Conference is coming soon."}
+              {featured ? "The flagship gathering for Africa's privacy profession." : "The Data Protection Officers Conference is coming soon."}
             </h2>
             <p className="mt-4 text-white/85 text-lg max-w-lg">
               {featured

@@ -30,6 +30,27 @@ export function useCmsPage(slug: string) {
   });
 }
 
+function expandBrandName(value?: string) {
+  return value?.replace(/\bDPO Conference\b/gi, "Data Protection Officers Conference");
+}
+
 export function cmsSection(page: CmsPage | undefined, key: string): CmsSectionContent | undefined {
-  return page?.sections.find((s) => s.key === key)?.content;
+  const content = page?.sections.find((s) => s.key === key)?.content;
+  if (!content) return undefined;
+
+  return {
+    ...content,
+    eyebrow: expandBrandName(content.eyebrow),
+    headline: expandBrandName(content.headline),
+    subhead: expandBrandName(content.subhead),
+    bodyHtml: expandBrandName(content.bodyHtml),
+    ctaLabel: expandBrandName(content.ctaLabel),
+    secondaryCtaLabel: expandBrandName(content.secondaryCtaLabel),
+    items: content.items?.map((item) => ({
+      ...item,
+      title: expandBrandName(item.title),
+      body: expandBrandName(item.body),
+      label: expandBrandName(item.label),
+    })),
+  };
 }

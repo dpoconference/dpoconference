@@ -124,8 +124,7 @@ export function Header() {
             <img src={logo} alt="Data Protection Officers Conference" className="h-28 w-28 object-contain sm:h-40 sm:w-40" />
             <div className="leading-none">
               <div className="text-[13px] font-bold tracking-tight text-[color:var(--brand-deep)] sm:text-[15px]">
-                <span className="sm:hidden">DPO Conference</span>
-                <span className="hidden sm:inline">Data Protection Officers Conference</span>
+                <span>Data Protection Officers Conference</span>
               </div>
               <div className="mt-0.5 hidden text-[9px] uppercase tracking-[0.14em] text-[color:var(--brand-green)] sm:block">
                 PROFESSIONAL NETWORK &amp; LEADERSHIP FORUM

@@ -73,7 +73,7 @@ function ConferencePage() {
           <div className="relative mx-auto max-w-7xl px-6 py-20 lg:py-28">
             <p className="mb-4 text-xs uppercase tracking-widest text-[color:var(--brand-gold)]">Home / Conference</p>
             <p className="inline-flex rounded-full border border-[color:var(--brand-gold)]/50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)]">Coming Soon</p>
-            <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">The DPO Conference is coming soon.</h1>
+            <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight md:text-6xl">The Data Protection Officers Conference is coming soon.</h1>
             <p className="mt-5 max-w-3xl text-lg leading-relaxed text-white/85 md:text-xl">
               A gathering for the people responsible for protecting personal data and building trust. Join Data Protection Officers, regulators and privacy professionals for practical learning, candid conversations and connections that strengthen the profession across Africa.
             </p>

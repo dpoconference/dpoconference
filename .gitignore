@@ -12,7 +12,7 @@ node_modules
 dist
 dist-ssr
 upload-ready-dev
-upload-ready-dev.zip
+upload-ready-dev*.zip
 cpanel-upload
 ndpo-cpanel-upload.zip
 .output

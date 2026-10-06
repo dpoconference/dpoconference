@@ -8,6 +8,7 @@ import { apiGet } from "@/lib/api";
 const primary = [
   { to: "/", label: "Home" },
   { to: "/about", label: "About" },
+  { to: "/membership", label: "Membership" },
   { to: "/conferences", label: "Conference" },
   { to: "/training", label: "Training" },
   { to: "/courses", label: "Courses" },
@@ -46,6 +47,7 @@ function HeaderDashboardLink({
 }
 
 export function Header() {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [moreOpen, setMoreOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -75,6 +77,7 @@ export function Header() {
     if (!term) {
       setHits([
         { title: "Conferences", href: "/conferences" },
+        { title: "Membership", href: "/membership" },
         { title: "Training", href: "/training" },
         { title: "Resources", href: "/resources" },
         { title: "FAQ", href: "/faq" },
@@ -204,6 +207,7 @@ export function Header() {
                 setSearchOpen(true);
                 setHits([
                   { title: "Conference", href: "/conference" },
+                  { title: "Membership", href: "/membership" },
                   { title: "Training", href: "/training" },
                   { title: "News", href: "/news" },
                 ]);
@@ -211,6 +215,22 @@ export function Header() {
             >
               <Search className="h-4 w-4" />
             </button>
+            {!user && (
+              <>
+                <Link
+                  to="/login"
+                  className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]"
+                >
+                  Sign in
+                </Link>
+                <Link
+                  to="/register"
+                  className="rounded-md border border-[color:var(--border)] px-3 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"
+                >
+                  Create account
+                </Link>
+              </>
+            )}
             <HeaderDashboardLink className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]" />
             <Link
               to={conference ? "/conferences/$slug/register" : "/conferences"}
@@ -258,6 +278,24 @@ export function Header() {
               >
                 Find a DPO
               </Link>
+              {!user && (
+                <>
+                  <Link
+                    to="/login"
+                    className="py-2 text-sm font-medium"
+                    onClick={() => setOpen(false)}
+                  >
+                    Sign in
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="py-2 text-sm font-medium"
+                    onClick={() => setOpen(false)}
+                  >
+                    Create account
+                  </Link>
+                </>
+              )}
               <HeaderDashboardLink className="py-2 text-sm font-medium hover:text-[color:var(--brand-green)]" />
               <div className="mt-2">
                 <Link

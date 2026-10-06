@@ -11,7 +11,10 @@ import { notify } from "@/lib/toast";
 export const Route = createFileRoute("/register")({
   validateSearch: parseAuthContinueSearch,
   head: () => ({
-    meta: [{ title: "Create an Account | Data Protection Officers Conference" }, { name: "description", content: "Create your Data Protection Officers Conference account." }],
+    meta: [
+      { title: "Create an Account | Data Protection Officers Conference" },
+      { name: "description", content: "Create your Data Protection Officers Conference account." },
+    ],
   }),
   component: RegisterPage,
 });
@@ -23,6 +26,13 @@ function RegisterPage() {
 
   useEffect(() => {
     if (authLoading || !user) return;
+    if (redirect?.startsWith("/courses/")) {
+      const id = redirect.slice("/courses/".length).split("/")[0];
+      if (id) {
+        void navigate({ to: "/courses/$id", params: { id } });
+        return;
+      }
+    }
     if (redirect?.startsWith("/membership/apply") || redirect?.startsWith("/portal/apply")) {
       void navigate({ to: "/portal/apply", search: category ? { category } : {} });
       return;
@@ -53,7 +63,9 @@ function RegisterPage() {
       return;
     }
     if (form.password.length < 10) {
-      setError("Password must be at least 10 characters and include upper, lower, number and symbol.");
+      setError(
+        "Password must be at least 10 characters and include upper, lower, number and symbol.",
+      );
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -71,7 +83,11 @@ function RegisterPage() {
       if (data.devOtp) notify.info("Development OTP", data.devOtp);
       await navigate({
         to: "/register/verify",
-        search: { email: data.email, ...(redirect ? { redirect } : {}), ...(category ? { category } : {}) },
+        search: {
+          email: data.email,
+          ...(redirect ? { redirect } : {}),
+          ...(category ? { category } : {}),
+        },
       });
     } catch (err) {
       if (err instanceof ApiRequestError && err.status === 409) {
@@ -89,23 +105,44 @@ function RegisterPage() {
       <AuthStepper step={1} steps={["Account details", "Verify email"]} />
       <h2 className="text-2xl font-semibold tracking-tight">Create an account</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Join Data Protection Officers Conference to apply for membership, register for events and track your CPD.
+        Join Data Protection Officers Conference to apply for membership, register for events and
+        track your CPD.
       </p>
       <AuthError message={error} />
       <form onSubmit={onSubmit} className="mt-8 space-y-4">
-        <input className="hidden" tabIndex={-1} autoComplete="off" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} />
+        <input
+          className="hidden"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.website}
+          onChange={(e) => setForm({ ...form, website: e.target.value })}
+        />
         <div className="grid grid-cols-2 gap-3">
           <AuthField label="First name">
-            <Input required value={form.firstName} onChange={(e) => setForm({ ...form, firstName: e.target.value })} />
+            <Input
+              required
+              value={form.firstName}
+              onChange={(e) => setForm({ ...form, firstName: e.target.value })}
+            />
           </AuthField>
           <AuthField label="Surname">
-            <Input required value={form.lastName} onChange={(e) => setForm({ ...form, lastName: e.target.value })} />
+            <Input
+              required
+              value={form.lastName}
+              onChange={(e) => setForm({ ...form, lastName: e.target.value })}
+            />
           </AuthField>
         </div>
         <AuthField label="Email address">
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="pl-9" />
+            <Input
+              type="email"
+              required
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="pl-9"
+            />
           </div>
         </AuthField>
         <AuthField label="Telephone">
@@ -114,17 +151,37 @@ function RegisterPage() {
         <AuthField label="Password">
           <div className="relative">
             <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input type="password" required value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="pl-9" />
+            <Input
+              type="password"
+              required
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className="pl-9"
+            />
           </div>
         </AuthField>
         <AuthField label="Confirm password">
-          <Input type="password" required value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })} />
+          <Input
+            type="password"
+            required
+            value={form.confirmPassword}
+            onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
+          />
         </AuthField>
         <label className="flex items-start gap-2 text-xs text-muted-foreground">
-          <input type="checkbox" className="mt-1 rounded border-border" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
+          <input
+            type="checkbox"
+            className="mt-1 rounded border-border"
+            checked={form.consent}
+            onChange={(e) => setForm({ ...form, consent: e.target.checked })}
+          />
           <span>
             I agree to the{" "}
-            <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-medium text-primary hover:underline">
+            <Link
+              to="/legal/$slug"
+              params={{ slug: "privacy-notice" }}
+              className="font-medium text-primary hover:underline"
+            >
               Privacy Notice
             </Link>
             .

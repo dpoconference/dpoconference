@@ -38,18 +38,27 @@ function VerifyEmailPage() {
     setLoading(true);
     setError(null);
     try {
-      const data = await apiPost<{ accessToken: string; user: { firstName: string; role: string; permissions: string[] } }>(
-        "/auth/otp/verify",
-        { email, code: nextCode },
-      );
+      const data = await apiPost<{
+        accessToken: string;
+        user: { firstName: string; role: string; permissions: string[] };
+      }>("/auth/otp/verify", { email, code: nextCode });
       setSession(data.accessToken, data.user as never);
       notify.success("Email verified. Welcome to Data Protection Officers Conference.");
+      if (redirect?.startsWith("/courses/")) {
+        const id = redirect.slice("/courses/".length).split("/")[0];
+        if (id) {
+          await navigate({ to: "/courses/$id", params: { id } });
+          return;
+        }
+      }
       if (redirect?.startsWith("/membership/apply") || redirect?.startsWith("/portal/apply")) {
         await navigate({ to: "/portal/apply", search: category ? { category } : {} });
       } else if (redirect?.startsWith("/support")) {
         await navigate({ to: "/portal/support" });
       } else {
-        await navigate({ to: data.user.permissions?.includes("admin.access") ? "/admin" : "/portal" });
+        await navigate({
+          to: data.user.permissions?.includes("admin.access") ? "/admin" : "/portal",
+        });
       }
     } catch (err) {
       if (err instanceof ApiRequestError) {
@@ -65,7 +74,10 @@ function VerifyEmailPage() {
   async function resend() {
     setResending(true);
     try {
-      const data = await apiPost<{ devOtp?: string; cooldownSeconds?: number }>("/auth/otp/resend", { email });
+      const data = await apiPost<{ devOtp?: string; cooldownSeconds?: number }>(
+        "/auth/otp/resend",
+        { email },
+      );
       notify.success("A new code is on its way.");
       if (data.devOtp) notify.info("Development OTP", data.devOtp);
       setCooldown(data.cooldownSeconds ?? 60);

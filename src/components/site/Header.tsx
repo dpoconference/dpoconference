@@ -10,6 +10,7 @@ const primary = [
   { to: "/about", label: "About" },
   { to: "/conferences", label: "Conference" },
   { to: "/training", label: "Training" },
+  { to: "/courses", label: "Courses" },
 ] as const;
 
 const more = [
@@ -28,7 +29,11 @@ const navLink =
 const navActive =
   "px-2.5 py-1.5 rounded-md text-sm font-semibold text-[color:var(--brand-deep)] bg-[color:var(--brand-tint)]";
 
-function HeaderDashboardLink({ className = "hover:text-[color:var(--brand-gold)]" }: { className?: string }) {
+function HeaderDashboardLink({
+  className = "hover:text-[color:var(--brand-gold)]",
+}: {
+  className?: string;
+}) {
   const { user } = useAuth();
   if (!user) return null;
 
@@ -85,7 +90,9 @@ export function Header() {
     setHits(
       [
         ...conferences
-          .filter((c) => c.title.toLowerCase().includes(needle) || c.slug.toLowerCase().includes(needle))
+          .filter(
+            (c) => c.title.toLowerCase().includes(needle) || c.slug.toLowerCase().includes(needle),
+          )
           .map((c) => ({ title: c.title, href: `/conferences/${c.slug}` })),
         ...resources
           .filter((r) => r.title.toLowerCase().includes(needle))
@@ -101,17 +108,28 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full">
       <div className="hidden lg:block bg-[color:var(--brand-deep)] text-white">
         <div className="mx-auto flex h-8 max-w-7xl items-center justify-between gap-4 px-5 text-[11px]">
-          <p className="truncate opacity-80">Advancing privacy leadership and data governance excellence</p>
+          <p className="truncate opacity-80">
+            Advancing privacy leadership and data governance excellence
+          </p>
           <div className="flex shrink-0 items-center gap-4">
-            <Link to="/verify-member" className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]">
+            <Link
+              to="/verify-member"
+              className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]"
+            >
               <ShieldCheck className="h-3 w-3" />
               Verify member
             </Link>
-            <Link to="/members/directory" className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]">
+            <Link
+              to="/members/directory"
+              className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]"
+            >
               <Users className="h-3 w-3" />
               Find a DPO
             </Link>
-            <a href="mailto:info@dpoconference.com" className="hover:text-[color:var(--brand-gold)]">
+            <a
+              href="mailto:info@dpoconference.com"
+              className="hover:text-[color:var(--brand-gold)]"
+            >
               info@dpoconference.com
             </a>
           </div>
@@ -121,7 +139,11 @@ export function Header() {
       <div className="border-b border-[color:var(--border)] bg-white/95 backdrop-blur">
         <div className="mx-auto flex h-32 max-w-7xl items-center gap-3 px-4 sm:px-5 lg:h-44">
           <Link to="/" className="flex min-w-0 shrink-0 items-center gap-2">
-            <img src={logo} alt="Data Protection Officers Conference" className="h-28 w-28 object-contain sm:h-40 sm:w-40" />
+            <img
+              src={logo}
+              alt="Data Protection Officers Conference"
+              className="h-28 w-28 object-contain sm:h-40 sm:w-40"
+            />
             <div className="leading-none">
               <div className="text-[13px] font-bold tracking-tight text-[color:var(--brand-deep)] sm:text-[15px]">
                 <span>Data Protection Officers Conference</span>
@@ -152,7 +174,9 @@ export function Header() {
                 onClick={() => setMoreOpen((v) => !v)}
               >
                 More
-                <ChevronDown className={`h-3 w-3 transition-transform ${moreOpen ? "rotate-180" : ""}`} />
+                <ChevronDown
+                  className={`h-3 w-3 transition-transform ${moreOpen ? "rotate-180" : ""}`}
+                />
               </button>
               {moreOpen && (
                 <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-[color:var(--border)] bg-white py-1 ">
@@ -211,14 +235,27 @@ export function Header() {
           <div className="border-t border-[color:var(--border)] bg-white lg:hidden">
             <div className="flex flex-col px-4 py-3">
               {allNav.map((n) => (
-                <Link key={n.to} to={n.to} className="py-2 text-sm font-medium" onClick={() => setOpen(false)}>
+                <Link
+                  key={n.to}
+                  to={n.to}
+                  className="py-2 text-sm font-medium"
+                  onClick={() => setOpen(false)}
+                >
                   {n.label}
                 </Link>
               ))}
-              <Link to="/verify-member" className="py-2 text-sm font-medium" onClick={() => setOpen(false)}>
+              <Link
+                to="/verify-member"
+                className="py-2 text-sm font-medium"
+                onClick={() => setOpen(false)}
+              >
                 Verify member
               </Link>
-              <Link to="/members/directory" className="py-2 text-sm font-medium" onClick={() => setOpen(false)}>
+              <Link
+                to="/members/directory"
+                className="py-2 text-sm font-medium"
+                onClick={() => setOpen(false)}
+              >
                 Find a DPO
               </Link>
               <HeaderDashboardLink className="py-2 text-sm font-medium hover:text-[color:var(--brand-green)]" />
@@ -267,7 +304,9 @@ export function Header() {
             onClick={(e) => e.stopPropagation()}
             onSubmit={(e) => void runSearch(e)}
           >
-            <p className="text-sm font-semibold text-[color:var(--brand-deep)]">Search resources and news</p>
+            <p className="text-sm font-semibold text-[color:var(--brand-deep)]">
+              Search resources and news
+            </p>
             <input
               autoFocus
               value={q}
@@ -275,7 +314,10 @@ export function Header() {
               className="mt-2 w-full rounded-md border px-3 py-2 text-sm"
               placeholder="Search…"
             />
-            <button type="submit" className="mt-2 rounded-md px-3 py-1.5 text-sm font-semibold text-white gradient-brand">
+            <button
+              type="submit"
+              className="mt-2 rounded-md px-3 py-1.5 text-sm font-semibold text-white gradient-brand"
+            >
               Search
             </button>
             <ul className="mt-3 space-y-1.5 text-sm">

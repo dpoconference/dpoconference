@@ -21,6 +21,7 @@ import { Route as ConferenceRouteImport } from './routes/conference'
 import { Route as ConferencesRouteImport } from './routes/conferences'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as CookieSettingsRouteImport } from './routes/cookie-settings'
+import { Route as CoursesRouteImport } from './routes/courses'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
@@ -67,6 +68,7 @@ import { Route as ConferenceRegisterRouteImport } from './routes/conference_.reg
 import { Route as ConferenceSpeakRouteImport } from './routes/conference_.speak'
 import { Route as ConferenceSponsorRouteImport } from './routes/conference_.sponsor'
 import { Route as ConferencesSlugRouteImport } from './routes/conferences_.$slug'
+import { Route as CoursesIdRouteImport } from './routes/courses_.$id'
 import { Route as LegalSlugRouteImport } from './routes/legal.$slug'
 import { Route as MembersDirectoryRouteImport } from './routes/members.directory'
 import { Route as MembershipApplyRouteImport } from './routes/membership_.apply'
@@ -81,6 +83,7 @@ import { Route as PortalCertificatesRouteImport } from './routes/portal.certific
 import { Route as PortalChatRouteImport } from './routes/portal.chat'
 import { Route as PortalCommunitiesRouteImport } from './routes/portal.communities'
 import { Route as PortalCorporateRouteImport } from './routes/portal.corporate'
+import { Route as PortalCoursesRouteImport } from './routes/portal.courses'
 import { Route as PortalCpdRouteImport } from './routes/portal.cpd'
 import { Route as PortalEventsRouteImport } from './routes/portal.events'
 import { Route as PortalLearningRouteImport } from './routes/portal.learning'
@@ -166,6 +169,11 @@ const ContactRoute = ContactRouteImport.update({
 const CookieSettingsRoute = CookieSettingsRouteImport.update({
   id: '/cookie-settings',
   path: '/cookie-settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CoursesRoute = CoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FaqRoute = FaqRouteImport.update({
@@ -398,6 +406,11 @@ const ConferencesSlugRoute = ConferencesSlugRouteImport.update({
   path: '/conferences/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CoursesIdRoute = CoursesIdRouteImport.update({
+  id: '/courses_/$id',
+  path: '/courses/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LegalSlugRoute = LegalSlugRouteImport.update({
   id: '/legal/$slug',
   path: '/legal/$slug',
@@ -466,6 +479,11 @@ const PortalCommunitiesRoute = PortalCommunitiesRouteImport.update({
 const PortalCorporateRoute = PortalCorporateRouteImport.update({
   id: '/corporate',
   path: '/corporate',
+  getParentRoute: () => PortalRoute,
+} as any)
+const PortalCoursesRoute = PortalCoursesRouteImport.update({
+  id: '/courses',
+  path: '/courses',
   getParentRoute: () => PortalRoute,
 } as any)
 const PortalCpdRoute = PortalCpdRouteImport.update({
@@ -613,6 +631,7 @@ export interface FileRoutesByFullPath {
   '/conferences': typeof ConferencesRoute
   '/contact': typeof ContactRoute
   '/cookie-settings': typeof CookieSettingsRoute
+  '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -658,6 +677,7 @@ export interface FileRoutesByFullPath {
   '/conference/speak': typeof ConferenceSpeakRoute
   '/conference/sponsor': typeof ConferenceSponsorRoute
   '/conferences/$slug': typeof ConferencesSlugRoute
+  '/courses/$id': typeof CoursesIdRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/members/directory': typeof MembersDirectoryRoute
   '/membership/apply': typeof MembershipApplyRoute
@@ -671,6 +691,7 @@ export interface FileRoutesByFullPath {
   '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
+  '/portal/courses': typeof PortalCoursesRoute
   '/portal/cpd': typeof PortalCpdRoute
   '/portal/events': typeof PortalEventsRoute
   '/portal/learning': typeof PortalLearningRoute
@@ -712,6 +733,7 @@ export interface FileRoutesByTo {
   '/conferences': typeof ConferencesRoute
   '/contact': typeof ContactRoute
   '/cookie-settings': typeof CookieSettingsRoute
+  '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -756,6 +778,7 @@ export interface FileRoutesByTo {
   '/conference/speak': typeof ConferenceSpeakRoute
   '/conference/sponsor': typeof ConferenceSponsorRoute
   '/conferences/$slug': typeof ConferencesSlugRoute
+  '/courses/$id': typeof CoursesIdRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/members/directory': typeof MembersDirectoryRoute
   '/membership/apply': typeof MembershipApplyRoute
@@ -769,6 +792,7 @@ export interface FileRoutesByTo {
   '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
+  '/portal/courses': typeof PortalCoursesRoute
   '/portal/cpd': typeof PortalCpdRoute
   '/portal/events': typeof PortalEventsRoute
   '/portal/learning': typeof PortalLearningRoute
@@ -811,6 +835,7 @@ export interface FileRoutesById {
   '/conferences': typeof ConferencesRoute
   '/contact': typeof ContactRoute
   '/cookie-settings': typeof CookieSettingsRoute
+  '/courses': typeof CoursesRoute
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
@@ -856,6 +881,7 @@ export interface FileRoutesById {
   '/conference_/speak': typeof ConferenceSpeakRoute
   '/conference_/sponsor': typeof ConferenceSponsorRoute
   '/conferences_/$slug': typeof ConferencesSlugRoute
+  '/courses_/$id': typeof CoursesIdRoute
   '/legal/$slug': typeof LegalSlugRoute
   '/members/directory': typeof MembersDirectoryRoute
   '/membership_/apply': typeof MembershipApplyRoute
@@ -869,6 +895,7 @@ export interface FileRoutesById {
   '/portal/chat': typeof PortalChatRoute
   '/portal/communities': typeof PortalCommunitiesRoute
   '/portal/corporate': typeof PortalCorporateRoute
+  '/portal/courses': typeof PortalCoursesRoute
   '/portal/cpd': typeof PortalCpdRoute
   '/portal/events': typeof PortalEventsRoute
   '/portal/learning': typeof PortalLearningRoute
@@ -913,6 +940,7 @@ export interface FileRouteTypes {
     | '/conferences'
     | '/contact'
     | '/cookie-settings'
+    | '/courses'
     | '/faq'
     | '/forgot-password'
     | '/login'
@@ -958,6 +986,7 @@ export interface FileRouteTypes {
     | '/conference/speak'
     | '/conference/sponsor'
     | '/conferences/$slug'
+    | '/courses/$id'
     | '/legal/$slug'
     | '/members/directory'
     | '/membership/apply'
@@ -971,6 +1000,7 @@ export interface FileRouteTypes {
     | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
+    | '/portal/courses'
     | '/portal/cpd'
     | '/portal/events'
     | '/portal/learning'
@@ -1012,6 +1042,7 @@ export interface FileRouteTypes {
     | '/conferences'
     | '/contact'
     | '/cookie-settings'
+    | '/courses'
     | '/faq'
     | '/forgot-password'
     | '/login'
@@ -1056,6 +1087,7 @@ export interface FileRouteTypes {
     | '/conference/speak'
     | '/conference/sponsor'
     | '/conferences/$slug'
+    | '/courses/$id'
     | '/legal/$slug'
     | '/members/directory'
     | '/membership/apply'
@@ -1069,6 +1101,7 @@ export interface FileRouteTypes {
     | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
+    | '/portal/courses'
     | '/portal/cpd'
     | '/portal/events'
     | '/portal/learning'
@@ -1110,6 +1143,7 @@ export interface FileRouteTypes {
     | '/conferences'
     | '/contact'
     | '/cookie-settings'
+    | '/courses'
     | '/faq'
     | '/forgot-password'
     | '/login'
@@ -1155,6 +1189,7 @@ export interface FileRouteTypes {
     | '/conference_/speak'
     | '/conference_/sponsor'
     | '/conferences_/$slug'
+    | '/courses_/$id'
     | '/legal/$slug'
     | '/members/directory'
     | '/membership_/apply'
@@ -1168,6 +1203,7 @@ export interface FileRouteTypes {
     | '/portal/chat'
     | '/portal/communities'
     | '/portal/corporate'
+    | '/portal/courses'
     | '/portal/cpd'
     | '/portal/events'
     | '/portal/learning'
@@ -1211,6 +1247,7 @@ export interface RootRouteChildren {
   ConferencesRoute: typeof ConferencesRoute
   ContactRoute: typeof ContactRoute
   CookieSettingsRoute: typeof CookieSettingsRoute
+  CoursesRoute: typeof CoursesRoute
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
@@ -1234,6 +1271,7 @@ export interface RootRouteChildren {
   ConferenceSpeakRoute: typeof ConferenceSpeakRoute
   ConferenceSponsorRoute: typeof ConferenceSponsorRoute
   ConferencesSlugRoute: typeof ConferencesSlugRoute
+  CoursesIdRoute: typeof CoursesIdRoute
   LegalSlugRoute: typeof LegalSlugRoute
   MembersDirectoryRoute: typeof MembersDirectoryRoute
   MembershipApplyRoute: typeof MembershipApplyRoute
@@ -1328,6 +1366,13 @@ declare module '@tanstack/react-router' {
       path: '/cookie-settings'
       fullPath: '/cookie-settings'
       preLoaderRoute: typeof CookieSettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/courses': {
+      id: '/courses'
+      path: '/courses'
+      fullPath: '/courses'
+      preLoaderRoute: typeof CoursesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/faq': {
@@ -1652,6 +1697,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ConferencesSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/courses_/$id': {
+      id: '/courses_/$id'
+      path: '/courses/$id'
+      fullPath: '/courses/$id'
+      preLoaderRoute: typeof CoursesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/legal/$slug': {
       id: '/legal/$slug'
       path: '/legal/$slug'
@@ -1748,6 +1800,13 @@ declare module '@tanstack/react-router' {
       path: '/corporate'
       fullPath: '/portal/corporate'
       preLoaderRoute: typeof PortalCorporateRouteImport
+      parentRoute: typeof PortalRoute
+    }
+    '/portal/courses': {
+      id: '/portal/courses'
+      path: '/courses'
+      fullPath: '/portal/courses'
+      preLoaderRoute: typeof PortalCoursesRouteImport
       parentRoute: typeof PortalRoute
     }
     '/portal/cpd': {
@@ -2042,6 +2101,7 @@ interface PortalRouteChildren {
   PortalChatRoute: typeof PortalChatRoute
   PortalCommunitiesRoute: typeof PortalCommunitiesRoute
   PortalCorporateRoute: typeof PortalCorporateRoute
+  PortalCoursesRoute: typeof PortalCoursesRoute
   PortalCpdRoute: typeof PortalCpdRoute
   PortalEventsRoute: typeof PortalEventsRoute
   PortalLearningRoute: typeof PortalLearningRoute
@@ -2070,6 +2130,7 @@ const PortalRouteChildren: PortalRouteChildren = {
   PortalChatRoute: PortalChatRoute,
   PortalCommunitiesRoute: PortalCommunitiesRoute,
   PortalCorporateRoute: PortalCorporateRoute,
+  PortalCoursesRoute: PortalCoursesRoute,
   PortalCpdRoute: PortalCpdRoute,
   PortalEventsRoute: PortalEventsRoute,
   PortalLearningRoute: PortalLearningRoute,
@@ -2105,6 +2166,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConferencesRoute: ConferencesRoute,
   ContactRoute: ContactRoute,
   CookieSettingsRoute: CookieSettingsRoute,
+  CoursesRoute: CoursesRoute,
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
@@ -2128,6 +2190,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConferenceSpeakRoute: ConferenceSpeakRoute,
   ConferenceSponsorRoute: ConferenceSponsorRoute,
   ConferencesSlugRoute: ConferencesSlugRoute,
+  CoursesIdRoute: CoursesIdRoute,
   LegalSlugRoute: LegalSlugRoute,
   MembersDirectoryRoute: MembersDirectoryRoute,
   MembershipApplyRoute: MembershipApplyRoute,

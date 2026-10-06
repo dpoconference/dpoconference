@@ -82,17 +82,26 @@ function Page() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <label className="text-xs font-semibold">
             Reason
-            <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm">
+            <select
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            >
               <option value="">All</option>
               <option value="MEMBERSHIP_APPLICATION">Membership application</option>
               <option value="MEMBERSHIP_RENEWAL">Membership renewal</option>
               <option value="CONFERENCE">Conference</option>
               <option value="SEMINAR">Seminar</option>
+              <option value="COURSE">Course</option>
             </select>
           </label>
           <label className="text-xs font-semibold">
             Status
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            >
               <option value="">All</option>
               <option value="SUCCESSFUL">Successful</option>
               <option value="AWAITING_REVIEW">Awaiting review</option>
@@ -103,11 +112,21 @@ function Page() {
           </label>
           <label className="text-xs font-semibold">
             From
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            />
           </label>
           <label className="text-xs font-semibold">
             To
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            />
           </label>
         </div>
         <Button
@@ -152,7 +171,9 @@ function Page() {
                     {new Date(p.paidAt ?? p.createdAt).toLocaleString("en-NG")}
                   </td>
                   <td className="px-4 py-3">{p.purpose.replaceAll("_", " ")}</td>
-                  <td className="px-4 py-3 text-xs">{(p.method ?? "PAYSTACK").replaceAll("_", " ")}</td>
+                  <td className="px-4 py-3 text-xs">
+                    {(p.method ?? "PAYSTACK").replaceAll("_", " ")}
+                  </td>
                   <td className="px-4 py-3 font-medium">{formatNaira(p.amountNgn)}</td>
                   <td className="px-4 py-3 font-mono text-xs">{p.paystackReference}</td>
                   <td className="px-4 py-3">
@@ -167,12 +188,21 @@ function Page() {
                     >
                       {p.status}
                     </StatusChip>
-                    {p.reviewNote ? <p className="mt-1 max-w-[12rem] text-xs text-muted-foreground">{p.reviewNote}</p> : null}
+                    {p.reviewNote ? (
+                      <p className="mt-1 max-w-[12rem] text-xs text-muted-foreground">
+                        {p.reviewNote}
+                      </p>
+                    ) : null}
                   </td>
                   <td className="px-4 py-3">
-                    {p.method === "BANK_TRANSFER" && (p.status === "PENDING" || p.status === "AWAITING_REVIEW") ? (
+                    {p.method === "BANK_TRANSFER" &&
+                    (p.status === "PENDING" || p.status === "AWAITING_REVIEW") ? (
                       <label className="inline-flex cursor-pointer flex-col gap-1 text-xs font-semibold text-[color:var(--brand-green)]">
-                        {uploadingId === p.id ? "Uploading…" : p.receiptUrl ? "Replace receipt" : "Upload receipt"}
+                        {uploadingId === p.id
+                          ? "Uploading…"
+                          : p.receiptUrl
+                            ? "Replace receipt"
+                            : "Upload receipt"}
                         <input
                           type="file"
                           accept="image/jpeg,image/png,application/pdf"
@@ -182,7 +212,12 @@ function Page() {
                         />
                       </label>
                     ) : p.receiptUrl ? (
-                      <a href={p.receiptUrl} target="_blank" rel="noreferrer" className="text-xs font-semibold text-[color:var(--brand-green)]">
+                      <a
+                        href={p.receiptUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs font-semibold text-[color:var(--brand-green)]"
+                      >
                         View
                       </a>
                     ) : (

@@ -46,9 +46,12 @@ function PortalHome() {
   const cpd = useQuery({
     queryKey: ["my-cpd"],
     queryFn: () =>
-      apiGet<{ points: number | string; required: number; outstanding: number | string; compliant: boolean }>(
-        "/portal/cpd",
-      ).catch(() => null),
+      apiGet<{
+        points: number | string;
+        required: number;
+        outstanding: number | string;
+        compliant: boolean;
+      }>("/portal/cpd").catch(() => null),
   });
   const events = useQuery({
     queryKey: ["my-events-dash"],
@@ -59,12 +62,14 @@ function PortalHome() {
   });
   const certs = useQuery({
     queryKey: ["certs-dash"],
-    queryFn: () =>
-      apiGet<{ id: string }[]>("/portal/certificates").catch(() => []),
+    queryFn: () => apiGet<{ id: string }[]>("/portal/certificates").catch(() => []),
   });
   const notifs = useQuery({
     queryKey: ["my-notifications-preview"],
-    queryFn: () => apiGet<{ id: string; title: string; body: string; readAt?: string | null }[]>("/portal/notifications").catch(() => []),
+    queryFn: () =>
+      apiGet<{ id: string; title: string; body: string; readAt?: string | null }[]>(
+        "/portal/notifications",
+      ).catch(() => []),
   });
 
   if (app.isPending || mem.isPending) return <PageSkeleton />;
@@ -137,10 +142,30 @@ function PortalHome() {
 
   const memberShortcuts = membership
     ? ([
-        { to: "/portal/library", label: "Library", desc: "View-only learning materials and resources", icon: BookOpen },
-        { to: "/portal/threats", label: "Threat intelligence", desc: "Defensive advisories for your category", icon: ShieldAlert },
-        { to: "/portal/careers", label: "Careers", desc: "Jobs, applications and alerts", icon: Briefcase },
-        { to: "/portal/mentorship", label: "Mentorship", desc: "Profiles, matches and sessions", icon: Handshake },
+        {
+          to: "/portal/library",
+          label: "Library",
+          desc: "View-only learning materials and resources",
+          icon: BookOpen,
+        },
+        {
+          to: "/portal/threats",
+          label: "Threat intelligence",
+          desc: "Defensive advisories for your category",
+          icon: ShieldAlert,
+        },
+        {
+          to: "/portal/careers",
+          label: "Careers",
+          desc: "Jobs, applications and alerts",
+          icon: Briefcase,
+        },
+        {
+          to: "/portal/mentorship",
+          label: "Mentorship",
+          desc: "Profiles, matches and sessions",
+          icon: Handshake,
+        },
       ] as const)
     : [];
 
@@ -152,13 +177,54 @@ function PortalHome() {
       desc: membership ? "Download or show your ID card" : "Start or continue membership",
       icon: membership ? IdCard : FileText,
     },
-    { to: "/portal/events", label: "My events", desc: "Conference and seminar registrations", icon: Ticket },
-    { to: "/portal/training", label: "Training", desc: "Browse seminars and enrol", icon: GraduationCap },
-    { to: "/portal/cpd", label: "CPD tracker", desc: "Log points toward your yearly target", icon: ScrollText },
-    { to: "/portal/renew", label: "Renew", desc: "Pay the next membership year fee", icon: RefreshCw },
-    { to: "/portal/support", label: "Support", desc: "Raise or track a secretariat ticket", icon: LifeBuoy },
-    { to: "/portal/profile", label: "Profile", desc: "Update name and phone details", icon: UserRound },
-    { to: "/portal/privacy", label: "Privacy", desc: "Export or request account deletion", icon: Shield },
+    {
+      to: "/portal/events",
+      label: "My events",
+      desc: "Conference and seminar registrations",
+      icon: Ticket,
+    },
+    {
+      to: "/portal/courses",
+      label: "My courses",
+      desc: "Continue courses and track learning progress",
+      icon: GraduationCap,
+    },
+    {
+      to: "/portal/training",
+      label: "Training",
+      desc: "Browse seminars and enrol",
+      icon: GraduationCap,
+    },
+    {
+      to: "/portal/cpd",
+      label: "CPD tracker",
+      desc: "Log points toward your yearly target",
+      icon: ScrollText,
+    },
+    {
+      to: "/portal/renew",
+      label: "Renew",
+      desc: "Pay the next membership year fee",
+      icon: RefreshCw,
+    },
+    {
+      to: "/portal/support",
+      label: "Support",
+      desc: "Raise or track a secretariat ticket",
+      icon: LifeBuoy,
+    },
+    {
+      to: "/portal/profile",
+      label: "Profile",
+      desc: "Update name and phone details",
+      icon: UserRound,
+    },
+    {
+      to: "/portal/privacy",
+      label: "Privacy",
+      desc: "Export or request account deletion",
+      icon: Shield,
+    },
   ] as const;
 
   const unread = (notifs.data ?? []).filter((n) => !n.readAt).slice(0, 3);
@@ -194,7 +260,11 @@ function PortalHome() {
       <NeedActionPanel items={actions} />
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Link to={membership ? "/portal/card" : "/portal/apply"} search={membership ? undefined : {}} className="block">
+        <Link
+          to={membership ? "/portal/card" : "/portal/apply"}
+          search={membership ? undefined : {}}
+          className="block"
+        >
           <StatCard
             label="Membership"
             value={membership?.status ?? application?.status?.replaceAll("_", " ") ?? "Not started"}
@@ -215,7 +285,11 @@ function PortalHome() {
           <StatCard
             label="Conference"
             value={hasConferenceTicket ? "Registered" : "Register"}
-            hint={hasConferenceTicket ? `${conferenceRegs.length} ticket(s) on file` : "Browse published conferences"}
+            hint={
+              hasConferenceTicket
+                ? `${conferenceRegs.length} ticket(s) on file`
+                : "Browse published conferences"
+            }
             icon={Ticket}
             well={hasConferenceTicket ? "success" : "primary"}
           />
@@ -229,13 +303,28 @@ function PortalHome() {
           />
         </Link>
         <Link to="/portal/library" className="block">
-          <StatCard label="Library" value="Open" hint="Learning assets and member resources" icon={BookOpen} />
+          <StatCard
+            label="Library"
+            value="Open"
+            hint="Learning assets and member resources"
+            icon={BookOpen}
+          />
         </Link>
         <Link to="/portal/mentorship" className="block">
-          <StatCard label="Mentorship" value="Open" hint="Apply, matches and sessions" icon={Handshake} />
+          <StatCard
+            label="Mentorship"
+            value="Open"
+            hint="Apply, matches and sessions"
+            icon={Handshake}
+          />
         </Link>
         <Link to="/portal/careers" className="block">
-          <StatCard label="Careers" value="Open" hint="Jobs, saves and applications" icon={Briefcase} />
+          <StatCard
+            label="Careers"
+            value="Open"
+            hint="Jobs, saves and applications"
+            icon={Briefcase}
+          />
         </Link>
         <Link to="/portal/threats" className="block">
           <StatCard
@@ -294,12 +383,17 @@ function PortalHome() {
           <div className="mt-4 flex flex-wrap gap-2">
             {membership && <StatusChip tone="success">{membership.status}</StatusChip>}
             {application && !membership && (
-              <StatusChip tone="warning">{String(application.status).replaceAll("_", " ")}</StatusChip>
+              <StatusChip tone="warning">
+                {String(application.status).replaceAll("_", " ")}
+              </StatusChip>
             )}
           </div>
           <div className="mt-6 flex flex-wrap gap-3">
             {membership ? (
-              <Link to="/portal/card" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+              <Link
+                to="/portal/card"
+                className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+              >
                 View card <ArrowRight className="h-3 w-3" />
               </Link>
             ) : (
@@ -311,10 +405,16 @@ function PortalHome() {
                 Apply now <ArrowRight className="h-3 w-3" />
               </Link>
             )}
-            <Link to="/portal/renew" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/renew"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Renew <ArrowRight className="h-3 w-3" />
             </Link>
-            <Link to="/portal/application" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/application"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Application file <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -326,14 +426,17 @@ function PortalHome() {
             <h2 className="text-sm font-semibold">Events & CPD</h2>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conference, seminars, certificates and the CPD tracker. Required year: {cpdRequired} points.
+            Conference, seminars, certificates and the CPD tracker. Required year: {cpdRequired}{" "}
+            points.
           </p>
           {cpd.data && (
             <div className="mt-4">
               <div className="h-2 overflow-hidden rounded-full bg-muted">
                 <div
                   className="h-full bg-primary"
-                  style={{ width: `${Math.min(100, (cpdPoints / Math.max(1, cpdRequired)) * 100)}%` }}
+                  style={{
+                    width: `${Math.min(100, (cpdPoints / Math.max(1, cpdRequired)) * 100)}%`,
+                  }}
                 />
               </div>
               <p className="mt-2 text-xs text-muted-foreground">
@@ -342,16 +445,28 @@ function PortalHome() {
             </div>
           )}
           <div className="mt-4 flex flex-wrap gap-3">
-            <Link to="/portal/events" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/events"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Open events <ArrowRight className="h-3 w-3" />
             </Link>
-            <Link to="/portal/cpd" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/cpd"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               CPD log <ArrowRight className="h-3 w-3" />
             </Link>
-            <Link to="/portal/certificates" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/certificates"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Certificates <ArrowRight className="h-3 w-3" />
             </Link>
-            <Link to="/conferences" className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/conferences"
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
               Browse conferences <ArrowRight className="h-3 w-3" />
             </Link>
           </div>
@@ -365,7 +480,10 @@ function PortalHome() {
               <Bell className="h-4 w-4 text-primary" />
               <h2 className="text-sm font-semibold">Recent alerts</h2>
             </div>
-            <Link to="/portal/notifications" className="text-xs font-medium text-primary hover:underline">
+            <Link
+              to="/portal/notifications"
+              className="text-xs font-medium text-primary hover:underline"
+            >
               View all
             </Link>
           </div>
@@ -387,7 +505,8 @@ function PortalHome() {
             <h2 className="text-sm font-semibold">Find a DPO directory</h2>
           </div>
           <p className="mt-1 text-sm text-muted-foreground">
-            Listing is opt-in. Public verification of your membership number remains available regardless.
+            Listing is opt-in. Public verification of your membership number remains available
+            regardless.
           </p>
           <Button
             size="sm"

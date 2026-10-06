@@ -7,7 +7,7 @@ import {
 } from "@/components/payments/PaymentMethodStep";
 
 export type CheckoutInput = {
-  purpose: "MEMBERSHIP_APPLICATION" | "MEMBERSHIP_RENEWAL" | "CONFERENCE" | "SEMINAR";
+  purpose: "MEMBERSHIP_APPLICATION" | "MEMBERSHIP_RENEWAL" | "CONFERENCE" | "SEMINAR" | "COURSE";
   linkedId?: string;
   email?: string;
   /** Preferred method when both are enabled. Ignored when only one method is available. */
@@ -38,7 +38,11 @@ export async function loadPaymentsConfig(force = false): Promise<PublicPaymentsC
 export async function startCheckout(input: CheckoutInput): Promise<CheckoutResult> {
   const config = await loadPaymentsConfig();
   if (!config.paystackEnabled && !config.bankTransferEnabled) {
-    throw new ApiRequestError(503, "PAYMENTS_DISABLED", "Online payments are temporarily unavailable.");
+    throw new ApiRequestError(
+      503,
+      "PAYMENTS_DISABLED",
+      "Online payments are temporarily unavailable.",
+    );
   }
 
   let method = input.method ?? resolveDefaultMethod(config);

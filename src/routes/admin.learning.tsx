@@ -34,6 +34,9 @@ type LearningAsset = {
   mimeType?: string | null;
   audience: string;
   isPublished: boolean;
+  isCourse: boolean;
+  guestAccess: boolean;
+  priceNgn: number | string;
 };
 
 type Category = { slug: string; name: string };
@@ -48,6 +51,9 @@ const emptyForm = {
   mimeType: "",
   audience: "ALL",
   isPublished: false,
+  isCourse: false,
+  guestAccess: false,
+  priceNgn: "0",
 };
 
 function Page() {
@@ -92,8 +98,8 @@ function Page() {
     <div className="space-y-6">
       <PageHeader
         icon={BookOpen}
-        title="Learning"
-        subtitle="Publish view-only LMS assets for members by audience category."
+        title="Learning and courses"
+        subtitle="Publish member learning assets or set up free guest courses and paid courses."
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -116,6 +122,9 @@ function Page() {
                 mimeType: form.mimeType || null,
                 audience: form.audience,
                 isPublished: form.isPublished,
+                isCourse: form.isCourse,
+                guestAccess: form.guestAccess,
+                priceNgn: Number(form.priceNgn),
               };
               if (form.id) {
                 await apiPatch(`/admin/learning-assets/${form.id}`, body);
@@ -156,6 +165,66 @@ function Page() {
               </option>
             ))}
           </select>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={form.isCourse}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  isCourse: e.target.checked,
+                  guestAccess: e.target.checked ? form.guestAccess : false,
+                  priceNgn: e.target.checked ? form.priceNgn : "0",
+                })
+              }
+            />
+            Publish this learning asset as a course
+          </label>
+          {form.isCourse ? (
+            <div className="space-y-3 rounded-xl border border-border bg-muted/30 p-3">
+              <label className="flex items-start gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  className="mt-1"
+                  checked={form.guestAccess}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      guestAccess: e.target.checked,
+                      priceNgn: e.target.checked ? "0" : form.priceNgn,
+                    })
+                  }
+                />
+                <span>
+                  <span className="block font-medium">Allow guest access</span>
+                  <span className="block text-xs text-muted-foreground">
+                    Free course content can be opened without an account or membership.
+                  </span>
+                </span>
+              </label>
+              <label className="block space-y-1 text-xs font-medium">
+                One-time price (NGN)
+                <input
+                  type="number"
+                  min="0"
+                  step="100"
+                  className="w-full rounded-md border px-3 py-2 text-sm"
+                  value={form.priceNgn}
+                  disabled={form.guestAccess}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      priceNgn: e.target.value,
+                      guestAccess: Number(e.target.value) > 0 ? false : form.guestAccess,
+                    })
+                  }
+                />
+              </label>
+              <p className="text-xs text-muted-foreground">
+                Paid courses require a learner account and a completed course purchase.
+              </p>
+            </div>
+          ) : null}
           <div className="space-y-2">
             <p className="text-xs font-semibold">Cover</p>
             {form.coverUrl ? (
@@ -178,7 +247,12 @@ function Page() {
                 }
               }}
             />
-            <Button type="button" size="sm" variant="outline" onClick={() => coverRef.current?.click()}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => coverRef.current?.click()}
+            >
               Upload cover
             </Button>
           </div>
@@ -208,7 +282,12 @@ function Page() {
                 }
               }}
             />
-            <Button type="button" size="sm" variant="outline" onClick={() => fileRef.current?.click()}>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => fileRef.current?.click()}
+            >
               Upload file
             </Button>
           </div>
@@ -258,13 +337,24 @@ function Page() {
                       mimeType: a.mimeType ?? "",
                       audience: a.audience,
                       isPublished: a.isPublished,
+                      isCourse: a.isCourse,
+                      guestAccess: a.guestAccess,
+                      priceNgn: String(a.priceNgn ?? 0),
                     })
                   }
                 >
+                  {a.isCourse ? "Course · " : ""}
                   {a.title}
                 </button>
                 <p className="text-xs text-muted-foreground">
-                  {a.audience} · {a.isPublished ? "Published" : "Draft"}
+                  {a.isCourse
+                    ? Number(a.priceNgn) > 0
+                      ? `Paid · ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(a.priceNgn))}`
+                      : a.guestAccess
+                        ? "Free · guest access"
+                        : "Free · account required"
+                    : a.audience}{" "}
+                  · {a.isPublished ? "Published" : "Draft"}
                 </p>
               </li>
             ))}
@@ -360,7 +450,9 @@ function AssignmentPanel({ assetId }: { assetId: string }) {
               <p className="font-medium">{a.title}</p>
               <p className="text-xs text-muted-foreground">{a.instructions}</p>
               {a.dueOn ? (
-                <p className="text-xs text-muted-foreground">Due {new Date(a.dueOn).toLocaleDateString("en-NG")}</p>
+                <p className="text-xs text-muted-foreground">
+                  Due {new Date(a.dueOn).toLocaleDateString("en-NG")}
+                </p>
               ) : null}
             </div>
             <Button
@@ -368,8 +460,12 @@ function AssignmentPanel({ assetId }: { assetId: string }) {
               size="sm"
               variant="outline"
               onClick={() =>
-                void apiPatch(`/admin/learning-assignments/${a.id}`, { isPublished: !a.isPublished }).then(() => {
-                  notify.success(a.isPublished ? "Assignment unpublished." : "Assignment published.");
+                void apiPatch(`/admin/learning-assignments/${a.id}`, {
+                  isPublished: !a.isPublished,
+                }).then(() => {
+                  notify.success(
+                    a.isPublished ? "Assignment unpublished." : "Assignment published.",
+                  );
                   void q.refetch();
                 })
               }
@@ -391,7 +487,9 @@ function AssignmentPanel({ assetId }: { assetId: string }) {
                     variant="outline"
                     className="mt-2"
                     onClick={() =>
-                      void apiPatch(`/admin/learning-submissions/${s.id}`, { status: "REVIEWED" }).then(() => {
+                      void apiPatch(`/admin/learning-submissions/${s.id}`, {
+                        status: "REVIEWED",
+                      }).then(() => {
                         notify.success("Marked reviewed.");
                         void q.refetch();
                       })
@@ -402,7 +500,9 @@ function AssignmentPanel({ assetId }: { assetId: string }) {
                 ) : null}
               </li>
             ))}
-            {a.submissions.length === 0 && <p className="text-xs text-muted-foreground">No submissions yet.</p>}
+            {a.submissions.length === 0 && (
+              <p className="text-xs text-muted-foreground">No submissions yet.</p>
+            )}
           </ul>
         </div>
       ))}

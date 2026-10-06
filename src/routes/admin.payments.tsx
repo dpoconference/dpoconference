@@ -110,7 +110,8 @@ function Page() {
   if (q.isPending) return <PageSkeleton />;
   const summary = q.data?.summary ?? [];
   const successful = summary.find((s) => s.status === "SUCCESSFUL");
-  const awaiting = q.data?.meta.awaitingReview ?? summary.find((s) => s.status === "AWAITING_REVIEW")?.count ?? 0;
+  const awaiting =
+    q.data?.meta.awaitingReview ?? summary.find((s) => s.status === "AWAITING_REVIEW")?.count ?? 0;
 
   async function submitRefund() {
     if (!refundTarget) return;
@@ -163,7 +164,9 @@ function Page() {
     }
     setActingId(rejectTarget.id);
     try {
-      await apiPost(`/admin/payments/${rejectTarget.id}/reject-offline`, { note: rejectNote.trim() });
+      await apiPost(`/admin/payments/${rejectTarget.id}/reject-offline`, {
+        note: rejectNote.trim(),
+      });
       notify.success("Transfer rejected. Payer emailed.");
       setRejectTarget(null);
       setRejectNote("");
@@ -201,8 +204,18 @@ function Page() {
       <div className="grid gap-4 md:grid-cols-4">
         <StatCard label="Matching rows" value={q.data?.meta.total ?? 0} icon={CreditCard} />
         <StatCard label="Awaiting review" value={awaiting} icon={CreditCard} well="warning" />
-        <StatCard label="Successful volume" value={formatNaira(successful?.sumNgn ?? 0)} icon={Wallet} well="gold" />
-        <StatCard label="Successful count" value={successful?.count ?? 0} icon={CreditCard} well="success" />
+        <StatCard
+          label="Successful volume"
+          value={formatNaira(successful?.sumNgn ?? 0)}
+          icon={Wallet}
+          well="gold"
+        />
+        <StatCard
+          label="Successful count"
+          value={successful?.count ?? 0}
+          icon={CreditCard}
+          well="success"
+        />
       </div>
 
       {canSettings && cfgDraft ? (
@@ -223,7 +236,9 @@ function Page() {
               <input
                 type="checkbox"
                 checked={cfgDraft.bankTransferEnabled}
-                onChange={(e) => setCfgDraft({ ...cfgDraft, bankTransferEnabled: e.target.checked })}
+                onChange={(e) =>
+                  setCfgDraft({ ...cfgDraft, bankTransferEnabled: e.target.checked })
+                }
               />
               Bank transfer enabled
             </label>
@@ -232,7 +247,10 @@ function Page() {
               <select
                 value={cfgDraft.defaultMethod}
                 onChange={(e) =>
-                  setCfgDraft({ ...cfgDraft, defaultMethod: e.target.value as PaymentsConfig["defaultMethod"] })
+                  setCfgDraft({
+                    ...cfgDraft,
+                    defaultMethod: e.target.value as PaymentsConfig["defaultMethod"],
+                  })
                 }
                 className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               >
@@ -244,7 +262,9 @@ function Page() {
               Bank name
               <input
                 value={cfgDraft.bank.bankName}
-                onChange={(e) => setCfgDraft({ ...cfgDraft, bank: { ...cfgDraft.bank, bankName: e.target.value } })}
+                onChange={(e) =>
+                  setCfgDraft({ ...cfgDraft, bank: { ...cfgDraft.bank, bankName: e.target.value } })
+                }
                 className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               />
             </label>
@@ -252,7 +272,12 @@ function Page() {
               Account name
               <input
                 value={cfgDraft.bank.accountName}
-                onChange={(e) => setCfgDraft({ ...cfgDraft, bank: { ...cfgDraft.bank, accountName: e.target.value } })}
+                onChange={(e) =>
+                  setCfgDraft({
+                    ...cfgDraft,
+                    bank: { ...cfgDraft.bank, accountName: e.target.value },
+                  })
+                }
                 className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               />
             </label>
@@ -261,7 +286,10 @@ function Page() {
               <input
                 value={cfgDraft.bank.accountNumber}
                 onChange={(e) =>
-                  setCfgDraft({ ...cfgDraft, bank: { ...cfgDraft.bank, accountNumber: e.target.value } })
+                  setCfgDraft({
+                    ...cfgDraft,
+                    bank: { ...cfgDraft.bank, accountNumber: e.target.value },
+                  })
                 }
                 className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               />
@@ -271,7 +299,10 @@ function Page() {
               <textarea
                 value={cfgDraft.bank.instructions}
                 onChange={(e) =>
-                  setCfgDraft({ ...cfgDraft, bank: { ...cfgDraft.bank, instructions: e.target.value } })
+                  setCfgDraft({
+                    ...cfgDraft,
+                    bank: { ...cfgDraft.bank, instructions: e.target.value },
+                  })
                 }
                 rows={3}
                 className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
@@ -371,17 +402,26 @@ function Page() {
           </label>
           <label className="text-xs font-semibold">
             Reason
-            <select value={purpose} onChange={(e) => setPurpose(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm">
+            <select
+              value={purpose}
+              onChange={(e) => setPurpose(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            >
               <option value="">All</option>
               <option value="MEMBERSHIP_APPLICATION">Membership application</option>
               <option value="MEMBERSHIP_RENEWAL">Membership renewal</option>
               <option value="CONFERENCE">Conference</option>
               <option value="SEMINAR">Seminar</option>
+              <option value="COURSE">Course</option>
             </select>
           </label>
           <label className="text-xs font-semibold">
             Method
-            <select value={method} onChange={(e) => setMethod(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm">
+            <select
+              value={method}
+              onChange={(e) => setMethod(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            >
               <option value="">All</option>
               <option value="PAYSTACK">Paystack</option>
               <option value="BANK_TRANSFER">Bank transfer</option>
@@ -389,7 +429,11 @@ function Page() {
           </label>
           <label className="text-xs font-semibold">
             Status
-            <select value={status} onChange={(e) => setStatus(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            >
               <option value="">All</option>
               <option value="AWAITING_REVIEW">Awaiting review</option>
               <option value="SUCCESSFUL">Successful</option>
@@ -401,11 +445,21 @@ function Page() {
           </label>
           <label className="text-xs font-semibold">
             From
-            <input type="date" value={from} onChange={(e) => setFrom(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+            <input
+              type="date"
+              value={from}
+              onChange={(e) => setFrom(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            />
           </label>
           <label className="text-xs font-semibold">
             To
-            <input type="date" value={to} onChange={(e) => setTo(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+            <input
+              type="date"
+              value={to}
+              onChange={(e) => setTo(e.target.value)}
+              className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+            />
           </label>
         </div>
         <div className="mt-3 flex flex-wrap gap-2">
@@ -453,16 +507,23 @@ function Page() {
           <tbody>
             {(q.data?.items ?? []).length === 0 ? (
               <tr>
-                <td colSpan={canRefund ? 8 : 7} className="px-4 py-10 text-center text-muted-foreground">
+                <td
+                  colSpan={canRefund ? 8 : 7}
+                  className="px-4 py-10 text-center text-muted-foreground"
+                >
                   No payments match these filters.
                 </td>
               </tr>
             ) : (
               (q.data?.items ?? []).map((p) => (
                 <tr key={p.id} className="border-b border-border last:border-0">
-                  <td className="px-4 py-3 whitespace-nowrap">{new Date(p.paidAt ?? p.createdAt).toLocaleString("en-NG")}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    {new Date(p.paidAt ?? p.createdAt).toLocaleString("en-NG")}
+                  </td>
                   <td className="px-4 py-3">
-                    <p className="font-medium">{p.user ? `${p.user.firstName} ${p.user.lastName}` : "—"}</p>
+                    <p className="font-medium">
+                      {p.user ? `${p.user.firstName} ${p.user.lastName}` : "—"}
+                    </p>
                     <p className="text-xs text-muted-foreground">{p.user?.email}</p>
                   </td>
                   <td className="px-4 py-3">{p.purpose.replaceAll("_", " ")}</td>
@@ -483,7 +544,11 @@ function Page() {
                     >
                       {p.status}
                     </StatusChip>
-                    {p.reviewNote ? <p className="mt-1 max-w-[14rem] text-xs text-muted-foreground">{p.reviewNote}</p> : null}
+                    {p.reviewNote ? (
+                      <p className="mt-1 max-w-[14rem] text-xs text-muted-foreground">
+                        {p.reviewNote}
+                      </p>
+                    ) : null}
                   </td>
                   {canRefund ? (
                     <td className="px-4 py-3">
@@ -500,7 +565,11 @@ function Page() {
                         ) : null}
                         {p.method === "BANK_TRANSFER" && p.status === "AWAITING_REVIEW" ? (
                           <>
-                            <Button size="sm" loading={actingId === p.id} onClick={() => void approveOffline(p)}>
+                            <Button
+                              size="sm"
+                              loading={actingId === p.id}
+                              onClick={() => void approveOffline(p)}
+                            >
                               Approve
                             </Button>
                             <Button
@@ -528,7 +597,9 @@ function Page() {
                             Refund
                           </Button>
                         ) : null}
-                        {!p.receiptUrl && !(p.method === "PAYSTACK" && p.status === "SUCCESSFUL") && p.status !== "AWAITING_REVIEW" ? (
+                        {!p.receiptUrl &&
+                        !(p.method === "PAYSTACK" && p.status === "SUCCESSFUL") &&
+                        p.status !== "AWAITING_REVIEW" ? (
                           <span className="text-xs text-muted-foreground">—</span>
                         ) : null}
                       </div>

@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { RichMediaFields } from "@/components/app/RichMediaFields";
 import { conferenceNightDayCount, formatNaira } from "@/lib/format";
 import { apiUpload } from "@/lib/upload";
+import { GroupParticipantOnboarding } from "@/components/admin/GroupParticipantOnboarding";
 
 type AgendaItem = { time: string; title: string; description: string };
 type AgendaDay = { date: string; title: string; items: AgendaItem[] };
@@ -44,6 +45,7 @@ function emptyPackageForm(conferenceId = "") {
     salesOpenOn: "",
     salesCloseOn: "",
     capacity: "",
+    maxGroupSize: "",
     isActive: true,
     isVisible: true,
   };
@@ -92,6 +94,7 @@ type Conference = {
   isPublished: boolean;
   isArchived?: boolean;
   isFree?: boolean;
+  cpdPoints?: number;
   capacity?: number | null;
   agenda?: AgendaDay[] | null;
   datesToBeAnnounced?: boolean;
@@ -108,6 +111,7 @@ type Conference = {
     salesOpenOn?: string | null;
     salesCloseOn?: string | null;
     capacity?: number | null;
+    maxGroupSize?: number | null;
     isActive: boolean;
     isVisible?: boolean;
   }[];
@@ -142,8 +146,10 @@ type Seminar = {
 function Page() {
   const { hasPermission } = useAuth();
   const canManage = hasPermission("events.manage");
+  const canManageSettings = hasPermission("settings.manage");
   const [tab, setTab] = useState<"setup" | "regs">("setup");
   const [loading, setLoading] = useState(false);
+  const [selectedRegistrationIds, setSelectedRegistrationIds] = useState<string[]>([]);
   const prospectusRef = useRef<HTMLInputElement>(null);
 
   const dash = useQuery({
@@ -208,10 +214,17 @@ function Page() {
           organisation?: string;
           amountNgn: number;
           paymentStatus: string;
+          loginReleaseStatus: string;
+          loginReleaseSentAt: string | null;
           packageName?: string;
           conference: { title: string };
         }[]
       >("/admin/events/conferences/registrations"),
+  });
+  const learnerLoginConfig = useQuery({
+    queryKey: ["admin-learner-login"],
+    queryFn: () => apiGet<{ enabled: boolean }>("/admin/settings/learner-login"),
+    enabled: canManageSettings,
   });
 
   const [confForm, setConfForm] = useState({
@@ -229,6 +242,7 @@ function Page() {
     format: "To be announced",
     isPublished: false,
     isFree: false,
+    cpdPoints: "0",
     capacity: "",
     agenda: [] as AgendaDay[],
     registrationOpensOn: "",
@@ -354,6 +368,7 @@ function Page() {
                     format: confForm.format,
                     isPublished: confForm.isPublished,
                     isFree: confForm.isFree,
+                    cpdPoints: Number(confForm.cpdPoints),
                     datesToBeAnnounced: confForm.datesToBeAnnounced,
                     capacity: confForm.capacity.trim() ? Number(confForm.capacity) : null,
                     agenda: confForm.agenda.map((day) => ({
@@ -558,6 +573,18 @@ function Page() {
                   onChange={(e) => setConfForm({ ...confForm, capacity: e.target.value })}
                 />
               </div>
+              <label className="block text-xs">
+                CPD points awarded for attended conference registrations
+                <input
+                  className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                  type="number"
+                  min={0}
+                  max={1000}
+                  step={1}
+                  value={confForm.cpdPoints}
+                  onChange={(e) => setConfForm({ ...confForm, cpdPoints: e.target.value })}
+                />
+              </label>
               <div className="space-y-2 rounded-md border border-border p-3">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <p className="text-sm font-medium">Agenda</p>
@@ -722,6 +749,7 @@ function Page() {
                           format: c.format,
                           isPublished: c.isPublished,
                           isFree: Boolean(c.isFree),
+                          cpdPoints: String(c.cpdPoints ?? 0),
                           capacity: c.capacity != null ? String(c.capacity) : "",
                           agenda: (c.agenda ?? []).map((day) => ({
                             date: day.date,
@@ -822,6 +850,7 @@ function Page() {
                   salesOpenOn: toIso(pkgForm.salesOpenOn) ?? null,
                   salesCloseOn: toIso(pkgForm.salesCloseOn) ?? null,
                   capacity: pkgForm.capacity ? Number(pkgForm.capacity) : null,
+                  maxGroupSize: pkgForm.maxGroupSize ? Number(pkgForm.maxGroupSize) : undefined,
                   isActive: pkgForm.isActive,
                   isVisible: pkgForm.isVisible,
                 });
@@ -875,6 +904,8 @@ function Page() {
                   salesCloseOn: fromIso(selectedPackage.salesCloseOn),
                   capacity:
                     selectedPackage.capacity == null ? "" : String(selectedPackage.capacity),
+                  maxGroupSize:
+                    selectedPackage.maxGroupSize == null ? "" : String(selectedPackage.maxGroupSize),
                   isActive: selectedPackage.isActive,
                   isVisible: selectedPackage.isVisible ?? true,
                 });
@@ -958,6 +989,14 @@ function Page() {
               placeholder="Ticket capacity (optional)"
               value={pkgForm.capacity}
               onChange={(e) => setPkgForm({ ...pkgForm, capacity: e.target.value })}
+            />
+            <input
+              className="rounded-md border px-3 py-2 text-sm"
+              type="number"
+              min={2}
+              placeholder="Maximum group size (default 100)"
+              value={pkgForm.maxGroupSize}
+              onChange={(e) => setPkgForm({ ...pkgForm, maxGroupSize: e.target.value })}
             />
             <label className="flex items-center gap-2 text-sm sm:col-span-3">
               <input
@@ -1267,11 +1306,101 @@ function Page() {
 
       {tab === "regs" && (
         <div className="space-y-6">
+          {canManageSettings && (
+            <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5">
+              <div>
+                <h3 className="font-bold">Learner login</h3>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Temporarily disable learner sign-in without affecting staff administration or conference ticket QR access.
+                </p>
+              </div>
+              <Button
+                variant={learnerLoginConfig.data?.enabled ? "default" : "outline"}
+                loading={learnerLoginConfig.isPending || loading}
+                onClick={async () => {
+                  if (learnerLoginConfig.data === undefined) return;
+                  setLoading(true);
+                  try {
+                    const data = await apiPut<{ enabled: boolean }>("/admin/settings/learner-login", {
+                      enabled: !learnerLoginConfig.data.enabled,
+                    });
+                    await learnerLoginConfig.refetch();
+                    notify.success(data.enabled ? "Learner login enabled." : "Learner login disabled.");
+                  } catch (err) {
+                    notify.error(err instanceof Error ? err.message : "Could not update learner login.");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+              >
+                {learnerLoginConfig.data?.enabled ? "Learner login enabled" : "Enable learner login"}
+              </Button>
+            </div>
+          )}
           <div className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
-            <h3 className="font-bold">Conference registrations</h3>
-            <table className="mt-3 w-full min-w-[960px] text-left text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h3 className="font-bold">Conference registrations</h3>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Learner account setup is separate from conference ticket and QR delivery.
+                </p>
+              </div>
+              {canManageSettings && (
+                <Button
+                  size="sm"
+                  loading={loading}
+                  disabled={!selectedRegistrationIds.length}
+                  onClick={async () => {
+                    setLoading(true);
+                    try {
+                      const result = await apiPost<{
+                        sentAttendees: number;
+                        results: { registrationId: string; status: string; message?: string }[];
+                      }>("/admin/events/conferences/registrations/login-release", {
+                        registrationIds: selectedRegistrationIds,
+                      });
+                      const sent = result.results.filter((item) => item.status === "SENT").length;
+                      const notSent = result.results.length - sent;
+                      notify.success(
+                        `${result.sentAttendees} setup link${result.sentAttendees === 1 ? "" : "s"} sent or queued for ${sent} registration${sent === 1 ? "" : "s"}${notSent ? `; ${notSent} skipped` : ""}.`,
+                      );
+                      setSelectedRegistrationIds([]);
+                      await confRegs.refetch();
+                    } catch (err) {
+                      notify.error(err instanceof Error ? err.message : "Could not release attendee access.");
+                    } finally {
+                      setLoading(false);
+                    }
+                  }}
+                >
+                  Release / resend setup link ({selectedRegistrationIds.length})
+                </Button>
+              )}
+            </div>
+            <table className="mt-3 w-full min-w-[1120px] text-left text-sm">
               <thead>
                 <tr className="border-b text-xs uppercase text-muted-foreground">
+                  <th className="p-2">
+                    <input
+                      type="checkbox"
+                      aria-label="Select all successful conference registrations"
+                      checked={
+                        (confRegs.data ?? []).filter((r) => ["PAID", "CONFIRMED"].includes(r.status)).length > 0 &&
+                        (confRegs.data ?? [])
+                          .filter((r) => ["PAID", "CONFIRMED"].includes(r.status))
+                          .every((r) => selectedRegistrationIds.includes(r.id))
+                      }
+                      onChange={(event) =>
+                        setSelectedRegistrationIds(
+                          event.target.checked
+                            ? (confRegs.data ?? [])
+                                .filter((r) => ["PAID", "CONFIRMED"].includes(r.status))
+                                .map((r) => r.id)
+                            : [],
+                        )
+                      }
+                    />
+                  </th>
                   <th className="p-2">Name</th>
                   <th className="p-2">Email</th>
                   <th className="p-2">Registration ID</th>
@@ -1280,12 +1409,28 @@ function Page() {
                   <th className="p-2">Amount</th>
                   <th className="p-2">Payment</th>
                   <th className="p-2">Attendance</th>
+                  <th className="p-2">Learner access</th>
                   <th className="p-2" />
                 </tr>
               </thead>
               <tbody>
                 {(confRegs.data ?? []).map((r) => (
                   <tr key={r.id} className="border-t align-top">
+                    <td className="p-2">
+                      <input
+                        type="checkbox"
+                        aria-label={`Select ${r.name} for login release`}
+                        disabled={!canManageSettings || !["PAID", "CONFIRMED"].includes(r.status)}
+                        checked={selectedRegistrationIds.includes(r.id)}
+                        onChange={(event) =>
+                          setSelectedRegistrationIds((current) =>
+                            event.target.checked
+                              ? [...new Set([...current, r.id])]
+                              : current.filter((id) => id !== r.id),
+                          )
+                        }
+                      />
+                    </td>
                     <td className="p-2 font-medium">
                       {r.name}
                       {r.organisation ? (
@@ -1313,6 +1458,14 @@ function Page() {
                       <span className="mt-0.5 block text-xs text-muted-foreground">{r.status}</span>
                     </td>
                     <td className="p-2">{r.attendanceStatus ?? "REGISTERED"}</td>
+                    <td className="p-2">
+                      <span className="font-medium">{r.loginReleaseStatus.replaceAll("_", " ")}</span>
+                      {r.loginReleaseSentAt && (
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {new Date(r.loginReleaseSentAt).toLocaleString()}
+                        </span>
+                      )}
+                    </td>
                     <td className="p-2">
                       {canManage && (
                         <Button
@@ -1342,6 +1495,8 @@ function Page() {
               <p className="mt-3 text-sm text-muted-foreground">No conference registrations.</p>
             )}
           </div>
+
+          <GroupParticipantOnboarding />
 
           <div className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
             <h3 className="font-bold">Seminar registrations</h3>

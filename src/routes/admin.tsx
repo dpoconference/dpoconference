@@ -63,6 +63,7 @@ function AdminLayout() {
       ? [
           { to: "/admin/cms", label: "Content", icon: Newspaper, group: "Delivery" } satisfies NavItem,
           { to: "/admin/learning", label: "Learning", icon: BookOpen, group: "Delivery" } satisfies NavItem,
+          { to: "/admin/certificates", label: "Certificates", icon: Award, group: "Delivery" } satisfies NavItem,
           { to: "/admin/jobs", label: "Jobs", icon: Briefcase, group: "Delivery" } satisfies NavItem,
           { to: "/admin/communities", label: "Communities", icon: UsersRound, group: "Delivery" } satisfies NavItem,
           { to: "/admin/awards", label: "Awards", icon: Award, group: "Delivery" } satisfies NavItem,

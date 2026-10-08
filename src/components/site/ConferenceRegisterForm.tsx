@@ -17,6 +17,7 @@ import {
   resolveDefaultMethod,
   type PaymentMethodChoice,
 } from "@/components/payments/PaymentMethodStep";
+import { ConferenceGroupRegisterForm } from "@/components/site/ConferenceGroupRegisterForm";
 
 type Package = {
   slug: string;
@@ -24,6 +25,7 @@ type Package = {
   description?: string;
   amountNgn: number | string;
   participantType: string;
+  maxGroupSize?: number | null;
 };
 
 type PublicConference = {
@@ -77,6 +79,7 @@ export function ConferenceRegisterForm({
   const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<PaymentMethodChoice>("PAYSTACK");
+  const [groupMode, setGroupMode] = useState(false);
   const [bankSession, setBankSession] = useState<BankTransferSession | null>(null);
   const [pendingReg, setPendingReg] = useState<{ number: string; email: string } | null>(null);
   const [details, setDetails] = useState({
@@ -195,6 +198,20 @@ export function ConferenceRegisterForm({
     );
   }
 
+  if (groupMode) {
+    return (
+      <ConferenceGroupRegisterForm
+        conference={q.data}
+        slug={slug}
+        packages={packages}
+        paymentConfig={payCfg.data}
+        initialPackage={pkg}
+        compact={compact}
+        onBack={() => setGroupMode(false)}
+      />
+    );
+  }
+
   if (bankSession) {
     return (
       <div className={compact ? "space-y-4" : "mx-auto max-w-xl space-y-4"}>
@@ -274,6 +291,17 @@ export function ConferenceRegisterForm({
           ) : null}
         </div>
       )}
+
+      <button
+        type="button"
+        className="w-full rounded-lg border border-[color:var(--brand-emerald)] px-4 py-3 text-left text-sm font-semibold text-[color:var(--brand-green)]"
+        onClick={() => setGroupMode(true)}
+      >
+        Register as an Organisation / Group
+        <span className="mt-1 block text-xs font-normal text-[color:var(--muted-foreground)]">
+          Buy multiple places in one payment and submit participant details after payment.
+        </span>
+      </button>
 
       {packages.length > 1 ? (
         <div className="grid gap-3">

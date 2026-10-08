@@ -26,7 +26,7 @@ import { notify } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 
 const DEFAULT_HERO_HEADLINE =
-  "Strengthening the professionals who protect trust, privacy and data.";
+  "Join the people shaping data protection and privacy.";
 const BOARD_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790941351/board.png";
 const COMMISSIONER_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790937623/nc.jpg";
 const CONFERENCE_SPOTLIGHT_IMAGE =
@@ -49,22 +49,22 @@ export const Route = createFileRoute("/")({
     meta: [
       {
         title:
-          "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
+          "DPO Conference | Data Protection, Privacy and Learning",
       },
       {
         name: "description",
         content:
-          "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
+          "Discover the DPO Conference: practical programme sessions, expert speakers, professional learning and registration for data protection and privacy leaders.",
       },
       {
         property: "og:title",
         content:
-          "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
+          "DPO Conference | Data Protection, Privacy and Learning",
       },
       {
         property: "og:description",
         content:
-          "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
+          "Discover the DPO Conference: practical programme sessions, expert speakers, professional learning and registration for data protection and privacy leaders.",
       },
     ],
   }),
@@ -94,12 +94,12 @@ function Hero() {
   const [typedLength, setTypedLength] = useState(HERO_HEADLINES[0].text.length);
   const [isDeleting, setIsDeleting] = useState(false);
   const eyebrow =
-    (heroCms?.eyebrow as string) || "Africa's Professional Community for Data Protection Officers";
+    (heroCms?.eyebrow as string) || "DPO Conference · Practical learning · Professional connection";
   const headline = heroCms?.headline || DEFAULT_HERO_HEADLINE;
   const usesTypewriter = headline === DEFAULT_HERO_HEADLINE;
   const subhead =
     heroCms?.subhead ||
-    "Join the Data Protection Officers Conference for practical learning, professional connections and cross-sector dialogue on privacy and data protection.";
+    "Discover the conference programme, meet privacy and data protection leaders, and register for practical learning, cross-sector dialogue and professional development.";
   const configuredCtaHref = (heroCms?.ctaHref as string | undefined) || "/conferences";
   const configuredCtaLabel = (heroCms?.ctaLabel as string | undefined) || "";
   const ctaPointsToLegacyFlow =
@@ -485,33 +485,33 @@ function CoreBenefits() {
   const cards = [
     {
       icon: Users,
-      title: "Professional Community",
-      body: "Peer network of DPOs, privacy leaders and compliance professionals.",
+      title: "Cross-sector connections",
+      body: "Meet DPOs, privacy leaders, regulators and professionals from across disciplines.",
     },
     {
       icon: GraduationCap,
-      title: "Quarterly Professional Training",
-      body: "Practical workshops led by experienced privacy practitioners.",
+      title: "Practical programme",
+      body: "Explore sessions and workshops focused on real data protection and privacy challenges.",
     },
     {
       icon: Award,
-      title: "Continuing Professional Development",
-      body: "Structured CPD credits, evidence and certification.",
+      title: "Event CPD",
+      body: "Earn configured CPD points when your event attendance is recorded.",
     },
     {
       icon: BookOpen,
-      title: "Regulatory Intelligence",
-      body: "Timely updates, guidance notes and jurisdiction-specific insights.",
+      title: "Continued learning",
+      body: "Access eligible free and paid learning courses through the conference LMS.",
     },
     {
       icon: Compass,
-      title: "Leadership Development",
-      body: "Programmes designed for the next generation of privacy leaders.",
+      title: "Expert perspectives",
+      body: "Learn from speakers and practitioners working across privacy, policy and technology.",
     },
     {
       icon: Network,
-      title: "Sector-Based Collaboration",
-      body: "Dedicated working groups across finance, health, tech and public sector.",
+      title: "Certificates",
+      body: "View and download certificates issued under the event's attendance and completion rules.",
     },
   ];
   return (
@@ -522,7 +522,7 @@ function CoreBenefits() {
             What you gain
           </p>
           <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">
-            Everything a modern DPO needs — in one professional home.
+            A conference experience built for practical professional growth.
           </h2>
         </div>
         <div className="mt-12 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -539,10 +539,10 @@ function CoreBenefits() {
                 {c.body}
               </p>
               <Link
-                to="/benefits"
+                to="/conference"
                 className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-[color:var(--brand-green)] group-hover:gap-2 transition-all"
               >
-                Learn more <ArrowRight className="h-3.5 w-3.5" />
+                Conference details <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </div>
           ))}

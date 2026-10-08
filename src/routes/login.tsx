@@ -5,8 +5,9 @@ import { AuthError, AuthField, AuthLayout } from "@/components/app/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth, parseAuthContinueSearch } from "@/lib/auth";
-import { ApiRequestError } from "@/lib/api";
+import { ApiRequestError, apiGet } from "@/lib/api";
 import { notify } from "@/lib/toast";
+import { useQuery } from "@tanstack/react-query";
 
 export const Route = createFileRoute("/login")({
   validateSearch: parseAuthContinueSearch,
@@ -31,6 +32,11 @@ function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const learnerLogin = useQuery({
+    queryKey: ["learner-login-status"],
+    queryFn: () => apiGet<{ enabled: boolean }>("/auth/learner-login-status"),
+    retry: false,
+  });
 
   const continueToAccount = useCallback(
     async (permissions: string[]) => {
@@ -55,8 +61,14 @@ function LoginPage() {
   );
 
   useEffect(() => {
-    if (!authLoading && user) void continueToAccount(user.permissions);
-  }, [authLoading, user, continueToAccount]);
+    if (
+      !authLoading &&
+      user &&
+      (learnerLogin.data?.enabled !== false || user.permissions.includes("admin.access"))
+    ) {
+      void continueToAccount(user.permissions);
+    }
+  }, [authLoading, user, learnerLogin.data?.enabled, continueToAccount]);
 
   async function signIn(e: React.FormEvent) {
     e.preventDefault();
@@ -71,7 +83,12 @@ function LoginPage() {
       notify.success(`Welcome back, ${nextUser.firstName}.`);
       await continueToAccount(nextUser.permissions);
     } catch (err) {
-      if (err instanceof ApiRequestError && err.status === 429) {
+      if (err instanceof ApiRequestError && err.code === "ATTENDEE_LOGIN_PENDING_RELEASE") {
+        setError("Your attendee account is pending release by the Secretariat. A secure password-setup link will be sent when access is released.");
+        notify.info("Attendee access has not been released yet.");
+      } else if (err instanceof ApiRequestError && err.code === "LEARNER_LOGIN_DISABLED") {
+        setError("Learner login is temporarily unavailable.");
+      } else if (err instanceof ApiRequestError && err.status === 429) {
         setError(err.message || "Too many attempts. Wait a few minutes and try again.");
         notify.warning("Too many login attempts. Try again shortly.");
       } else if (err instanceof ApiRequestError && err.status === 401) {
@@ -87,6 +104,62 @@ function LoginPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  if (learnerLogin.data?.enabled === false && !user?.permissions.includes("admin.access")) {
+    return (
+      <AuthLayout variant="login">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">DPO Conference Connect</p>
+          <h2 className="mt-3 text-2xl font-semibold tracking-tight">Learner login is coming soon</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            Online learner access is temporarily unavailable while the Secretariat prepares the service.
+            Conference registration and ticket QR access remain separate and are not affected.
+          </p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Attendees will receive a secure password-setup link when their account access is released.
+          </p>
+          <Link
+            to="/"
+            className="mt-6 inline-flex w-full items-center justify-center rounded-full bg-primary py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+          >
+            Return to the conference website
+          </Link>
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  if (learnerLogin.isPending && !user?.permissions.includes("admin.access")) {
+    return (
+      <AuthLayout variant="login">
+        <div className="rounded-2xl border border-border bg-card p-6 text-sm text-muted-foreground shadow-sm sm:p-8">
+          Checking learner sign-in availability…
+        </div>
+      </AuthLayout>
+    );
+  }
+
+  if (learnerLogin.isError && !user?.permissions.includes("admin.access")) {
+    return (
+      <AuthLayout variant="login">
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8">
+          <h2 className="text-2xl font-semibold tracking-tight">Sign-in status unavailable</h2>
+          <p className="mt-3 text-sm leading-6 text-muted-foreground">
+            We could not confirm whether learner sign-in is available. Please try again before signing in.
+          </p>
+          <Button
+            type="button"
+            variant="outline"
+            className="mt-5 w-full"
+            loading={learnerLogin.isFetching}
+            onClick={() => void learnerLogin.refetch()}
+          >
+            Retry
+          </Button>
+        </div>
+      </AuthLayout>
+    );
   }
 
   return (

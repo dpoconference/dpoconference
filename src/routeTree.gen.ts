@@ -41,6 +41,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as AdminApplicationsRouteImport } from './routes/admin.applications'
 import { Route as AdminAuditRouteImport } from './routes/admin.audit'
 import { Route as AdminAwardsRouteImport } from './routes/admin.awards'
+import { Route as AdminCertificatesRouteImport } from './routes/admin.certificates'
 import { Route as AdminChatRouteImport } from './routes/admin.chat'
 import { Route as AdminCheckInRouteImport } from './routes/admin.check-in'
 import { Route as AdminCmsRouteImport } from './routes/admin.cms'
@@ -269,6 +270,11 @@ const AdminAuditRoute = AdminAuditRouteImport.update({
 const AdminAwardsRoute = AdminAwardsRouteImport.update({
   id: '/awards',
   path: '/awards',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCertificatesRoute = AdminCertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminChatRoute = AdminChatRouteImport.update({
@@ -650,6 +656,7 @@ export interface FileRoutesByFullPath {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
@@ -751,6 +758,7 @@ export interface FileRoutesByTo {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
@@ -854,6 +862,7 @@ export interface FileRoutesById {
   '/admin/applications': typeof AdminApplicationsRoute
   '/admin/audit': typeof AdminAuditRoute
   '/admin/awards': typeof AdminAwardsRoute
+  '/admin/certificates': typeof AdminCertificatesRoute
   '/admin/chat': typeof AdminChatRoute
   '/admin/check-in': typeof AdminCheckInRoute
   '/admin/cms': typeof AdminCmsRoute
@@ -959,6 +968,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/certificates'
     | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
@@ -1060,6 +1070,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/certificates'
     | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
@@ -1162,6 +1173,7 @@ export interface FileRouteTypes {
     | '/admin/applications'
     | '/admin/audit'
     | '/admin/awards'
+    | '/admin/certificates'
     | '/admin/chat'
     | '/admin/check-in'
     | '/admin/cms'
@@ -1506,6 +1518,13 @@ declare module '@tanstack/react-router' {
       path: '/awards'
       fullPath: '/admin/awards'
       preLoaderRoute: typeof AdminAwardsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/certificates': {
+      id: '/admin/certificates'
+      path: '/certificates'
+      fullPath: '/admin/certificates'
+      preLoaderRoute: typeof AdminCertificatesRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/chat': {
@@ -1998,6 +2017,7 @@ interface AdminRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
   AdminAuditRoute: typeof AdminAuditRoute
   AdminAwardsRoute: typeof AdminAwardsRoute
+  AdminCertificatesRoute: typeof AdminCertificatesRoute
   AdminChatRoute: typeof AdminChatRoute
   AdminCheckInRoute: typeof AdminCheckInRoute
   AdminCmsRoute: typeof AdminCmsRoute
@@ -2026,6 +2046,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
   AdminAuditRoute: AdminAuditRoute,
   AdminAwardsRoute: AdminAwardsRoute,
+  AdminCertificatesRoute: AdminCertificatesRoute,
   AdminChatRoute: AdminChatRoute,
   AdminCheckInRoute: AdminCheckInRoute,
   AdminCmsRoute: AdminCmsRoute,

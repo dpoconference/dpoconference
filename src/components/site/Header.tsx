@@ -1,25 +1,24 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { Menu, X, Search, ShieldCheck, Users, ChevronDown } from "lucide-react";
+import { Menu, X, Search, ChevronDown } from "lucide-react";
 import logo from "@/assets/logo.png";
 import { useAuth } from "@/lib/auth";
 import { apiGet } from "@/lib/api";
 
 const primary = [
   { to: "/", label: "Home" },
-  { to: "/about", label: "About" },
-  { to: "/membership", label: "Membership" },
-  { to: "/conferences", label: "Conference" },
-  { to: "/training", label: "Training" },
-  { to: "/courses", label: "Courses" },
+  { to: "/conference", label: "About the Conference" },
+  { to: "/conference", hash: "activities", label: "Programme" },
+  { to: "/conference/speak", label: "Speakers" },
+  { to: "/conference/sponsor", label: "Sponsors" },
+  { to: "/faq", label: "FAQs" },
 ] as const;
 
 const more = [
+  { to: "/conferences", label: "All conferences" },
   { to: "/conference/lookup", label: "Find e-invite" },
-  { to: "/communities", label: "Communities" },
   { to: "/resources", label: "Resources" },
-  { to: "/careers", label: "Careers" },
-  { to: "/benefits", label: "Benefits" },
+  { to: "/news", label: "News" },
   { to: "/contact", label: "Contact" },
 ] as const;
 
@@ -77,10 +76,11 @@ export function Header() {
     if (!term) {
       setHits([
         { title: "Conferences", href: "/conferences" },
-        { title: "Membership", href: "/membership" },
-        { title: "Training", href: "/training" },
+        { title: "About the Conference", href: "/conference" },
+        { title: "Programme", href: "/conference#activities" },
+        { title: "FAQs", href: "/faq" },
         { title: "Resources", href: "/resources" },
-        { title: "FAQ", href: "/faq" },
+        { title: "Contact", href: "/contact" },
       ]);
       return;
     }
@@ -115,20 +115,6 @@ export function Header() {
             Advancing privacy leadership and data governance excellence
           </p>
           <div className="flex shrink-0 items-center gap-4">
-            <Link
-              to="/verify-member"
-              className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]"
-            >
-              <ShieldCheck className="h-3 w-3" />
-              Verify member
-            </Link>
-            <Link
-              to="/members/directory"
-              className="inline-flex items-center gap-1 hover:text-[color:var(--brand-gold)]"
-            >
-              <Users className="h-3 w-3" />
-              Find a DPO
-            </Link>
             <a
               href="mailto:info@dpoconference.com"
               className="hover:text-[color:var(--brand-gold)]"
@@ -160,8 +146,9 @@ export function Header() {
           <nav className="hidden flex-1 items-center justify-center lg:flex">
             {primary.map((n) => (
               <Link
-                key={n.to}
+                key={n.label}
                 to={n.to}
+                hash={"hash" in n ? n.hash : undefined}
                 className={navLink}
                 activeProps={{ className: navActive }}
                 activeOptions={{ exact: n.to === "/" }}
@@ -207,8 +194,8 @@ export function Header() {
                 setSearchOpen(true);
                 setHits([
                   { title: "Conference", href: "/conference" },
-                  { title: "Membership", href: "/membership" },
-                  { title: "Training", href: "/training" },
+                  { title: "Programme", href: "/conference#activities" },
+                  { title: "FAQs", href: "/faq" },
                   { title: "News", href: "/news" },
                 ]);
               }}
@@ -256,28 +243,15 @@ export function Header() {
             <div className="flex flex-col px-4 py-3">
               {allNav.map((n) => (
                 <Link
-                  key={n.to}
+                  key={n.label}
                   to={n.to}
+                  hash={"hash" in n ? n.hash : undefined}
                   className="py-2 text-sm font-medium"
                   onClick={() => setOpen(false)}
                 >
                   {n.label}
                 </Link>
               ))}
-              <Link
-                to="/verify-member"
-                className="py-2 text-sm font-medium"
-                onClick={() => setOpen(false)}
-              >
-                Verify member
-              </Link>
-              <Link
-                to="/members/directory"
-                className="py-2 text-sm font-medium"
-                onClick={() => setOpen(false)}
-              >
-                Find a DPO
-              </Link>
               {!user && (
                 <>
                   <Link

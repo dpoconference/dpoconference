@@ -1,12 +1,15 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useState, type FormEvent } from "react";
 import { Calendar, MapPin, Ticket, Users } from "lucide-react";
 import { SiteLayout } from "@/components/site/Layout";
 import { CheckList } from "@/components/site/CheckList";
 import { ConferenceRegisterForm } from "@/components/site/ConferenceRegisterForm";
+import { Button } from "@/components/ui/button";
 import { SafeHtml } from "@/components/SafeHtml";
-import { apiGet } from "@/lib/api";
-import { formatConferenceDates, formatNaira } from "@/lib/format";
+import { apiGet, apiPost } from "@/lib/api";
+import { formatConferenceDateLabel, formatConferenceDates, formatNaira } from "@/lib/format";
+import { notify } from "@/lib/toast";
 import { Skeleton } from "@/components/ui/skeleton";
 import conferenceImg from "@/assets/conference.jpg";
 
@@ -37,9 +40,11 @@ type PublicConference = {
   city: string;
   format?: string | null;
   isFree: boolean;
-  fromAmountNgn: number;
+  fromAmountNgn: number | null;
   capacity?: number | null;
   registrationOpen?: boolean;
+  registrationReady?: boolean;
+  datesToBeAnnounced?: boolean;
   registrationOpensOn?: string | null;
   registrationClosesOn?: string | null;
   agenda?: AgendaDay[] | null;
@@ -52,13 +57,19 @@ function ConferenceDetailPage() {
     queryFn: () => apiGet<PublicConference>(`/public/conferences/${slug}`),
   });
   const c = q.data;
+  const isUpcoming = Boolean(c && new Date(c.endsOn).getTime() >= Date.now());
+  const registrationReady = c?.registrationReady ?? false;
   const heroImg = c?.coverUrl || conferenceImg;
   const priceLabel =
-    c && (c.isFree || Number(c.fromAmountNgn) === 0)
-      ? "Free"
-      : c
-        ? `From ${formatNaira(Number(c.fromAmountNgn))}`
-        : "";
+    !c
+      ? ""
+      : c.isFree
+        ? "Free"
+        : c.fromAmountNgn == null
+          ? "Waitlist open"
+          : c.fromAmountNgn === 0
+            ? "Free"
+            : `From ${formatNaira(c.fromAmountNgn)}`;
 
   if (q.isPending) {
     return (
@@ -95,7 +106,7 @@ function ConferenceDetailPage() {
           <h1 className="mt-5 max-w-4xl text-4xl font-extrabold leading-[1.05] md:text-6xl">{c.title}</h1>
           {c.theme ? <p className="mt-5 max-w-2xl text-xl text-white/85">{c.theme}</p> : null}
           <div className="mt-8 flex flex-wrap gap-2">
-            <Chip icon={Calendar} label={formatConferenceDates(c.startsOn, c.endsOn)} />
+            <Chip icon={Calendar} label={formatConferenceDateLabel(c.startsOn, c.endsOn, c.datesToBeAnnounced)} />
             <Chip icon={MapPin} label={`${c.venue}, ${c.city}`} />
             <Chip icon={Ticket} label={c.format ?? "Hybrid"} />
             <Chip icon={Users} label={priceLabel} />
@@ -105,7 +116,7 @@ function ConferenceDetailPage() {
               href="#register"
               className="min-h-11 rounded-md bg-[color:var(--brand-gold)] px-6 py-3.5 font-bold text-[color:var(--brand-deep)]"
             >
-              Register
+              {isUpcoming && !registrationReady ? "Join waitlist" : "Register"}
             </a>
             <Link to="/conference/speak" className="min-h-11 rounded-md px-6 py-3.5 font-semibold text-white/90">
               Apply to Speak
@@ -215,8 +226,8 @@ function ConferenceDetailPage() {
         <ul className="mt-4 space-y-2 text-sm leading-7">
           <li>
             <span className="font-semibold">Registration: </span>
-            {c.registrationOpen === false ? "Closed" : "Open"}
-            {c.registrationOpensOn || c.registrationClosesOn
+            {registrationReady ? "Open" : isUpcoming ? "Waitlist" : "Closed"}
+            {!c.datesToBeAnnounced && (c.registrationOpensOn || c.registrationClosesOn)
               ? ` · ${c.registrationOpensOn ? formatConferenceDates(c.registrationOpensOn, c.registrationOpensOn) : "…"} to ${c.registrationClosesOn ? formatConferenceDates(c.registrationClosesOn, c.registrationClosesOn) : "…"}`
               : null}
           </li>
@@ -235,13 +246,30 @@ function ConferenceDetailPage() {
 
       <section id="register" className="border-t border-[color:var(--border)] bg-[color:var(--brand-tint)]/40 py-16">
         <div className="mx-auto max-w-xl px-6">
-          <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Register</h2>
-          <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
-            Anyone can register — member or guest. Complete the form, pay if required, and receive your e-invite.
-          </p>
-          <div className="mt-8">
-            <ConferenceRegisterForm slug={c.slug} compact />
-          </div>
+          {registrationReady ? (
+            <>
+              <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Register</h2>
+              <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
+                Anyone can register — member or guest. Complete the form, pay if required, and receive your e-invite.
+              </p>
+              <div className="mt-8">
+                <ConferenceRegisterForm slug={c.slug} compact />
+              </div>
+            </>
+          ) : isUpcoming ? (
+            <>
+              <h2 className="text-3xl font-extrabold text-[color:var(--brand-deep)]">Join the waitlist</h2>
+              <p className="mt-2 text-sm text-[color:var(--muted-foreground)]">
+                Registration details are being prepared. Join the waitlist and we’ll email you when the programme and ticket
+                options are ready.
+              </p>
+              <div className="mt-8">
+                <ConferenceWaitlistForm slug={c.slug} />
+              </div>
+            </>
+          ) : (
+            <p className="text-sm text-[color:var(--muted-foreground)]">Registration for this conference is closed.</p>
+          )}
         </div>
       </section>
 
@@ -250,10 +278,108 @@ function ConferenceDetailPage() {
           href="#register"
           className="flex min-h-11 w-full items-center justify-center rounded-md bg-[color:var(--brand-gold)] font-bold text-[color:var(--brand-deep)]"
         >
-          Register
+          {isUpcoming && !registrationReady ? "Join waitlist" : "Register"}
         </a>
       </div>
     </SiteLayout>
+  );
+}
+
+function ConferenceWaitlistForm({ slug }: { slug: string }) {
+  const [form, setForm] = useState({ name: "", organisationName: "", email: "", phone: "" });
+  const [loading, setLoading] = useState(false);
+  const [whatsappGroupUrl, setWhatsappGroupUrl] = useState("");
+
+  async function submit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = await apiPost<{ whatsappGroupUrl: string }>(`/public/conferences/${slug}/waitlist`, {
+        name: form.name.trim(),
+        organisationName: form.organisationName.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
+      });
+      setWhatsappGroupUrl(data.whatsappGroupUrl);
+      notify.success("You’ve joined the conference waitlist.");
+    } catch (err) {
+      notify.error(err instanceof Error ? err.message : "Could not join the waitlist.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (whatsappGroupUrl) {
+    return (
+      <div className="space-y-4 rounded-xl border border-[color:var(--border)] bg-white p-5">
+        <p className="text-sm font-semibold text-[color:var(--brand-deep)]">
+          You’re on the waitlist. We’ll email you when registration opens.
+        </p>
+        <a
+          href={whatsappGroupUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex min-h-11 items-center justify-center rounded-md bg-[color:var(--brand-green)] px-5 py-3 font-semibold text-white"
+        >
+          Join our WhatsApp group
+        </a>
+      </div>
+    );
+  }
+
+  return (
+    <form className="space-y-3 rounded-xl border border-[color:var(--border)] bg-white p-5" onSubmit={submit}>
+      <input
+        required
+        minLength={2}
+        maxLength={160}
+        placeholder="Full name"
+        autoComplete="name"
+        className="w-full rounded-md border px-3 py-3"
+        value={form.name}
+        onChange={(e) => setForm({ ...form, name: e.target.value })}
+      />
+      <input
+        required
+        minLength={2}
+        maxLength={200}
+        placeholder="Organization name"
+        autoComplete="organization"
+        className="w-full rounded-md border px-3 py-3"
+        value={form.organisationName}
+        onChange={(e) => setForm({ ...form, organisationName: e.target.value })}
+      />
+      <input
+        required
+        type="email"
+        placeholder="Email address"
+        autoComplete="email"
+        className="w-full rounded-md border px-3 py-3"
+        value={form.email}
+        onChange={(e) => setForm({ ...form, email: e.target.value })}
+      />
+      <input
+        required
+        type="tel"
+        minLength={5}
+        maxLength={40}
+        placeholder="Phone number"
+        autoComplete="tel"
+        className="w-full rounded-md border px-3 py-3"
+        value={form.phone}
+        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+      />
+      <p className="text-xs leading-5 text-muted-foreground">
+        We’ll use these details to manage your waitlist request and notify you when registration opens. See our{" "}
+        <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-semibold text-[color:var(--brand-green)]">
+          Privacy Notice
+        </Link>
+        .
+      </p>
+      <Button type="submit" loading={loading} className="w-full gradient-brand text-white">
+        Join waitlist
+      </Button>
+    </form>
   );
 }
 

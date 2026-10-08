@@ -65,7 +65,7 @@ function ConferenceInvitePage() {
         <section className="mx-auto max-w-lg px-6 py-24 text-center text-sm">
           <h1 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">E-invite</h1>
           <p className="mt-3 text-[color:var(--muted-foreground)]">
-            Open this page from your confirmation email, or look up your ticket with email or Registration ID.
+            Open this page from your confirmation email, or look up your ticket using both your registered email and Registration ID.
           </p>
           <Link to="/conference/lookup" className="mt-6 inline-block font-semibold text-[color:var(--brand-green)]">
             Find my e-invite

@@ -41,6 +41,16 @@ export function formatConferenceDates(startsOn: string | Date, endsOn: string | 
   return `${startLabel} – ${endLabel}`;
 }
 
+export function formatConferenceDateLabel(
+  startsOn: string | Date,
+  endsOn: string | Date,
+  datesToBeAnnounced = false,
+) {
+  const starts = new Date(startsOn);
+  if (Number.isNaN(starts.getTime())) return "";
+  return datesToBeAnnounced ? `${starts.getFullYear()} · Exact dates to be announced` : formatConferenceDates(startsOn, endsOn);
+}
+
 export function conferenceNightDayCount(startsOn: string | Date, endsOn: string | Date) {
   const s = new Date(startsOn);
   const e = new Date(endsOn);

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { notify } from "@/lib/toast";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -31,6 +31,22 @@ function buildAgendaDaysFromDates(startsOn: string, endsOn: string): AgendaDay[]
     n += 1;
   }
   return days;
+}
+
+function emptyPackageForm(conferenceId = "") {
+  return {
+    conferenceId,
+    name: "",
+    slug: "",
+    participantType: "GENERAL",
+    amountNgn: "",
+    description: "",
+    salesOpenOn: "",
+    salesCloseOn: "",
+    capacity: "",
+    isActive: true,
+    isVisible: true,
+  };
 }
 
 export const Route = createFileRoute("/admin/events")({
@@ -78,15 +94,22 @@ type Conference = {
   isFree?: boolean;
   capacity?: number | null;
   agenda?: AgendaDay[] | null;
+  datesToBeAnnounced?: boolean;
   registrationOpensOn?: string | null;
   registrationClosesOn?: string | null;
+  _count: { registrations: number };
   packages: {
     id: string;
     name: string;
     slug: string;
+    description: string;
     participantType: string;
     amountNgn: string;
+    salesOpenOn?: string | null;
+    salesCloseOn?: string | null;
+    capacity?: number | null;
     isActive: boolean;
+    isVisible?: boolean;
   }[];
 };
 
@@ -202,15 +225,11 @@ function Page() {
     agenda: [] as AgendaDay[],
     registrationOpensOn: "",
     registrationClosesOn: "",
+    datesToBeAnnounced: false,
+    eventYear: "2027",
   });
-  const [pkgForm, setPkgForm] = useState({
-    conferenceId: "",
-    name: "",
-    slug: "",
-    participantType: "GENERAL",
-    amountNgn: "",
-    isActive: true,
-  });
+  const [pkgForm, setPkgForm] = useState(() => emptyPackageForm());
+  const [editingPackageId, setEditingPackageId] = useState("");
   const nightDay = useMemo(() => {
     if (!confForm.startsOn || !confForm.endsOn) return null;
     return conferenceNightDayCount(confForm.startsOn, confForm.endsOn);
@@ -283,8 +302,17 @@ function Page() {
                 e.preventDefault();
                 setLoading(true);
                 try {
-                  const startsOn = toIso(confForm.startsOn);
-                  const endsOn = toIso(confForm.endsOn);
+                  const year = Number(confForm.eventYear);
+                  const startsOn = confForm.datesToBeAnnounced
+                    ? Number.isInteger(year) && year >= 2026 && year <= 2100
+                      ? new Date(Date.UTC(year, 0, 1)).toISOString()
+                      : undefined
+                    : toIso(confForm.startsOn);
+                  const endsOn = confForm.datesToBeAnnounced
+                    ? Number.isInteger(year) && year >= 2026 && year <= 2100
+                      ? new Date(Date.UTC(year, 11, 31, 23, 59, 59)).toISOString()
+                      : undefined
+                    : toIso(confForm.endsOn);
                   if (!startsOn || !endsOn) throw new Error("Dates required");
                   await apiPost("/admin/events/conferences", {
                     slug: confForm.slug || slugify(confForm.title),
@@ -301,6 +329,7 @@ function Page() {
                     format: confForm.format,
                     isPublished: confForm.isPublished,
                     isFree: confForm.isFree,
+                    datesToBeAnnounced: confForm.datesToBeAnnounced,
                     capacity: confForm.capacity.trim() ? Number(confForm.capacity) : null,
                     agenda: confForm.agenda.map((day) => ({
                       date: day.date,
@@ -390,27 +419,55 @@ function Page() {
                 </Button>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <label className="text-xs">
-                  Starts
+                {confForm.datesToBeAnnounced ? (
+                  <label className="text-xs">
+                    Conference year
+                    <input
+                      type="number"
+                      min={2026}
+                      max={2100}
+                      className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
+                      required
+                      value={confForm.eventYear}
+                      onChange={(e) => setConfForm({ ...confForm, eventYear: e.target.value })}
+                    />
+                  </label>
+                ) : (
+                  <>
+                    <label className="text-xs">
+                      Starts
+                      <input
+                        type="datetime-local"
+                        className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
+                        required
+                        value={confForm.startsOn}
+                        onChange={(e) => setConfForm({ ...confForm, startsOn: e.target.value })}
+                      />
+                    </label>
+                    <label className="text-xs">
+                      Ends
+                      <input
+                        type="datetime-local"
+                        className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
+                        required
+                        value={confForm.endsOn}
+                        onChange={(e) => setConfForm({ ...confForm, endsOn: e.target.value })}
+                      />
+                    </label>
+                  </>
+                )}
+                <label className="flex items-center gap-2 text-xs">
                   <input
-                    type="datetime-local"
-                    className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
-                    required
-                    value={confForm.startsOn}
-                    onChange={(e) => setConfForm({ ...confForm, startsOn: e.target.value })}
+                    type="checkbox"
+                    checked={confForm.datesToBeAnnounced}
+                    onChange={(e) => setConfForm({ ...confForm, datesToBeAnnounced: e.target.checked })}
                   />
-                </label>
-                <label className="text-xs">
-                  Ends
-                  <input
-                    type="datetime-local"
-                    className="mt-1 w-full rounded-md border px-2 py-2 text-sm"
-                    required
-                    value={confForm.endsOn}
-                    onChange={(e) => setConfForm({ ...confForm, endsOn: e.target.value })}
-                  />
+                  Exact dates to be announced
                 </label>
               </div>
+              {confForm.datesToBeAnnounced ? (
+                <p className="text-xs text-muted-foreground">The public event page will show only the selected year, not placeholder dates.</p>
+              ) : null}
               {nightDay ? (
                 <p className="text-xs text-muted-foreground">
                   {nightDay.days} day{nightDay.days === 1 ? "" : "s"} · {nightDay.nights} night
@@ -605,6 +662,8 @@ function Page() {
                           })),
                           registrationOpensOn: fromIso(c.registrationOpensOn),
                           registrationClosesOn: fromIso(c.registrationClosesOn),
+                          datesToBeAnnounced: Boolean(c.datesToBeAnnounced),
+                          eventYear: String(new Date(c.startsOn).getFullYear()),
                         });
                         setPkgForm((p) => ({ ...p, conferenceId: c.id }));
                       }}
@@ -633,6 +692,25 @@ function Page() {
                         Archive
                       </Button>
                     ) : null}
+                    {c._count.registrations === 0 ? (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="destructive"
+                        className="ml-2 mt-2"
+                        onClick={() => {
+                          if (!window.confirm(`Permanently delete "${c.title}" and its packages and waitlist entries?`)) return;
+                          void apiDelete(`/admin/events/conferences/${c.id}`)
+                            .then(() => {
+                              notify.success("Conference deleted.");
+                              return conferences.refetch();
+                            })
+                            .catch((err) => notify.error(err instanceof Error ? err.message : "Delete failed."));
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    ) : null}
                   </li>
                 ))}
                 {(conferences.data ?? []).length === 0 && <p className="text-muted-foreground">No conferences yet.</p>}
@@ -653,9 +731,14 @@ function Page() {
                 await apiPut(`/admin/events/conferences/${pkgForm.conferenceId}/packages`, {
                   name: pkgForm.name,
                   slug: pkgForm.slug || slugify(pkgForm.name),
+                  description: pkgForm.description,
                   participantType: pkgForm.participantType,
                   amountNgn: Number(pkgForm.amountNgn),
+                  salesOpenOn: toIso(pkgForm.salesOpenOn) ?? null,
+                  salesCloseOn: toIso(pkgForm.salesCloseOn) ?? null,
+                  capacity: pkgForm.capacity ? Number(pkgForm.capacity) : null,
                   isActive: pkgForm.isActive,
+                  isVisible: pkgForm.isVisible,
                 });
                 notify.success("Package saved.");
                 await conferences.refetch();
@@ -668,7 +751,10 @@ function Page() {
             <select
               className="rounded-md border px-3 py-2 text-sm"
               value={pkgForm.conferenceId}
-              onChange={(e) => setPkgForm({ ...pkgForm, conferenceId: e.target.value })}
+              onChange={(e) => {
+                setEditingPackageId("");
+                setPkgForm(emptyPackageForm(e.target.value));
+              }}
               required
             >
               <option value="">Select conference</option>
@@ -677,6 +763,42 @@ function Page() {
                   {c.title}
                 </option>
               ))}
+            </select>
+            <select
+              className="rounded-md border px-3 py-2 text-sm"
+              value={editingPackageId}
+              onChange={(e) => {
+                const conference = (conferences.data ?? []).find((item) => item.id === pkgForm.conferenceId);
+                const selectedPackage = conference?.packages.find((item) => item.id === e.target.value);
+                setEditingPackageId(e.target.value);
+                if (!selectedPackage) {
+                  setPkgForm(emptyPackageForm(pkgForm.conferenceId));
+                  return;
+                }
+                setPkgForm({
+                  conferenceId: pkgForm.conferenceId,
+                  name: selectedPackage.name,
+                  slug: selectedPackage.slug,
+                  participantType: selectedPackage.participantType,
+                  amountNgn: String(selectedPackage.amountNgn),
+                  description: selectedPackage.description,
+                  salesOpenOn: fromIso(selectedPackage.salesOpenOn),
+                  salesCloseOn: fromIso(selectedPackage.salesCloseOn),
+                  capacity: selectedPackage.capacity == null ? "" : String(selectedPackage.capacity),
+                  isActive: selectedPackage.isActive,
+                  isVisible: selectedPackage.isVisible ?? true,
+                });
+              }}
+              disabled={!pkgForm.conferenceId}
+            >
+              <option value="">Create new package</option>
+              {(conferences.data ?? [])
+                .find((item) => item.id === pkgForm.conferenceId)
+                ?.packages.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    Edit: {item.name}
+                  </option>
+                ))}
             </select>
             <input
               className="rounded-md border px-3 py-2 text-sm"
@@ -689,6 +811,7 @@ function Page() {
               className="rounded-md border px-3 py-2 text-sm"
               required
               placeholder="slug"
+              disabled={Boolean(editingPackageId)}
               value={pkgForm.slug}
               onChange={(e) => setPkgForm({ ...pkgForm, slug: e.target.value })}
             />
@@ -705,6 +828,12 @@ function Page() {
             </select>
             <input
               className="rounded-md border px-3 py-2 text-sm"
+              placeholder="Short description"
+              value={pkgForm.description}
+              onChange={(e) => setPkgForm({ ...pkgForm, description: e.target.value })}
+            />
+            <input
+              className="rounded-md border px-3 py-2 text-sm"
               required
               type="number"
               min={0}
@@ -712,6 +841,44 @@ function Page() {
               value={pkgForm.amountNgn}
               onChange={(e) => setPkgForm({ ...pkgForm, amountNgn: e.target.value })}
             />
+            <input
+              className="rounded-md border px-3 py-2 text-sm"
+              type="datetime-local"
+              aria-label="Sales open date"
+              value={pkgForm.salesOpenOn}
+              onChange={(e) => setPkgForm({ ...pkgForm, salesOpenOn: e.target.value })}
+            />
+            <input
+              className="rounded-md border px-3 py-2 text-sm"
+              type="datetime-local"
+              aria-label="Sales close date"
+              value={pkgForm.salesCloseOn}
+              onChange={(e) => setPkgForm({ ...pkgForm, salesCloseOn: e.target.value })}
+            />
+            <input
+              className="rounded-md border px-3 py-2 text-sm"
+              type="number"
+              min={1}
+              placeholder="Ticket capacity (optional)"
+              value={pkgForm.capacity}
+              onChange={(e) => setPkgForm({ ...pkgForm, capacity: e.target.value })}
+            />
+            <label className="flex items-center gap-2 text-sm sm:col-span-3">
+              <input
+                type="checkbox"
+                checked={pkgForm.isActive}
+                onChange={(e) => setPkgForm({ ...pkgForm, isActive: e.target.checked })}
+              />
+              Active for sale
+            </label>
+            <label className="flex items-center gap-2 text-sm sm:col-span-3">
+              <input
+                type="checkbox"
+                checked={pkgForm.isVisible}
+                onChange={(e) => setPkgForm({ ...pkgForm, isVisible: e.target.checked })}
+              />
+              Visible publicly
+            </label>
             <Button type="submit" loading={loading}>
               Save package
             </Button>

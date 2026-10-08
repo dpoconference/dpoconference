@@ -18,6 +18,7 @@ import {
 type Package = {
   slug: string;
   name: string;
+  description?: string;
   amountNgn: number | string;
   participantType: string;
 };
@@ -30,7 +31,7 @@ type PublicConference = {
   venue: string;
   city: string;
   isFree: boolean;
-  fromAmountNgn: number;
+  fromAmountNgn: number | null;
   registrationOpen?: boolean;
   packages: Package[];
 };
@@ -66,7 +67,9 @@ export function ConferenceRegisterForm({
   }, [q.data?.packages]);
 
   const [pkg, setPkg] = useState("");
-  const [consent, setConsent] = useState(false);
+  const [privacyConsent, setPrivacyConsent] = useState(false);
+  const [eventTermsConsent, setEventTermsConsent] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<PaymentMethodChoice>("PAYSTACK");
   const [bankSession, setBankSession] = useState<BankTransferSession | null>(null);
@@ -101,10 +104,8 @@ export function ConferenceRegisterForm({
   }, [payCfg.data]);
 
   const selected = packages.find((p) => p.slug === pkg);
-  const isFree =
-    Boolean(q.data?.isFree) ||
-    Number(selected?.amountNgn ?? q.data?.fromAmountNgn ?? 0) === 0 ||
-    (packages.length === 0 && Number(q.data?.fromAmountNgn ?? 0) === 0);
+  const effectivePackage = selected ?? packages[0];
+  const isFree = Boolean(q.data?.isFree) || (Boolean(effectivePackage) && Number(effectivePackage?.amountNgn) === 0);
 
   async function submit() {
     if (!q.data) return;
@@ -112,8 +113,8 @@ export function ConferenceRegisterForm({
       notify.error("First name, last name and email are required.");
       return;
     }
-    if (!consent) {
-      notify.error("Please agree to the Privacy Notice consent.");
+    if (!privacyConsent || !eventTermsConsent) {
+      notify.error("Please accept the Privacy Notice and event terms to continue.");
       return;
     }
     setLoading(true);
@@ -127,6 +128,9 @@ export function ConferenceRegisterForm({
         invite?: { email?: string } | null;
       }>(`/public/conferences/${slug}/register`, {
         ...(pkg ? { packageSlug: pkg } : {}),
+        privacyConsent,
+        eventTermsConsent,
+        marketingConsent,
         details: {
           firstName: details.firstName.trim(),
           lastName: details.lastName.trim(),
@@ -213,7 +217,13 @@ export function ConferenceRegisterForm({
 
   const conf = q.data;
   const summaryPrice =
-    isFree ? "Free" : selected ? formatNaira(Number(selected.amountNgn)) : `From ${formatNaira(Number(conf.fromAmountNgn))}`;
+    isFree
+      ? "Free"
+      : selected
+        ? formatNaira(Number(selected.amountNgn))
+        : conf.fromAmountNgn == null
+          ? "Unavailable"
+          : `From ${formatNaira(conf.fromAmountNgn)}`;
   const payLabel = isFree
     ? "Complete registration"
     : method === "BANK_TRANSFER"
@@ -232,6 +242,9 @@ export function ConferenceRegisterForm({
           {conf.registrationOpen === false ? (
             <p className="mt-2 text-amber-700">Registration is currently closed for this conference.</p>
           ) : null}
+          {conf.registrationOpen !== false && packages.length === 0 ? (
+            <p className="mt-2 text-amber-700">No ticket categories are currently available for registration.</p>
+          ) : null}
         </div>
       ) : (
         <div className="rounded-xl border border-[color:var(--border)] bg-white p-4 text-sm">
@@ -241,6 +254,9 @@ export function ConferenceRegisterForm({
           </p>
           {conf.registrationOpen === false ? (
             <p className="mt-2 text-amber-700">Registration is currently closed for this conference.</p>
+          ) : null}
+          {conf.registrationOpen !== false && packages.length === 0 ? (
+            <p className="mt-2 text-amber-700">No ticket categories are currently available for registration.</p>
           ) : null}
         </div>
       )}
@@ -254,9 +270,13 @@ export function ConferenceRegisterForm({
             >
               <input type="radio" className="mr-2" checked={pkg === p.slug} onChange={() => setPkg(p.slug)} />
               {p.name} · {Number(p.amountNgn) === 0 ? "Free" : formatNaira(Number(p.amountNgn))}
+              {p.description ? <span className="mt-1 block text-sm text-muted-foreground">{p.description}</span> : null}
             </label>
           ))}
         </div>
+      ) : null}
+      {packages.length === 1 && packages[0].description ? (
+        <p className="text-sm text-muted-foreground">{packages[0].description}</p>
       ) : null}
 
       {(
@@ -284,16 +304,53 @@ export function ConferenceRegisterForm({
         <PaymentMethodStep config={payCfg.data} value={method} onChange={setMethod} />
       ) : null}
 
-      <label className="flex items-start gap-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
-        <input type="checkbox" className="mt-1" checked={consent} onChange={(e) => setConsent(e.target.checked)} />
-        <span>
-          I agree that Data Protection Officers Conference may use this information to issue my e-invite and process my registration in line with the{" "}
-          <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-semibold text-[color:var(--brand-green)]">
-            Privacy Notice
-          </Link>
-          .
-        </span>
-      </label>
+      <div className="space-y-3 rounded-lg border border-[color:var(--border)] p-4">
+        <label className="flex items-start gap-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
+          <input
+            type="checkbox"
+            required
+            className="mt-1"
+            checked={privacyConsent}
+            onChange={(e) => setPrivacyConsent(e.target.checked)}
+          />
+          <span>
+            I agree that Data Protection Officers Conference may use my information to process this registration in line with the{" "}
+            <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-semibold text-[color:var(--brand-green)]">
+              Privacy Notice
+            </Link>
+            .
+          </span>
+        </label>
+        <label className="flex items-start gap-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
+          <input
+            type="checkbox"
+            required
+            className="mt-1"
+            checked={eventTermsConsent}
+            onChange={(e) => setEventTermsConsent(e.target.checked)}
+          />
+          <span>
+            I accept the{" "}
+            <Link to="/legal/$slug" params={{ slug: "terms-of-use" }} className="font-semibold text-[color:var(--brand-green)]">
+              event terms
+            </Link>{" "}
+            and{" "}
+            <Link to="/legal/$slug" params={{ slug: "refund-policy" }} className="font-semibold text-[color:var(--brand-green)]">
+              refund policy
+            </Link>
+            .
+          </span>
+        </label>
+        <label className="flex items-start gap-2 text-sm leading-6 text-[color:var(--muted-foreground)]">
+          <input
+            type="checkbox"
+            className="mt-1"
+            checked={marketingConsent}
+            onChange={(e) => setMarketingConsent(e.target.checked)}
+          />
+          <span>Send me optional conference and professional updates. I can unsubscribe at any time.</span>
+        </label>
+      </div>
 
       <p className="text-xs text-[color:var(--muted-foreground)]">
         This registers you for a conference ticket only — not membership.{" "}
@@ -305,7 +362,7 @@ export function ConferenceRegisterForm({
 
       <Button
         loading={loading}
-        disabled={conf.registrationOpen === false}
+        disabled={conf.registrationOpen === false || packages.length === 0}
         className="w-full gradient-brand text-white"
         onClick={() => void submit()}
       >

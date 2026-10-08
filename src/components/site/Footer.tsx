@@ -56,16 +56,13 @@ export function Footer() {
         <FooterCol
           title="Quick Links"
           links={[
-            ["About Us", "/about"],
-            ["Membership", "/membership"],
+            ["About the Conference", "/conference"],
+            ["Programme", "/conference#activities"],
             ["Annual Conference", "/conferences"],
             ["Find e-invite", "/conference/lookup"],
-            ["Training and CPD", "/training"],
-            ["Sector Communities", "/communities"],
-            ["Mentorship", "/mentorship"],
-            ["Awards", "/awards"],
+            ["Speakers", "/conference/speak"],
+            ["Sponsors", "/conference/sponsor"],
             ["Partnerships", "/partnerships"],
-            ["Threat Intelligence", "/threat-intelligence"],
           ]}
         />
         <FooterCol
@@ -84,10 +81,8 @@ export function Footer() {
             ["Privacy Notice", "/legal/privacy-notice"],
             ["Cookie Notice", "/legal/cookie-notice"],
             ["Terms of Use", "/legal/terms-of-use"],
-            ["Membership Terms", "/legal/membership-terms"],
-            ["Code of Ethics", "/legal/code-of-ethics"],
-            ["Acceptable Use", "/legal/acceptable-use-policy"],
             ["Refund Policy", "/legal/refund-policy"],
+            ["Accessibility", "/legal/accessibility"],
           ]}
         />
         <div>

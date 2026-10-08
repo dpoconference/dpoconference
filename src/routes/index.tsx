@@ -19,11 +19,10 @@ import {
   Star,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/Layout";
-import conferenceImg from "@/assets/conference.jpg";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet, apiPost } from "@/lib/api";
 import { cmsSection, useCmsPage } from "@/lib/cms";
-import { formatConferenceDates, formatNaira } from "@/lib/format";
+import { formatConferenceDateLabel, formatNaira } from "@/lib/format";
 import { notify } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 
@@ -669,14 +668,18 @@ function ConferenceSpotlight() {
           city: string;
           format?: string | null;
           isFree: boolean;
-          fromAmountNgn: number;
+          fromAmountNgn: number | null;
+          datesToBeAnnounced?: boolean;
         }[]
       >("/public/conferences"),
   });
 
   const now = Date.now();
   const upcoming = (q.data ?? []).filter((c) => new Date(c.endsOn).getTime() >= now);
-  const cards = upcoming.slice(0, 3);
+  const spotlightConference = upcoming.find((c) => c.slug === "annual-2027");
+  const cards = spotlightConference
+    ? [spotlightConference, ...upcoming.filter((c) => c.slug !== spotlightConference.slug).slice(0, 2)]
+    : upcoming.slice(0, 3);
   const featured = cards[0];
   return (
     <section className="relative overflow-hidden">
@@ -697,12 +700,13 @@ function ConferenceSpotlight() {
               </span>
               <h2 className="mt-5 text-4xl md:text-5xl font-extrabold leading-tight">
                 {featured
-                  ? "The flagship gathering for Africa's privacy profession."
+                  ? featured.title
                   : "The Data Protection Officers Conference is coming soon."}
               </h2>
               <p className="mt-4 text-white/85 text-lg max-w-lg">
                 {featured
-                  ? "Join DPOs, regulators and privacy leaders for practical learning, professional connections and cross-sector dialogue."
+                  ? featured.theme ||
+                    "Join DPOs, regulators and privacy leaders for practical learning, professional connections and cross-sector dialogue."
                   : "We are preparing a gathering for DPOs, regulators and privacy professionals to share practical insight, strengthen connections and advance trusted data protection across Africa. Dates, venue and programme details will be announced here."}
               </p>
             </div>
@@ -764,15 +768,16 @@ function ConferenceSpotlight() {
                 >
                   <div className="aspect-video overflow-hidden">
                     <img
-                      src={c.coverUrl || conferenceImg}
+                      src={c.coverUrl || CONFERENCE_SPOTLIGHT_IMAGE}
                       alt=""
                       className="h-full w-full object-cover"
                       loading="lazy"
                     />
                   </div>
                   <div className="p-5">
-                    <p className="text-xs uppercase tracking-wide text-white/60">
-                      {formatConferenceDates(c.startsOn, c.endsOn)}
+                    <p className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-white/60">
+                      <Calendar className="h-3.5 w-3.5" />
+                      {formatConferenceDateLabel(c.startsOn, c.endsOn, c.datesToBeAnnounced)}
                     </p>
                     <h3 className="mt-2 text-lg font-bold leading-snug">{c.title}</h3>
                     <p className="mt-2 flex items-center gap-1.5 text-sm text-white/80">
@@ -781,21 +786,36 @@ function ConferenceSpotlight() {
                       {c.format ? ` · ${c.format}` : ""}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[color:var(--brand-gold)]">
-                      {c.isFree || Number(c.fromAmountNgn) === 0
+                      {c.isFree
                         ? "Free"
-                        : `From ${formatNaira(Number(c.fromAmountNgn))}`}
+                        : c.fromAmountNgn == null
+                          ? "Waitlist open"
+                          : c.fromAmountNgn === 0
+                            ? "Free"
+                            : `From ${formatNaira(c.fromAmountNgn)}`}
                     </p>
                     {c.theme ? (
                       <p className="mt-2 line-clamp-2 text-sm text-white/75">{c.theme}</p>
                     ) : null}
                     <div className="mt-5 flex flex-wrap gap-3">
-                      <Link
-                        to="/conferences/$slug/register"
-                        params={{ slug: c.slug }}
-                        className="rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
-                      >
-                        Register
-                      </Link>
+                      {c.fromAmountNgn == null ? (
+                        <Link
+                          to="/conferences/$slug"
+                          params={{ slug: c.slug }}
+                          hash="register"
+                          className="rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
+                        >
+                          Join Waitlist
+                        </Link>
+                      ) : (
+                        <Link
+                          to="/conferences/$slug/register"
+                          params={{ slug: c.slug }}
+                          className="rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
+                        >
+                          Register
+                        </Link>
+                      )}
                       <Link
                         to="/conferences/$slug"
                         params={{ slug: c.slug }}
@@ -812,13 +832,24 @@ function ConferenceSpotlight() {
 
           {featured ? (
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link
-                to="/conferences/$slug/register"
-                params={{ slug: featured.slug }}
-                className="rounded-md bg-[color:var(--brand-gold)] px-6 py-3 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
-              >
-                Register Now
-              </Link>
+              {featured.fromAmountNgn == null ? (
+                <Link
+                  to="/conferences/$slug"
+                  params={{ slug: featured.slug }}
+                  hash="register"
+                  className="rounded-md bg-[color:var(--brand-gold)] px-6 py-3 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
+                >
+                  Join Waitlist
+                </Link>
+              ) : (
+                <Link
+                  to="/conferences/$slug/register"
+                  params={{ slug: featured.slug }}
+                  className="rounded-md bg-[color:var(--brand-gold)] px-6 py-3 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
+                >
+                  Register Now
+                </Link>
+              )}
               <Link
                 to="/conferences/$slug"
                 params={{ slug: featured.slug }}

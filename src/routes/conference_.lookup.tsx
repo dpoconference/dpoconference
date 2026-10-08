@@ -38,8 +38,8 @@ function Page() {
   const [invites, setInvites] = useState<Invite[] | null>(null);
 
   async function lookup() {
-    if (!email.trim() && !number.trim()) {
-      notify.error("Enter your email or registration number.");
+    if (!email.trim() || !number.trim()) {
+      notify.error("Enter both your registered email and registration number.");
       return;
     }
     setLoading(true);
@@ -85,7 +85,7 @@ function Page() {
         breadcrumb="Home / Conference / Find e-invite"
         eyebrow="Attendee ticket"
         title="Find or reprint your e-invite"
-        subtitle="Enter the email you registered with, or your Registration ID. This is a conference ticket, not membership."
+        subtitle="Enter both the email address used to register and your Registration ID. This is a conference ticket, not membership."
       />
       <section className="mx-auto max-w-xl space-y-6 px-6 py-12">
         <form
@@ -96,19 +96,20 @@ function Page() {
           }}
         >
           <label className="block text-sm">
-            Email
+            Registered email
             <input
               type="email"
+              required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setEmail(e.target.value.trimStart())}
               placeholder="you@organisation.ng"
             />
           </label>
-          <p className="text-center text-xs text-[color:var(--muted-foreground)]">or</p>
           <label className="block text-sm">
             Registration ID
             <input
+              required
               className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
               value={number}
               onChange={(e) => setNumber(e.target.value)}

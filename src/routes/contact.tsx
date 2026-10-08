@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { SiteLayout, PageHero } from "@/components/site/Layout";
-import { Mail, MapPin, Clock } from "lucide-react";
+import { Mail, MapPin, Clock, Phone } from "lucide-react";
 import { apiPost } from "@/lib/api";
 import { notify } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
@@ -17,15 +17,6 @@ export const Route = createFileRoute("/contact")({
   }),
   component: ContactPage,
 });
-
-const boxes = [
-  { title: "General Enquiries", email: "info@dpoconference.com" },
-  { title: "Membership Enquiries", email: "membership@dpoconference.com" },
-  { title: "Conference Enquiries", email: "conference@dpoconference.com" },
-  { title: "Partnership and Sponsorship", email: "partnerships@dpoconference.com" },
-  { title: "Training and CPD", email: "training@dpoconference.com" },
-  { title: "Career Centre", email: "careers@dpoconference.com" },
-];
 
 function ContactPage() {
   const [loading, setLoading] = useState(false);
@@ -48,16 +39,11 @@ function ContactPage() {
       <section className="mx-auto max-w-7xl px-6 py-20 grid lg:grid-cols-2 gap-10">
         <div className="space-y-4">
           <InfoCard icon={Mail} title="Email" body="info@dpoconference.com" />
+          <a href="tel:+2348033336644" className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-green)]">
+            <InfoCard icon={Phone} title="Telephone" body="+234 803 333 6644" />
+          </a>
           <InfoCard icon={MapPin} title="Secretariat" body="Abuja, Nigeria" />
           <InfoCard icon={Clock} title="Operating hours" body="Mon–Fri, 9am–5pm WAT" />
-          <div className="mt-6 grid sm:grid-cols-2 gap-3">
-            {boxes.map((d) => (
-              <a key={d.title} href={`mailto:${d.email}`} className="rounded-lg border border-[color:var(--border)] bg-white p-4 text-sm font-semibold text-[color:var(--brand-deep)] hover:border-[color:var(--brand-emerald)]">
-                <span className="block">{d.title}</span>
-                <span className="mt-1 block text-xs font-normal text-[color:var(--muted-foreground)]">{d.email}</span>
-              </a>
-            ))}
-          </div>
         </div>
         <form
           className="p-8 rounded-2xl border border-[color:var(--border)] bg-white "

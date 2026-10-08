@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Calendar, MapPin } from "lucide-react";
 import { SiteLayout, PageHero } from "@/components/site/Layout";
 import { apiGet } from "@/lib/api";
-import { formatConferenceDates, formatNaira } from "@/lib/format";
+import { formatConferenceDateLabel, formatNaira } from "@/lib/format";
 import { Skeleton } from "@/components/ui/skeleton";
 import conferenceImg from "@/assets/conference.jpg";
 
@@ -31,7 +31,8 @@ type PublicConference = {
   endsOn: string;
   city: string;
   isFree: boolean;
-  fromAmountNgn: number;
+  fromAmountNgn: number | null;
+  datesToBeAnnounced?: boolean;
 };
 
 type Filter = "upcoming" | "past" | "free" | "paid";
@@ -52,8 +53,8 @@ function ConferencesCataloguePage() {
       const upcoming = ends >= now || starts >= now;
       if (filter === "upcoming") return upcoming;
       if (filter === "past") return !upcoming;
-      if (filter === "free") return c.isFree || Number(c.fromAmountNgn) === 0;
-      if (filter === "paid") return !c.isFree && Number(c.fromAmountNgn) > 0;
+      if (filter === "free") return c.isFree || c.fromAmountNgn === 0;
+      if (filter === "paid") return !c.isFree && c.fromAmountNgn != null && c.fromAmountNgn > 0;
       return true;
     });
   }, [q.data, filter]);
@@ -114,7 +115,7 @@ function ConferencesCataloguePage() {
                 <div className="p-5">
                   <p className="flex items-center gap-1.5 text-xs text-[color:var(--muted-foreground)]">
                     <Calendar className="h-3.5 w-3.5" />
-                    {formatConferenceDates(c.startsOn, c.endsOn)}
+                    {formatConferenceDateLabel(c.startsOn, c.endsOn, c.datesToBeAnnounced)}
                   </p>
                   <p className="mt-1 flex items-center gap-1.5 text-xs text-[color:var(--muted-foreground)]">
                     <MapPin className="h-3.5 w-3.5" />
@@ -126,9 +127,13 @@ function ConferencesCataloguePage() {
                   ) : null}
                   <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                     <span className="rounded-full bg-[color:var(--brand-tint)] px-3 py-1 text-xs font-semibold text-[color:var(--brand-deep)]">
-                      {c.isFree || Number(c.fromAmountNgn) === 0
+                      {c.isFree
                         ? "Free"
-                        : `From ${formatNaira(Number(c.fromAmountNgn))}`}
+                        : c.fromAmountNgn == null
+                          ? "Waitlist open"
+                          : c.fromAmountNgn === 0
+                            ? "Free"
+                            : `From ${formatNaira(c.fromAmountNgn)}`}
                     </span>
                     <div className="flex flex-wrap gap-3">
                       <Link
@@ -139,11 +144,11 @@ function ConferencesCataloguePage() {
                         View details
                       </Link>
                       <Link
-                        to="/conferences/$slug/register"
+                        to="/conferences/$slug"
                         params={{ slug: c.slug }}
                         className="text-sm font-semibold text-[color:var(--brand-deep)] hover:text-[color:var(--brand-green)]"
                       >
-                        Register
+                        {c.fromAmountNgn == null ? "Join waitlist" : "Register"}
                       </Link>
                     </div>
                   </div>

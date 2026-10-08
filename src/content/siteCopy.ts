@@ -162,8 +162,8 @@ export const cpdActivities = [
   "Professional publications",
   "Research",
   "Speaking engagements",
-  "Mentorship",
-  "Committee service",
+  "Course completion",
+  "Approved external learning",
   "Approved external training",
 ];
 

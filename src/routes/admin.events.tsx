@@ -133,7 +133,6 @@ type Seminar = {
   facilitator?: string | null;
   outcomes?: string | null;
   certificateAvailable?: boolean;
-  memberPrice: string;
   nonMemberPrice: string;
   corporatePrice: string;
   paymentRequired: boolean;
@@ -149,6 +148,7 @@ type ConferenceWaitlistEntry = {
   organisationName: string;
   email: string;
   phone: string;
+  acknowledgementSentAt: string | null;
   notificationSentAt: string | null;
   createdAt: string;
   conference: { title: string; slug: string };
@@ -205,6 +205,8 @@ function Page() {
           organisation?: string;
           amountNgn: number;
           paymentStatus: string;
+          loginReleaseStatus: string;
+          loginReleaseSentAt: string | null;
           seminar: { title: string };
         }[]
       >("/admin/events/seminars/registrations"),
@@ -300,7 +302,6 @@ function Page() {
     facilitator: "",
     outcomes: "",
     certificateAvailable: false,
-    memberPrice: "0",
     nonMemberPrice: "25000",
     corporatePrice: "100000",
     paymentRequired: true,
@@ -926,7 +927,8 @@ function Page() {
                   conferenceId: pkgForm.conferenceId,
                   name: selectedPackage.name,
                   slug: selectedPackage.slug,
-                  participantType: selectedPackage.participantType,
+                  participantType:
+                    selectedPackage.participantType === "CORPORATE" ? "CORPORATE" : "GENERAL",
                   amountNgn: String(selectedPackage.amountNgn),
                   description: selectedPackage.description,
                   salesOpenOn: fromIso(selectedPackage.salesOpenOn),
@@ -1065,7 +1067,7 @@ function Page() {
                     endsOn,
                     durationHours: Number(semForm.durationHours),
                     capacity: Number(semForm.capacity),
-                    memberPrice: Number(semForm.memberPrice),
+                    memberPrice: Number(semForm.nonMemberPrice),
                     nonMemberPrice: Number(semForm.nonMemberPrice),
                     corporatePrice: Number(semForm.corporatePrice),
                     cpdPoints: Number(semForm.cpdPoints),
@@ -1167,18 +1169,11 @@ function Page() {
                   onChange={(e) => setSemForm({ ...semForm, cpdPoints: e.target.value })}
                 />
               </div>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <input
                   className="rounded-md border px-2 py-2 text-sm"
                   type="number"
-                  placeholder="Member ₦"
-                  value={semForm.memberPrice}
-                  onChange={(e) => setSemForm({ ...semForm, memberPrice: e.target.value })}
-                />
-                <input
-                  className="rounded-md border px-2 py-2 text-sm"
-                  type="number"
-                  placeholder="Non-member ₦"
+                  placeholder="Registration price ₦"
                   value={semForm.nonMemberPrice}
                   onChange={(e) => setSemForm({ ...semForm, nonMemberPrice: e.target.value })}
                 />
@@ -1249,7 +1244,6 @@ function Page() {
                           facilitator: s.facilitator ?? "",
                           outcomes: s.outcomes ?? "",
                           certificateAvailable: Boolean(s.certificateAvailable),
-                          memberPrice: String(s.memberPrice),
                           nonMemberPrice: String(s.nonMemberPrice),
                           corporatePrice: String(s.corporatePrice),
                           paymentRequired: s.paymentRequired,
@@ -1470,7 +1464,7 @@ function Page() {
                   <th className="p-2">Payment</th>
                   <th className="p-2">Attendance</th>
                   <th className="p-2">Learner access</th>
-                  <th className="p-2" />
+                  <th className="p-2">Learner access</th>
                 </tr>
               </thead>
               <tbody>
@@ -1509,7 +1503,10 @@ function Page() {
                     </td>
                     <td className="p-2 font-mono text-xs">{r.registrationNumber}</td>
                     <td className="p-2">{r.conference.title}</td>
-                    <td className="p-2">{r.packageName ?? r.participantType}</td>
+                    <td className="p-2">
+                      {r.packageName ??
+                        (r.participantType === "CORPORATE" ? "Corporate" : "General")}
+                    </td>
                     <td className="p-2">
                       {Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}
                     </td>
@@ -1585,6 +1582,7 @@ function Page() {
                     <th className="p-2">Email / phone</th>
                     <th className="p-2">Conference</th>
                     <th className="p-2">Joined waitlist</th>
+                    <th className="p-2">Acknowledgement</th>
                     <th className="p-2">Registration notice</th>
                   </tr>
                 </thead>
@@ -1599,6 +1597,11 @@ function Page() {
                       </td>
                       <td className="p-2">{entry.conference.title}</td>
                       <td className="p-2">{new Date(entry.createdAt).toLocaleString()}</td>
+                      <td className="p-2">
+                        {entry.acknowledgementSentAt
+                          ? `Sent ${new Date(entry.acknowledgementSentAt).toLocaleString()}`
+                          : "Pending"}
+                      </td>
                       <td className="p-2">
                         {entry.notificationSentAt
                           ? `Sent ${new Date(entry.notificationSentAt).toLocaleString()}`
@@ -1655,24 +1658,69 @@ function Page() {
                     </td>
                     <td className="p-2 font-mono text-xs">{r.registrationNumber}</td>
                     <td className="p-2">{r.seminar.title}</td>
-                    <td className="p-2">{r.participantType}</td>
+                    <td className="p-2">
+                      {r.participantType === "CORPORATE" ? "Corporate" : "General"}
+                    </td>
                     <td className="p-2">
                       {Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}
                     </td>
                     <td className="p-2">{r.paymentStatus}</td>
                     <td className="p-2">{r.attendanceStatus}</td>
                     <td className="p-2">
+                      <span className="mb-2 block text-xs">
+                        {r.loginReleaseStatus.replaceAll("_", " ")}
+                        {r.loginReleaseSentAt
+                          ? ` · ${new Date(r.loginReleaseSentAt).toLocaleString()}`
+                          : ""}
+                      </span>
+                      {canManageSettings && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          disabled={
+                            loading ||
+                            r.attendanceStatus === "WAITLIST" ||
+                            (r.paymentStatus !== "SUCCESSFUL" && Number(r.amountNgn) !== 0)
+                          }
+                          onClick={async () => {
+                            setLoading(true);
+                            try {
+                              const result = await apiPost<{ status: string }>(
+                                `/admin/events/seminars/registrations/${r.id}/login-release`,
+                                {},
+                              );
+                              notify.success(
+                                result.status === "ACTIVATED"
+                                  ? "This participant already has active learner access."
+                                  : "Secure account setup link sent or queued.",
+                              );
+                              await regs.refetch();
+                            } catch (err) {
+                              notify.error(err instanceof Error ? err.message : "Could not release learner access.");
+                            } finally {
+                              setLoading(false);
+                            }
+                          }}
+                        >
+                          {r.loginReleaseStatus === "SENT" ? "Resend setup link" : "Send setup link"}
+                        </Button>
+                      )}
                       <Button
+                        className="mt-2"
                         size="sm"
                         variant="outline"
-                        onClick={() =>
-                          void apiPost(`/admin/events/seminars/registrations/${r.id}/attendance`, {
-                            attendanceStatus: "ATTENDED",
-                          }).then(() => {
+                        disabled={loading || !["REGISTERED", "INVITED"].includes(r.attendanceStatus)}
+                        onClick={async () => {
+                          try {
+                            await apiPost(`/admin/events/seminars/registrations/${r.id}/attendance`, {
+                              attendanceStatus: "ATTENDED",
+                            });
                             notify.success("Attendance marked. CPD awarded if configured.");
-                            void regs.refetch();
-                          })
-                        }
+                            await regs.refetch();
+                          } catch (err) {
+                            notify.error(err instanceof Error ? err.message : "Could not update attendance.");
+                          }
+                        }}
                       >
                         Mark attended
                       </Button>

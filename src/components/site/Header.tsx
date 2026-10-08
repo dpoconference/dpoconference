@@ -7,22 +7,24 @@ import { apiGet } from "@/lib/api";
 
 const primary = [
   { to: "/", label: "Home" },
-  { to: "/conference", label: "About the Conference" },
+  { to: "/about", label: "About" },
+  { to: "/platform", label: "LMS / Platform" },
+] as const;
+
+const more = [
+  { to: "/conference", label: "Conference" },
   { to: "/conference", hash: "activities", label: "Programme" },
   { to: "/conference/speak", label: "Speakers" },
   { to: "/conference/sponsor", label: "Sponsors" },
   { to: "/faq", label: "FAQs" },
-] as const;
-
-const more = [
   { to: "/conferences", label: "All conferences" },
   { to: "/conference/lookup", label: "Find e-invite" },
+  { to: "/courses", label: "Courses" },
+  { to: "/training", label: "Seminars & training" },
   { to: "/resources", label: "Resources" },
   { to: "/news", label: "News" },
   { to: "/contact", label: "Contact" },
 ] as const;
-
-const allNav = [...primary, ...more];
 
 const navLink =
   "px-2.5 py-1.5 rounded-md text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)] hover:bg-[color:var(--brand-tint)] transition-colors";
@@ -101,7 +103,8 @@ export function Header() {
     if (!term) {
       setHits([
         { title: "Conferences", href: "/conferences" },
-        { title: "About the Conference", href: "/conference" },
+        { title: "About", href: "/about" },
+        { title: "Conference", href: "/conference" },
         { title: "Programme", href: "/conference#activities" },
         { title: "FAQs", href: "/faq" },
         { title: "Resources", href: "/resources" },
@@ -163,7 +166,7 @@ export function Header() {
                 <span>Data Protection Officers Conference</span>
               </div>
               <div className="mt-0.5 hidden text-[9px] uppercase tracking-[0.14em] text-[color:var(--brand-green)] sm:block">
-                PROFESSIONAL NETWORK &amp; LEADERSHIP FORUM
+                CONFERENCES · LEARNING · CPD
               </div>
             </div>
           </Link>
@@ -173,7 +176,6 @@ export function Header() {
               <Link
                 key={n.label}
                 to={n.to}
-                hash={"hash" in n ? n.hash : undefined}
                 className={navLink}
                 activeProps={{ className: navActive }}
                 activeOptions={{ exact: n.to === "/" }}
@@ -194,11 +196,12 @@ export function Header() {
                 />
               </button>
               {moreOpen && (
-                <div className="absolute left-0 top-full z-20 mt-1 w-48 rounded-lg border border-[color:var(--border)] bg-white py-1 ">
+                <div className="absolute left-0 top-full z-20 mt-1 w-56 rounded-lg border border-[color:var(--border)] bg-white py-1 ">
                   {more.map((n) => (
                     <Link
                       key={n.to}
                       to={n.to}
+                      hash={n.label === "Programme" ? "activities" : undefined}
                       className="block px-3 py-2 text-sm hover:bg-[color:var(--brand-tint)] hover:text-[color:var(--brand-deep)]"
                       onClick={() => setMoreOpen(false)}
                     >
@@ -218,6 +221,7 @@ export function Header() {
               onClick={() => {
                 setSearchOpen(true);
                 setHits([
+                  { title: "About", href: "/about" },
                   { title: "Conference", href: "/conference" },
                   { title: "Programme", href: "/conference#activities" },
                   { title: "FAQs", href: "/faq" },
@@ -255,17 +259,43 @@ export function Header() {
         {open && (
           <div className="border-t border-[color:var(--border)] bg-white lg:hidden">
             <div className="flex flex-col px-4 py-3">
-              {allNav.map((n) => (
+              {primary.map((n) => (
                 <Link
                   key={n.label}
                   to={n.to}
-                  hash={"hash" in n ? n.hash : undefined}
                   className="py-2 text-sm font-medium"
                   onClick={() => setOpen(false)}
                 >
                   {n.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                className="flex items-center justify-between py-2 text-left text-sm font-medium"
+                aria-expanded={moreOpen}
+                onClick={() => setMoreOpen((value) => !value)}
+              >
+                More
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${moreOpen ? "rotate-180" : ""}`}
+                />
+              </button>
+              {moreOpen
+                ? more.map((n) => (
+                    <Link
+                      key={n.label}
+                      to={n.to}
+                      hash={n.label === "Programme" ? "activities" : undefined}
+                      className="py-2 pl-4 text-sm font-medium text-[color:var(--muted-foreground)]"
+                      onClick={() => {
+                        setOpen(false);
+                        setMoreOpen(false);
+                      }}
+                    >
+                      {n.label}
+                    </Link>
+                  ))
+                : null}
               <HeaderDashboardLink className="py-2 text-sm font-medium hover:text-[color:var(--brand-green)]" />
               <div className="mt-2">
                 <Link

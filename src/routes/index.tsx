@@ -79,7 +79,7 @@ function Home() {
       <WhyMatters />
       <CoreBenefits />
       <ConferenceSpotlight />
-      <Sectors />
+      <LearningSpotlight />
       <Insights />
       <Newsletter />
       <FinalCTA />
@@ -787,48 +787,35 @@ function ConferenceSpotlight() {
   );
 }
 
-function Sectors() {
-  const sectors = [
-    "Financial Services",
-    "Public Sector",
-    "Healthcare",
-    "Telecommunications",
-    "Technology & Digital",
-    "Education",
-    "Legal & Professional",
-    "Energy & Utilities",
-    "Media & Marketing",
-    "Non-Profit & Development",
-  ];
+function LearningSpotlight() {
   return (
     <section className="bg-[color:var(--brand-deep)] text-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="max-w-2xl">
+        <div className="mx-auto max-w-3xl text-center">
           <p className="text-sm font-semibold text-[color:var(--brand-gold)] uppercase tracking-wider">
-            Sector Communities
+            Learning beyond the conference
           </p>
           <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">
-            Dedicated networks for the sectors you work in.
+            Keep learning all year.
           </h2>
           <p className="mt-4 text-white/80">
-            Join peer-led communities that share sector-specific guidance, run roundtables and shape
-            sector-level responses to emerging regulation.
+            Continue your professional development with free and paid courses, practical seminars
+            and CPD learning connected to the conference community.
           </p>
         </div>
-        <div className="mt-12 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          {sectors.map((s) => (
-            <Link
-              to="/communities"
-              key={s}
-              className="group relative rounded-xl border border-white/15 p-5 hover:border-[color:var(--brand-gold)] hover:bg-white/5 transition-all"
-            >
-              <Building2 className="h-6 w-6 text-[color:var(--brand-emerald)]" />
-              <p className="mt-3 font-semibold text-sm">{s}</p>
-              <p className="mt-1 text-xs text-white/60 group-hover:text-[color:var(--brand-gold)]">
-                Join community →
-              </p>
-            </Link>
-          ))}
+        <div className="mt-8 flex flex-wrap justify-center gap-3">
+          <Link
+            to="/courses"
+            className="inline-flex items-center gap-2 rounded-md bg-[color:var(--brand-gold)] px-5 py-3 text-sm font-bold text-[color:var(--brand-deep)]"
+          >
+            Browse courses <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            to="/training"
+            className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-3 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            Explore seminars <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>

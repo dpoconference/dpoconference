@@ -26,9 +26,10 @@ type Seminar = {
   startsOn: string;
   format?: string | null;
   cpdPoints?: number | null;
-  memberPrice: number;
   nonMemberPrice: number;
   soldOut?: boolean;
+  registrationOpen?: boolean;
+  registrationClosed?: boolean;
 };
 
 function TrainingPage() {
@@ -56,19 +57,19 @@ function TrainingPage() {
       <section className="mx-auto max-w-7xl px-6 py-16 grid gap-10 lg:grid-cols-2">
         <div>
           <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">Quarterly Training Programme</h2>
-          <p className="mt-3 text-sm">Members receive access to four professional training programmes annually. Training may cover:</p>
+          <p className="mt-3 text-sm">Continuing-learning programmes may cover:</p>
           <CheckList items={trainingTopics} className="mt-4" />
         </div>
         <div>
           <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">CPD Activities</h2>
-          <p className="mt-3 text-sm">Members may earn CPD points through:</p>
+          <p className="mt-3 text-sm">Participants can earn CPD points through:</p>
           <CheckList items={cpdActivities} className="mt-4" />
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-8">
         <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">CPD Dashboard</h2>
-        <p className="mt-3 text-sm">Through the membership portal, members can:</p>
+        <p className="mt-3 text-sm">Through the learner portal, participants can:</p>
         <CheckList
           className="mt-4 max-w-xl"
           items={[
@@ -77,7 +78,6 @@ function TrainingPage() {
             "Upload external CPD evidence",
             "Download CPD statements",
             "View outstanding requirements",
-            "Receive renewal reminders",
             "Access completed certificates",
           ]}
         />
@@ -119,7 +119,7 @@ function TrainingPage() {
               <div>
                 <h3 className="font-bold text-[color:var(--brand-deep)]">{u.title}</h3>
                 <p className="mt-1 text-sm text-[color:var(--muted-foreground)]">
-                  Member: {u.memberPrice === 0 ? "Free" : formatNaira(u.memberPrice)} · Public: {formatNaira(u.nonMemberPrice)}
+                  {u.nonMemberPrice === 0 ? "Free" : formatNaira(u.nonMemberPrice)}
                 </p>
               </div>
               <p className="text-sm flex items-center gap-1.5 text-[color:var(--foreground)]">
@@ -130,13 +130,17 @@ function TrainingPage() {
                 {u.format ?? "Training"}
                 {u.cpdPoints ? ` · ${u.cpdPoints} CPD` : ""}
               </span>
-              <Link
-                to="/seminars/$slug/register"
-                params={{ slug: u.slug }}
-                className="rounded-md gradient-brand text-white px-4 py-2 text-sm font-semibold text-center min-h-11 inline-flex items-center justify-center w-full md:w-auto"
-              >
-                {u.soldOut ? "Waitlist" : "Enrol"}
-              </Link>
+              {u.registrationClosed ? (
+                <span className="text-sm font-medium text-muted-foreground">Closed</span>
+              ) : (
+                <Link
+                  to="/seminars/$slug/register"
+                  params={{ slug: u.slug }}
+                  className="rounded-md gradient-brand text-white px-4 py-2 text-sm font-semibold text-center min-h-11 inline-flex items-center justify-center w-full md:w-auto"
+                >
+                  {u.soldOut || u.registrationOpen === false ? "Waitlist" : "Enrol"}
+                </Link>
+              )}
             </div>
           ))}
           {!q.isPending && (q.data ?? []).length === 0 && (
@@ -151,7 +155,7 @@ function TrainingPage() {
             <p className="text-sm font-semibold text-[color:var(--brand-gold)] uppercase tracking-wider">CPD Framework</p>
             <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">Structured Continuing Professional Development.</h2>
             <p className="mt-4 text-white/80">
-              Members earn CPD credits through Data Protection Officers Conference training, external accredited programmes, conferences, publications, mentoring and committee service.
+              Learners can earn CPD credits through conference attendance, seminars and approved continuing-learning programmes.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 gap-4">

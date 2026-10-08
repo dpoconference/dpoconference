@@ -17,9 +17,10 @@ type Seminar = {
   startsOn: string;
   format?: string | null;
   cpdPoints?: number | null;
-  memberPrice: number;
   nonMemberPrice: number;
   soldOut?: boolean;
+  registrationOpen?: boolean;
+  registrationClosed?: boolean;
 };
 
 function Page() {
@@ -32,7 +33,7 @@ function Page() {
     <div className="space-y-6">
       <PageHeader
         title="Training catalogue"
-        subtitle="Browse and enrol in seminars without leaving your member workspace."
+        subtitle="Browse and enrol in continuing-learning seminars."
       />
       {q.isPending && <Skeleton className="h-48" />}
       <div className="divide-y overflow-hidden rounded-2xl border border-border bg-card">
@@ -47,8 +48,7 @@ function Page() {
             <div>
               <h3 className="font-semibold">{u.title}</h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Member: {u.memberPrice === 0 ? "Free" : formatNaira(u.memberPrice)} · Public:{" "}
-                {formatNaira(u.nonMemberPrice)}
+                {u.nonMemberPrice === 0 ? "Free" : formatNaira(u.nonMemberPrice)}
               </p>
               <p className="mt-1 flex items-center gap-1.5 text-sm">
                 <Calendar className="h-4 w-4 text-primary" />
@@ -57,13 +57,17 @@ function Page() {
               </p>
             </div>
             <span className="text-xs font-semibold text-muted-foreground">{u.format ?? "Training"}</span>
-            <Link
-              to="/portal/training/$slug"
-              params={{ slug: u.slug }}
-              className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
-            >
-              {u.soldOut ? "Waitlist" : "Enrol"}
-            </Link>
+            {u.registrationClosed ? (
+              <span className="text-sm text-muted-foreground">Closed</span>
+            ) : (
+              <Link
+                to="/portal/training/$slug"
+                params={{ slug: u.slug }}
+                className="inline-flex min-h-11 items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground"
+              >
+                {u.soldOut || u.registrationOpen === false ? "Waitlist" : "Enrol"}
+              </Link>
+            )}
           </div>
         ))}
         {!q.isPending && (q.data ?? []).length === 0 && (

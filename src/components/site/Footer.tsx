@@ -23,11 +23,11 @@ export function Footer() {
             <img src={logo} alt="Data Protection Officers Conference" className="h-40 w-40 rounded-md bg-white p-1" />
             <div>
               <div className="text-white font-bold text-lg">Data Protection Officers Conference</div>
-              <div className="text-xs tracking-widest uppercase text-[color:var(--brand-gold)]">Connect · Collaborate · Change</div>
+              <div className="text-xs tracking-widest uppercase text-[color:var(--brand-gold)]">Conferences · Learning · CPD</div>
             </div>
           </div>
           <p className="mt-4 text-sm leading-relaxed opacity-80 max-w-sm">
-            Data Protection Officers Conference is a professional platform supporting the competence, leadership and continuous development of Data Protection Officers and privacy professionals.
+            Data Protection Officers Conference brings professionals together for conferences, practical learning and continuing professional development.
           </p>
           <div className="mt-4 flex items-center gap-3 text-sm">
             <a href={tiktok} target="_blank" rel="noreferrer" aria-label="TikTok" title="TikTok" className="grid h-9 w-9 place-items-center rounded-full border border-white/25 text-lg font-bold hover:border-[color:var(--brand-gold)] hover:text-[color:var(--brand-gold)]">
@@ -56,20 +56,21 @@ export function Footer() {
         <FooterCol
           title="Quick Links"
           links={[
-            ["About the Conference", "/conference"],
+            ["About", "/about"],
+            ["Conference", "/conference"],
             ["Programme", "/conference#activities"],
             ["Annual Conference", "/conferences"],
             ["Find e-invite", "/conference/lookup"],
+            ["Courses", "/courses"],
+            ["Seminars & training", "/training"],
             ["Speakers", "/conference/speak"],
             ["Sponsors", "/conference/sponsor"],
-            ["Partnerships", "/partnerships"],
           ]}
         />
         <FooterCol
           title="Resources"
           links={[
             ["Resource Centre", "/resources"],
-            ["Career Centre", "/careers"],
             ["Contact Us", "/contact"],
             ["FAQ", "/faq"],
             ["News", "/news"],
@@ -87,7 +88,7 @@ export function Footer() {
         />
         <div>
           <h4 className="text-white font-semibold mb-4">Newsletter</h4>
-          <p className="text-sm opacity-80 mb-3">Subscribe to receive professional updates, regulatory intelligence, event information and career opportunities.</p>
+          <p className="text-sm opacity-80 mb-3">Subscribe for conference announcements, learning opportunities and professional updates.</p>
           <form
             className="flex flex-col gap-2"
             onSubmit={async (e) => {
@@ -125,7 +126,7 @@ export function Footer() {
       </div>
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-xs opacity-70">
-          <p>© {new Date().getFullYear()} Data Protection Officers Conference, Professional Network and Leadership Forum. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Data Protection Officers Conference. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <Link to="/legal/$slug" params={{ slug: "privacy-notice" }}>
               Privacy Notice
@@ -168,10 +169,6 @@ function FooterCol({ title, links }: { title: string; links: [string, string][] 
               <a href={to} className="hover:text-[color:var(--brand-gold)]">
                 {label}
               </a>
-            ) : to === "/membership/apply" ? (
-              <Link to="/membership/apply" search={{}} className="hover:text-[color:var(--brand-gold)]">
-                {label}
-              </Link>
             ) : (
               <Link to={to as never} className="hover:text-[color:var(--brand-gold)]">
                 {label}

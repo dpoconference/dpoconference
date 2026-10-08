@@ -17,11 +17,19 @@ import {
 } from "@/components/payments/PaymentMethodStep";
 
 export const Route = createFileRoute("/portal/training/$slug")({
+  validateSearch: (search: Record<string, unknown>): { waitlistRegistrationNumber?: string } => ({
+    waitlistRegistrationNumber:
+      typeof search.waitlistRegistrationNumber === "string"
+        ? search.waitlistRegistrationNumber
+        : undefined,
+  }),
   component: Page,
 });
 
 function Page() {
   const { slug } = Route.useParams();
+  const { waitlistRegistrationNumber } = Route.useSearch();
+  const isWaitlistInvitation = Boolean(waitlistRegistrationNumber);
   const { user } = useAuth();
   const navigate = useNavigate();
   const q = useQuery({
@@ -30,7 +38,8 @@ function Page() {
       apiGet<{
         title: string;
         soldOut: boolean;
-        memberPrice: number;
+        registrationOpen: boolean;
+        registrationClosed: boolean;
         nonMemberPrice: number;
         bodyHtml?: string;
         coverUrl?: string | null;
@@ -40,16 +49,8 @@ function Page() {
         certificateAvailable?: boolean;
       }>(`/public/seminars/${slug}`),
   });
-  const mem = useQuery({
-    queryKey: ["my-membership"],
-    queryFn: () =>
-      apiGet<{ status?: string; membershipNumber?: string } | null>("/membership/me").catch(() => null),
-    enabled: Boolean(user),
-  });
   const payCfg = useQuery({ queryKey: ["payments-config"], queryFn: () => loadPaymentsConfig() });
-  const isActiveMember = mem.data?.status === "ACTIVE";
-  const price = isActiveMember ? Number(q.data?.memberPrice ?? 0) : Number(q.data?.nonMemberPrice ?? 0);
-  const participantType = isActiveMember ? "MEMBER" : "NON_MEMBER";
+  const price = Number(q.data?.nonMemberPrice ?? 0);
 
   const [loading, setLoading] = useState(false);
   const [method, setMethod] = useState<PaymentMethodChoice>("PAYSTACK");
@@ -88,8 +89,8 @@ function Page() {
         paymentRequired: boolean;
         amountNgn: number;
       }>(`/public/seminars/${slug}/register`, {
-        membershipNumber: isActiveMember ? mem.data?.membershipNumber : undefined,
-        participantType,
+        participantType: "GENERAL",
+        waitlistRegistrationNumber,
         details,
       });
       if (data.waitlist) {
@@ -123,13 +124,19 @@ function Page() {
     }
   }
 
-  if (q.isPending || (user && mem.isPending)) return <Skeleton className="h-64" />;
+  if (q.isPending) return <Skeleton className="h-64" />;
 
   return (
     <div className="mx-auto max-w-xl space-y-6">
       <PageHeader
         title={q.data?.title ?? "Seminar"}
-        subtitle={q.data?.soldOut ? "This seminar is full. You can join the waitlist." : "Complete enrolment in your workspace."}
+        subtitle={
+          q.data?.registrationClosed
+            ? "Registration for this seminar has closed."
+            : !isWaitlistInvitation && (q.data?.soldOut || !q.data?.registrationOpen)
+              ? "Registration is not currently available. Join the waitlist to be notified."
+              : "Complete enrolment in your learning workspace."
+        }
       />
       {q.data?.coverUrl ? <img src={q.data.coverUrl} alt="" className="max-h-48 w-full rounded-2xl object-cover" /> : null}
       <div className="space-y-3 rounded-2xl border border-border bg-card p-5 text-sm">
@@ -155,7 +162,6 @@ function Page() {
           <>
             <p className="text-sm">
               Fee {formatNaira(price)}
-              {isActiveMember ? " (member rate)" : " (standard rate)"}
             </p>
             {["firstName", "lastName", "email", "phone", "organisation"].map((k) => (
               <input
@@ -166,15 +172,24 @@ function Page() {
                 onChange={(e) => setDetails({ ...details, [k]: e.target.value })}
               />
             ))}
-            {!q.data?.soldOut && payCfg.data ? (
+            {!q.data?.registrationClosed &&
+            (isWaitlistInvitation || (!q.data?.soldOut && q.data?.registrationOpen)) &&
+            payCfg.data ? (
               <PaymentMethodStep config={payCfg.data} value={method} onChange={setMethod} />
             ) : null}
-            <Button loading={loading} className="w-full" onClick={() => void submit()}>
-              {q.data?.soldOut
-                ? "Join waitlist"
-                : method === "BANK_TRANSFER"
-                  ? "Continue to bank transfer"
-                  : "Continue"}
+            <Button
+              loading={loading}
+              disabled={q.data?.registrationClosed}
+              className="w-full"
+              onClick={() => void submit()}
+            >
+              {q.data?.registrationClosed
+                ? "Registration closed"
+                : !isWaitlistInvitation && (q.data?.soldOut || !q.data?.registrationOpen)
+                  ? "Join waitlist"
+                  : method === "BANK_TRANSFER"
+                    ? "Continue to bank transfer"
+                    : "Continue"}
             </Button>
             <Link to="/portal/training" className="block text-center text-sm font-medium text-primary">
               Back to catalogue

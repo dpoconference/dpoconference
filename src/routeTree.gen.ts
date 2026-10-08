@@ -29,6 +29,7 @@ import { Route as MembershipRouteImport } from './routes/membership'
 import { Route as MentorshipRouteImport } from './routes/mentorship'
 import { Route as NewsRouteImport } from './routes/news'
 import { Route as PartnershipsRouteImport } from './routes/partnerships'
+import { Route as PlatformRouteImport } from './routes/platform'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -52,6 +53,7 @@ import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminFaqRouteImport } from './routes/admin.faq'
 import { Route as AdminFeesRouteImport } from './routes/admin.fees'
 import { Route as AdminJobsRouteImport } from './routes/admin.jobs'
+import { Route as AdminLearnersRouteImport } from './routes/admin.learners'
 import { Route as AdminLearningRouteImport } from './routes/admin.learning'
 import { Route as AdminLegalRouteImport } from './routes/admin.legal'
 import { Route as AdminMembersRouteImport } from './routes/admin.members'
@@ -59,6 +61,7 @@ import { Route as AdminMentorshipRouteImport } from './routes/admin.mentorship'
 import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminProfileRouteImport } from './routes/admin.profile'
 import { Route as AdminReportsRouteImport } from './routes/admin.reports'
+import { Route as AdminSeminarGroupsRouteImport } from './routes/admin.seminar-groups'
 import { Route as AdminSpeakersRouteImport } from './routes/admin.speakers'
 import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AwardsNominateRouteImport } from './routes/awards_.nominate'
@@ -212,6 +215,11 @@ const PartnershipsRoute = PartnershipsRouteImport.update({
   path: '/partnerships',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlatformRoute = PlatformRouteImport.update({
+  id: '/platform',
+  path: '/platform',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PortalRoute = PortalRouteImport.update({
   id: '/portal',
   path: '/portal',
@@ -327,6 +335,11 @@ const AdminJobsRoute = AdminJobsRouteImport.update({
   path: '/jobs',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLearnersRoute = AdminLearnersRouteImport.update({
+  id: '/learners',
+  path: '/learners',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLearningRoute = AdminLearningRouteImport.update({
   id: '/learning',
   path: '/learning',
@@ -360,6 +373,11 @@ const AdminProfileRoute = AdminProfileRouteImport.update({
 const AdminReportsRoute = AdminReportsRouteImport.update({
   id: '/reports',
   path: '/reports',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminSeminarGroupsRoute = AdminSeminarGroupsRouteImport.update({
+  id: '/seminar-groups',
+  path: '/seminar-groups',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminSpeakersRoute = AdminSpeakersRouteImport.update({
@@ -645,6 +663,7 @@ export interface FileRoutesByFullPath {
   '/mentorship': typeof MentorshipRoute
   '/news': typeof NewsRoute
   '/partnerships': typeof PartnershipsRoute
+  '/platform': typeof PlatformRoute
   '/portal': typeof PortalRouteWithChildren
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -667,6 +686,7 @@ export interface FileRoutesByFullPath {
   '/admin/faq': typeof AdminFaqRoute
   '/admin/fees': typeof AdminFeesRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/learners': typeof AdminLearnersRoute
   '/admin/learning': typeof AdminLearningRoute
   '/admin/legal': typeof AdminLegalRoute
   '/admin/members': typeof AdminMembersRoute
@@ -674,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seminar-groups': typeof AdminSeminarGroupsRoute
   '/admin/speakers': typeof AdminSpeakersRoute
   '/admin/users': typeof AdminUsersRoute
   '/awards/nominate': typeof AwardsNominateRoute
@@ -748,6 +769,7 @@ export interface FileRoutesByTo {
   '/mentorship': typeof MentorshipRoute
   '/news': typeof NewsRoute
   '/partnerships': typeof PartnershipsRoute
+  '/platform': typeof PlatformRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
@@ -769,6 +791,7 @@ export interface FileRoutesByTo {
   '/admin/faq': typeof AdminFaqRoute
   '/admin/fees': typeof AdminFeesRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/learners': typeof AdminLearnersRoute
   '/admin/learning': typeof AdminLearningRoute
   '/admin/legal': typeof AdminLegalRoute
   '/admin/members': typeof AdminMembersRoute
@@ -776,6 +799,7 @@ export interface FileRoutesByTo {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seminar-groups': typeof AdminSeminarGroupsRoute
   '/admin/speakers': typeof AdminSpeakersRoute
   '/admin/users': typeof AdminUsersRoute
   '/awards/nominate': typeof AwardsNominateRoute
@@ -851,6 +875,7 @@ export interface FileRoutesById {
   '/mentorship': typeof MentorshipRoute
   '/news': typeof NewsRoute
   '/partnerships': typeof PartnershipsRoute
+  '/platform': typeof PlatformRoute
   '/portal': typeof PortalRouteWithChildren
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -873,6 +898,7 @@ export interface FileRoutesById {
   '/admin/faq': typeof AdminFaqRoute
   '/admin/fees': typeof AdminFeesRoute
   '/admin/jobs': typeof AdminJobsRoute
+  '/admin/learners': typeof AdminLearnersRoute
   '/admin/learning': typeof AdminLearningRoute
   '/admin/legal': typeof AdminLegalRoute
   '/admin/members': typeof AdminMembersRoute
@@ -880,6 +906,7 @@ export interface FileRoutesById {
   '/admin/payments': typeof AdminPaymentsRoute
   '/admin/profile': typeof AdminProfileRoute
   '/admin/reports': typeof AdminReportsRoute
+  '/admin/seminar-groups': typeof AdminSeminarGroupsRoute
   '/admin/speakers': typeof AdminSpeakersRoute
   '/admin/users': typeof AdminUsersRoute
   '/awards_/nominate': typeof AwardsNominateRoute
@@ -957,6 +984,7 @@ export interface FileRouteTypes {
     | '/mentorship'
     | '/news'
     | '/partnerships'
+    | '/platform'
     | '/portal'
     | '/register'
     | '/reset-password'
@@ -979,6 +1007,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/fees'
     | '/admin/jobs'
+    | '/admin/learners'
     | '/admin/learning'
     | '/admin/legal'
     | '/admin/members'
@@ -986,6 +1015,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/profile'
     | '/admin/reports'
+    | '/admin/seminar-groups'
     | '/admin/speakers'
     | '/admin/users'
     | '/awards/nominate'
@@ -1060,6 +1090,7 @@ export interface FileRouteTypes {
     | '/mentorship'
     | '/news'
     | '/partnerships'
+    | '/platform'
     | '/register'
     | '/reset-password'
     | '/resources'
@@ -1081,6 +1112,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/fees'
     | '/admin/jobs'
+    | '/admin/learners'
     | '/admin/learning'
     | '/admin/legal'
     | '/admin/members'
@@ -1088,6 +1120,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/profile'
     | '/admin/reports'
+    | '/admin/seminar-groups'
     | '/admin/speakers'
     | '/admin/users'
     | '/awards/nominate'
@@ -1162,6 +1195,7 @@ export interface FileRouteTypes {
     | '/mentorship'
     | '/news'
     | '/partnerships'
+    | '/platform'
     | '/portal'
     | '/register'
     | '/reset-password'
@@ -1184,6 +1218,7 @@ export interface FileRouteTypes {
     | '/admin/faq'
     | '/admin/fees'
     | '/admin/jobs'
+    | '/admin/learners'
     | '/admin/learning'
     | '/admin/legal'
     | '/admin/members'
@@ -1191,6 +1226,7 @@ export interface FileRouteTypes {
     | '/admin/payments'
     | '/admin/profile'
     | '/admin/reports'
+    | '/admin/seminar-groups'
     | '/admin/speakers'
     | '/admin/users'
     | '/awards_/nominate'
@@ -1267,6 +1303,7 @@ export interface RootRouteChildren {
   MentorshipRoute: typeof MentorshipRoute
   NewsRoute: typeof NewsRoute
   PartnershipsRoute: typeof PartnershipsRoute
+  PlatformRoute: typeof PlatformRoute
   PortalRoute: typeof PortalRouteWithChildren
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -1436,6 +1473,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PartnershipsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/platform': {
+      id: '/platform'
+      path: '/platform'
+      fullPath: '/platform'
+      preLoaderRoute: typeof PlatformRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/portal': {
       id: '/portal'
       path: '/portal'
@@ -1597,6 +1641,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminJobsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/learners': {
+      id: '/admin/learners'
+      path: '/learners'
+      fullPath: '/admin/learners'
+      preLoaderRoute: typeof AdminLearnersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/learning': {
       id: '/admin/learning'
       path: '/learning'
@@ -1644,6 +1695,13 @@ declare module '@tanstack/react-router' {
       path: '/reports'
       fullPath: '/admin/reports'
       preLoaderRoute: typeof AdminReportsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/seminar-groups': {
+      id: '/admin/seminar-groups'
+      path: '/seminar-groups'
+      fullPath: '/admin/seminar-groups'
+      preLoaderRoute: typeof AdminSeminarGroupsRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/speakers': {
@@ -2028,6 +2086,7 @@ interface AdminRouteChildren {
   AdminFaqRoute: typeof AdminFaqRoute
   AdminFeesRoute: typeof AdminFeesRoute
   AdminJobsRoute: typeof AdminJobsRoute
+  AdminLearnersRoute: typeof AdminLearnersRoute
   AdminLearningRoute: typeof AdminLearningRoute
   AdminLegalRoute: typeof AdminLegalRoute
   AdminMembersRoute: typeof AdminMembersRoute
@@ -2035,6 +2094,7 @@ interface AdminRouteChildren {
   AdminPaymentsRoute: typeof AdminPaymentsRoute
   AdminProfileRoute: typeof AdminProfileRoute
   AdminReportsRoute: typeof AdminReportsRoute
+  AdminSeminarGroupsRoute: typeof AdminSeminarGroupsRoute
   AdminSpeakersRoute: typeof AdminSpeakersRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -2057,6 +2117,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminFaqRoute: AdminFaqRoute,
   AdminFeesRoute: AdminFeesRoute,
   AdminJobsRoute: AdminJobsRoute,
+  AdminLearnersRoute: AdminLearnersRoute,
   AdminLearningRoute: AdminLearningRoute,
   AdminLegalRoute: AdminLegalRoute,
   AdminMembersRoute: AdminMembersRoute,
@@ -2064,6 +2125,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminPaymentsRoute: AdminPaymentsRoute,
   AdminProfileRoute: AdminProfileRoute,
   AdminReportsRoute: AdminReportsRoute,
+  AdminSeminarGroupsRoute: AdminSeminarGroupsRoute,
   AdminSpeakersRoute: AdminSpeakersRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
@@ -2195,6 +2257,7 @@ const rootRouteChildren: RootRouteChildren = {
   MentorshipRoute: MentorshipRoute,
   NewsRoute: NewsRoute,
   PartnershipsRoute: PartnershipsRoute,
+  PlatformRoute: PlatformRoute,
   PortalRoute: PortalRouteWithChildren,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,

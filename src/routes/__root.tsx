@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   HeadContent,
+  redirect,
 } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/lib/auth";
@@ -64,37 +65,47 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: ({ location }) => {
+    const archivedRoutes = [
+      /^\/(?:membership|members|verify-member|benefits|communities|mentorship|careers|partnerships|threat-intelligence|jobs)(?:\/|$)/,
+      /^\/(?:portal|admin)\/(?:application|applications|apply|members|fees|mentorship|careers|communities|jobs|awards)(?:\/|$)/,
+      /^\/portal\/(?:card|messages|corporate|employer|renew|threats)(?:\/|$)/,
+    ];
+    if (archivedRoutes.some((pattern) => pattern.test(location.pathname))) {
+      throw redirect({ to: "/" });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa" },
+      { title: "Data Protection Officers Conference | Conferences and Learning" },
       {
         name: "description",
         content:
-          "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
+          "Discover professional conferences, seminars and continuing-learning courses for data protection and privacy professionals.",
       },
       { name: "author", content: "Data Protection Officers Conference" },
       {
         property: "og:title",
-        content: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
+        content: "Data Protection Officers Conference | Conferences and Learning",
       },
       {
         property: "og:description",
         content:
-          "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
+          "Discover professional conferences, seminars and continuing-learning courses for data protection and privacy professionals.",
       },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://webthinkers.com/" },
       { name: "twitter:card", content: "summary_large_image" },
       {
         name: "twitter:title",
-        content: "Data Protection Officers Conference | Professional Network for Data Protection Officers in Africa",
+        content: "Data Protection Officers Conference | Conferences and Learning",
       },
       {
         name: "twitter:description",
         content:
-          "Africa's year-round professional network, conference and leadership platform for Data Protection Officers, privacy professionals and data-governance leaders.",
+          "Discover professional conferences, seminars and continuing-learning courses for data protection and privacy professionals.",
       },
     ],
   }),

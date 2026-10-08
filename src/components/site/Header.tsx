@@ -52,13 +52,38 @@ export function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [q, setQ] = useState("");
   const [hits, setHits] = useState<{ title: string; href: string }[]>([]);
-  const [conference, setConference] = useState<{ title: string; slug: string } | null>(null);
+  const [conference, setConference] = useState<{
+    title: string;
+    slug: string;
+    registrationReady: boolean;
+  } | null>(null);
   const moreRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    apiGet<{ title: string; slug: string }[]>("/public/conferences")
-      .then((rows) => setConference(rows[0] ?? null))
+    apiGet<
+      {
+        title: string;
+        slug: string;
+        registrationReady?: boolean;
+        fromAmountNgn?: number | null;
+        packages?: { isActive: boolean }[];
+      }[]
+    >("/public/conferences")
+      .then((rows) => {
+        const selected = rows.find((row) => row.slug === "annual-2027") ?? rows[0];
+        setConference(
+          selected
+            ? {
+                ...selected,
+                registrationReady:
+                  selected.registrationReady ??
+                  (selected.fromAmountNgn != null ||
+                    Boolean(selected.packages?.some((pkg) => pkg.isActive))),
+              }
+            : null,
+        );
+      })
       .catch(() => setConference(null));
   }, []);
 
@@ -202,29 +227,18 @@ export function Header() {
             >
               <Search className="h-4 w-4" />
             </button>
-            {!user && (
-              <>
-                <Link
-                  to="/login"
-                  className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]"
-                >
-                  Sign in
-                </Link>
-                <Link
-                  to="/register"
-                  className="rounded-md border border-[color:var(--border)] px-3 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"
-                >
-                  Create account
-                </Link>
-              </>
-            )}
             <HeaderDashboardLink className="px-2.5 py-1.5 text-sm font-medium text-[color:var(--foreground)] hover:text-[color:var(--brand-green)]" />
             <Link
-              to={conference ? "/conferences/$slug/register" : "/conferences"}
+              to={conference ? "/conferences/$slug" : "/conferences"}
               params={conference ? { slug: conference.slug } : undefined}
+              hash={conference && !conference.registrationReady ? "register" : undefined}
               className="rounded-md px-3 py-3 text-sm font-semibold text-white gradient-brand hover:opacity-95"
             >
-              {conference ? "Register for conference" : "Conferences"}
+              {conference
+                ? conference.registrationReady
+                  ? "Register for conference"
+                  : "Join conference waitlist"
+                : "Conferences"}
             </Link>
           </div>
 
@@ -252,33 +266,20 @@ export function Header() {
                   {n.label}
                 </Link>
               ))}
-              {!user && (
-                <>
-                  <Link
-                    to="/login"
-                    className="py-2 text-sm font-medium"
-                    onClick={() => setOpen(false)}
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="py-2 text-sm font-medium"
-                    onClick={() => setOpen(false)}
-                  >
-                    Create account
-                  </Link>
-                </>
-              )}
               <HeaderDashboardLink className="py-2 text-sm font-medium hover:text-[color:var(--brand-green)]" />
               <div className="mt-2">
                 <Link
-                  to={conference ? "/conferences/$slug/register" : "/conferences"}
+                  to={conference ? "/conferences/$slug" : "/conferences"}
                   params={conference ? { slug: conference.slug } : undefined}
+                  hash={conference && !conference.registrationReady ? "register" : undefined}
                   className="block w-full rounded-md px-3 py-2 text-center text-sm font-semibold text-white gradient-brand"
                   onClick={() => setOpen(false)}
                 >
-                  {conference ? "Register for conference" : "Conferences"}
+                  {conference
+                    ? conference.registrationReady
+                      ? "Register for conference"
+                      : "Join conference waitlist"
+                    : "Conferences"}
                 </Link>
               </div>
             </div>
@@ -290,21 +291,25 @@ export function Header() {
         <div className="border-b border-[color:var(--brand-emerald)]/20 bg-[color:var(--brand-tint)]">
           <div className="mx-auto flex h-8 max-w-7xl items-center justify-center gap-2 px-4 text-[11px] text-[color:var(--brand-deep)] sm:text-xs">
             <span className="truncate">
-              Registration is open for <strong>{conference.title}</strong>
+              {conference.registrationReady ? "Registration is open for" : "Join the waitlist for"}{" "}
+              <strong>{conference.title}</strong>
             </span>
             <Link
-              to="/conferences/$slug/register"
+              to="/conferences/$slug"
               params={{ slug: conference.slug }}
+              hash="register"
               className="shrink-0 font-semibold underline underline-offset-2 hover:text-[color:var(--brand-green)]"
             >
-              Register
+              {conference.registrationReady ? "Register" : "Join waitlist"}
             </Link>
-            <Link
-              to="/conference/lookup"
-              className="shrink-0 font-semibold underline underline-offset-2 hover:text-[color:var(--brand-green)]"
-            >
-              Find e-invite
-            </Link>
+            {conference.registrationReady ? (
+              <Link
+                to="/conference/lookup"
+                className="shrink-0 font-semibold underline underline-offset-2 hover:text-[color:var(--brand-green)]"
+              >
+                Find e-invite
+              </Link>
+            ) : null}
           </div>
         </div>
       )}

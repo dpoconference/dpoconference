@@ -150,8 +150,16 @@ function Page() {
     queryKey: ["ev-dash"],
     queryFn: () =>
       apiGet<{
-        conference: { paidCount: number; revenue: number; byType: { participantType: string; status: string; _count: number }[] };
-        seminar: { paidCount: number; revenue: number; byType: { participantType: string; _count: number }[] };
+        conference: {
+          paidCount: number;
+          revenue: number;
+          byType: { participantType: string; status: string; _count: number }[];
+        };
+        seminar: {
+          paidCount: number;
+          revenue: number;
+          byType: { participantType: string; _count: number }[];
+        };
         recent: { id: string; name: string; event: string; status: string }[];
       }>("/admin/events/dashboard"),
   });
@@ -218,7 +226,7 @@ function Page() {
     endsOn: "",
     venue: "",
     city: "",
-    format: "HYBRID",
+    format: "To be announced",
     isPublished: false,
     isFree: false,
     capacity: "",
@@ -264,15 +272,22 @@ function Page() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Events" subtitle="Create conferences and seminars, manage packages, and mark attendance." />
+      <PageHeader
+        title="Events"
+        subtitle="Create conferences and seminars, manage packages, and mark attendance."
+      />
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Conference paid</p>
           <p className="mt-1 text-lg font-semibold">{dash.data?.conference.paidCount ?? 0}</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-xs uppercase tracking-wide text-muted-foreground">Conference revenue</p>
-          <p className="mt-1 text-lg font-semibold">₦{(dash.data?.conference.revenue ?? 0).toLocaleString("en-NG")}</p>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground">
+            Conference revenue
+          </p>
+          <p className="mt-1 text-lg font-semibold">
+            ₦{(dash.data?.conference.revenue ?? 0).toLocaleString("en-NG")}
+          </p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Seminar paid</p>
@@ -280,15 +295,25 @@ function Page() {
         </div>
         <div className="rounded-2xl border border-border bg-card p-4">
           <p className="text-xs uppercase tracking-wide text-muted-foreground">Seminar revenue</p>
-          <p className="mt-1 text-lg font-semibold">₦{(dash.data?.seminar.revenue ?? 0).toLocaleString("en-NG")}</p>
+          <p className="mt-1 text-lg font-semibold">
+            ₦{(dash.data?.seminar.revenue ?? 0).toLocaleString("en-NG")}
+          </p>
         </div>
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="sm" variant={tab === "setup" ? "default" : "outline"} onClick={() => setTab("setup")}>
+        <Button
+          size="sm"
+          variant={tab === "setup" ? "default" : "outline"}
+          onClick={() => setTab("setup")}
+        >
           Setup
         </Button>
-        <Button size="sm" variant={tab === "regs" ? "default" : "outline"} onClick={() => setTab("regs")}>
+        <Button
+          size="sm"
+          variant={tab === "regs" ? "default" : "outline"}
+          onClick={() => setTab("regs")}
+        >
           Registrations
         </Button>
       </div>
@@ -360,7 +385,13 @@ function Page() {
                 required
                 placeholder="Title"
                 value={confForm.title}
-                onChange={(e) => setConfForm({ ...confForm, title: e.target.value, slug: confForm.slug || slugify(e.target.value) })}
+                onChange={(e) =>
+                  setConfForm({
+                    ...confForm,
+                    title: e.target.value,
+                    slug: confForm.slug || slugify(e.target.value),
+                  })
+                }
               />
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm"
@@ -414,7 +445,12 @@ function Page() {
                     }
                   }}
                 />
-                <Button type="button" size="sm" variant="outline" onClick={() => prospectusRef.current?.click()}>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => prospectusRef.current?.click()}
+                >
                   Upload prospectus PDF
                 </Button>
               </div>
@@ -460,13 +496,17 @@ function Page() {
                   <input
                     type="checkbox"
                     checked={confForm.datesToBeAnnounced}
-                    onChange={(e) => setConfForm({ ...confForm, datesToBeAnnounced: e.target.checked })}
+                    onChange={(e) =>
+                      setConfForm({ ...confForm, datesToBeAnnounced: e.target.checked })
+                    }
                   />
                   Exact dates to be announced
                 </label>
               </div>
               {confForm.datesToBeAnnounced ? (
-                <p className="text-xs text-muted-foreground">The public event page will show only the selected year, not placeholder dates.</p>
+                <p className="text-xs text-muted-foreground">
+                  The public event page will show only the selected year, not placeholder dates.
+                </p>
               ) : null}
               {nightDay ? (
                 <p className="text-xs text-muted-foreground">
@@ -474,6 +514,16 @@ function Page() {
                   {nightDay.nights === 1 ? "" : "s"}
                 </p>
               ) : null}
+              <label className="block text-xs">
+                Format
+                <input
+                  className="mt-1 w-full rounded-md border px-3 py-2 text-sm"
+                  aria-label="Conference format"
+                  placeholder="e.g. Hybrid, Online, In-person, or To be announced"
+                  value={confForm.format}
+                  onChange={(e) => setConfForm({ ...confForm, format: e.target.value })}
+                />
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   className="rounded-md border px-3 py-2 text-sm"
@@ -530,7 +580,10 @@ function Page() {
                   </Button>
                 </div>
                 {(confForm.agenda ?? []).map((day, dayIdx) => (
-                  <div key={`${day.date}-${dayIdx}`} className="space-y-2 rounded-md border border-dashed p-3">
+                  <div
+                    key={`${day.date}-${dayIdx}`}
+                    className="space-y-2 rounded-md border border-dashed p-3"
+                  >
                     <div className="grid gap-2 sm:grid-cols-2">
                       <input
                         className="rounded-md border px-2 py-1.5 text-sm"
@@ -611,14 +664,33 @@ function Page() {
                     >
                       Add session
                     </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      onClick={() =>
+                        setConfForm({
+                          ...confForm,
+                          agenda: confForm.agenda.filter((_, i) => i !== dayIdx),
+                        })
+                      }
+                    >
+                      Remove day
+                    </Button>
                   </div>
                 ))}
                 {!confForm.agenda.length ? (
-                  <p className="text-xs text-muted-foreground">No agenda days yet. Use “Build days from dates”.</p>
+                  <p className="text-xs text-muted-foreground">
+                    No agenda days yet. Use “Build days from dates”.
+                  </p>
                 ) : null}
               </div>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={confForm.isPublished} onChange={(e) => setConfForm({ ...confForm, isPublished: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={confForm.isPublished}
+                  onChange={(e) => setConfForm({ ...confForm, isPublished: e.target.checked })}
+                />
                 Published
               </label>
               <Button type="submit" loading={loading}>
@@ -671,8 +743,8 @@ function Page() {
                       {c.title}
                     </button>
                     <p className="text-xs text-muted-foreground">
-                      {c.slug} · {c.isArchived ? "Archived" : c.isPublished ? "Published" : "Draft"} · {c.packages.length}{" "}
-                      packages
+                      {c.slug} · {c.isArchived ? "Archived" : c.isPublished ? "Published" : "Draft"}{" "}
+                      · {c.packages.length} packages
                     </p>
                     {!c.isArchived ? (
                       <Button
@@ -681,12 +753,16 @@ function Page() {
                         variant="outline"
                         className="mt-2"
                         onClick={() =>
-                          void apiPatch(`/admin/events/conferences/${c.id}/archive`, { isArchived: true })
+                          void apiPatch(`/admin/events/conferences/${c.id}/archive`, {
+                            isArchived: true,
+                          })
                             .then(() => {
                               notify.success("Conference archived.");
                               return conferences.refetch();
                             })
-                            .catch((err) => notify.error(err instanceof Error ? err.message : "Archive failed."))
+                            .catch((err) =>
+                              notify.error(err instanceof Error ? err.message : "Archive failed."),
+                            )
                         }
                       >
                         Archive
@@ -699,13 +775,20 @@ function Page() {
                         variant="destructive"
                         className="ml-2 mt-2"
                         onClick={() => {
-                          if (!window.confirm(`Permanently delete "${c.title}" and its packages and waitlist entries?`)) return;
+                          if (
+                            !window.confirm(
+                              `Permanently delete "${c.title}" and its packages and waitlist entries?`,
+                            )
+                          )
+                            return;
                           void apiDelete(`/admin/events/conferences/${c.id}`)
                             .then(() => {
                               notify.success("Conference deleted.");
                               return conferences.refetch();
                             })
-                            .catch((err) => notify.error(err instanceof Error ? err.message : "Delete failed."));
+                            .catch((err) =>
+                              notify.error(err instanceof Error ? err.message : "Delete failed."),
+                            );
                         }}
                       >
                         Delete
@@ -713,7 +796,9 @@ function Page() {
                     ) : null}
                   </li>
                 ))}
-                {(conferences.data ?? []).length === 0 && <p className="text-muted-foreground">No conferences yet.</p>}
+                {(conferences.data ?? []).length === 0 && (
+                  <p className="text-muted-foreground">No conferences yet.</p>
+                )}
               </ul>
             </div>
           </div>
@@ -768,8 +853,12 @@ function Page() {
               className="rounded-md border px-3 py-2 text-sm"
               value={editingPackageId}
               onChange={(e) => {
-                const conference = (conferences.data ?? []).find((item) => item.id === pkgForm.conferenceId);
-                const selectedPackage = conference?.packages.find((item) => item.id === e.target.value);
+                const conference = (conferences.data ?? []).find(
+                  (item) => item.id === pkgForm.conferenceId,
+                );
+                const selectedPackage = conference?.packages.find(
+                  (item) => item.id === e.target.value,
+                );
                 setEditingPackageId(e.target.value);
                 if (!selectedPackage) {
                   setPkgForm(emptyPackageForm(pkgForm.conferenceId));
@@ -784,7 +873,8 @@ function Page() {
                   description: selectedPackage.description,
                   salesOpenOn: fromIso(selectedPackage.salesOpenOn),
                   salesCloseOn: fromIso(selectedPackage.salesCloseOn),
-                  capacity: selectedPackage.capacity == null ? "" : String(selectedPackage.capacity),
+                  capacity:
+                    selectedPackage.capacity == null ? "" : String(selectedPackage.capacity),
                   isActive: selectedPackage.isActive,
                   isVisible: selectedPackage.isVisible ?? true,
                 });
@@ -805,7 +895,13 @@ function Page() {
               required
               placeholder="Package name"
               value={pkgForm.name}
-              onChange={(e) => setPkgForm({ ...pkgForm, name: e.target.value, slug: pkgForm.slug || slugify(e.target.value) })}
+              onChange={(e) =>
+                setPkgForm({
+                  ...pkgForm,
+                  name: e.target.value,
+                  slug: pkgForm.slug || slugify(e.target.value),
+                })
+              }
             />
             <input
               className="rounded-md border px-3 py-2 text-sm"
@@ -921,7 +1017,13 @@ function Page() {
                 required
                 placeholder="Title"
                 value={semForm.title}
-                onChange={(e) => setSemForm({ ...semForm, title: e.target.value, slug: semForm.slug || slugify(e.target.value) })}
+                onChange={(e) =>
+                  setSemForm({
+                    ...semForm,
+                    title: e.target.value,
+                    slug: semForm.slug || slugify(e.target.value),
+                  })
+                }
               />
               <input
                 className="w-full rounded-md border px-3 py-2 text-sm"
@@ -1036,12 +1138,18 @@ function Page() {
                 <input
                   type="checkbox"
                   checked={semForm.certificateAvailable}
-                  onChange={(e) => setSemForm({ ...semForm, certificateAvailable: e.target.checked })}
+                  onChange={(e) =>
+                    setSemForm({ ...semForm, certificateAvailable: e.target.checked })
+                  }
                 />
                 Certificate available
               </label>
               <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={semForm.isPublished} onChange={(e) => setSemForm({ ...semForm, isPublished: e.target.checked })} />
+                <input
+                  type="checkbox"
+                  checked={semForm.isPublished}
+                  onChange={(e) => setSemForm({ ...semForm, isPublished: e.target.checked })}
+                />
                 Published
               </label>
               <Button type="submit" loading={loading}>
@@ -1087,11 +1195,14 @@ function Page() {
                       {s.title}
                     </button>
                     <p className="text-xs text-muted-foreground">
-                      {s.slug} · {s.isPublished ? "Published" : "Draft"} · CPD {s.cpdPoints} · {s.materials?.length ?? 0} materials
+                      {s.slug} · {s.isPublished ? "Published" : "Draft"} · CPD {s.cpdPoints} ·{" "}
+                      {s.materials?.length ?? 0} materials
                     </p>
                   </li>
                 ))}
-                {(seminars.data ?? []).length === 0 && <p className="text-muted-foreground">No seminars yet.</p>}
+                {(seminars.data ?? []).length === 0 && (
+                  <p className="text-muted-foreground">No seminars yet.</p>
+                )}
               </ul>
             </div>
           </div>
@@ -1178,17 +1289,25 @@ function Page() {
                     <td className="p-2 font-medium">
                       {r.name}
                       {r.organisation ? (
-                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">{r.organisation}</span>
+                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                          {r.organisation}
+                        </span>
                       ) : null}
                     </td>
                     <td className="p-2">
                       {r.email || "—"}
-                      {r.phone ? <span className="mt-0.5 block text-xs text-muted-foreground">{r.phone}</span> : null}
+                      {r.phone ? (
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {r.phone}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="p-2 font-mono text-xs">{r.registrationNumber}</td>
                     <td className="p-2">{r.conference.title}</td>
                     <td className="p-2">{r.packageName ?? r.participantType}</td>
-                    <td className="p-2">{Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}</td>
+                    <td className="p-2">
+                      {Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}
+                    </td>
                     <td className="p-2">
                       <span className="font-medium">{r.paymentStatus}</span>
                       <span className="mt-0.5 block text-xs text-muted-foreground">{r.status}</span>
@@ -1200,9 +1319,12 @@ function Page() {
                           size="sm"
                           variant="outline"
                           onClick={() =>
-                            void apiPost(`/admin/events/conferences/registrations/${r.id}/attendance`, {
-                              attendanceStatus: "ATTENDED",
-                            }).then(() => {
+                            void apiPost(
+                              `/admin/events/conferences/registrations/${r.id}/attendance`,
+                              {
+                                attendanceStatus: "ATTENDED",
+                              },
+                            ).then(() => {
                               notify.success("Conference attendance marked.");
                               void confRegs.refetch();
                             })
@@ -1216,7 +1338,9 @@ function Page() {
                 ))}
               </tbody>
             </table>
-            {(confRegs.data ?? []).length === 0 && <p className="mt-3 text-sm text-muted-foreground">No conference registrations.</p>}
+            {(confRegs.data ?? []).length === 0 && (
+              <p className="mt-3 text-sm text-muted-foreground">No conference registrations.</p>
+            )}
           </div>
 
           <div className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
@@ -1241,17 +1365,25 @@ function Page() {
                     <td className="p-2 font-medium">
                       {r.name}
                       {r.organisation ? (
-                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">{r.organisation}</span>
+                        <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                          {r.organisation}
+                        </span>
                       ) : null}
                     </td>
                     <td className="p-2">
                       {r.email || "—"}
-                      {r.phone ? <span className="mt-0.5 block text-xs text-muted-foreground">{r.phone}</span> : null}
+                      {r.phone ? (
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {r.phone}
+                        </span>
+                      ) : null}
                     </td>
                     <td className="p-2 font-mono text-xs">{r.registrationNumber}</td>
                     <td className="p-2">{r.seminar.title}</td>
                     <td className="p-2">{r.participantType}</td>
-                    <td className="p-2">{Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}</td>
+                    <td className="p-2">
+                      {Number(r.amountNgn) === 0 ? "Free" : formatNaira(Number(r.amountNgn))}
+                    </td>
                     <td className="p-2">{r.paymentStatus}</td>
                     <td className="p-2">{r.attendanceStatus}</td>
                     <td className="p-2">
@@ -1259,12 +1391,12 @@ function Page() {
                         size="sm"
                         variant="outline"
                         onClick={() =>
-                          void apiPost(`/admin/events/seminars/registrations/${r.id}/attendance`, { attendanceStatus: "ATTENDED" }).then(
-                            () => {
-                              notify.success("Attendance marked. CPD awarded if configured.");
-                              void regs.refetch();
-                            },
-                          )
+                          void apiPost(`/admin/events/seminars/registrations/${r.id}/attendance`, {
+                            attendanceStatus: "ATTENDED",
+                          }).then(() => {
+                            notify.success("Attendance marked. CPD awarded if configured.");
+                            void regs.refetch();
+                          })
                         }
                       >
                         Mark attended
@@ -1274,7 +1406,9 @@ function Page() {
                 ))}
               </tbody>
             </table>
-            {(regs.data ?? []).length === 0 && <p className="mt-3 text-sm text-muted-foreground">No seminar registrations.</p>}
+            {(regs.data ?? []).length === 0 && (
+              <p className="mt-3 text-sm text-muted-foreground">No seminar registrations.</p>
+            )}
             {hasPermission("fees.override") && (
               <form
                 className="mt-4 grid gap-2 sm:grid-cols-4"

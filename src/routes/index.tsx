@@ -16,7 +16,6 @@ import {
   BookOpen,
   Briefcase,
   Building2,
-  Star,
 } from "lucide-react";
 import { SiteLayout } from "@/components/site/Layout";
 import { useQuery } from "@tanstack/react-query";
@@ -79,11 +78,9 @@ function Home() {
       <PartnersStrip />
       <WhyMatters />
       <CoreBenefits />
-      <MembershipTiers />
       <ConferenceSpotlight />
       <Sectors />
       <Insights />
-      <Testimonials />
       <Newsletter />
       <FinalCTA />
     </SiteLayout>
@@ -102,11 +99,16 @@ function Hero() {
   const usesTypewriter = headline === DEFAULT_HERO_HEADLINE;
   const subhead =
     heroCms?.subhead ||
-    "Data Protection Officers Conference is a year-round professional network, leadership forum and conference platform advancing the competence, effectiveness and influence of Data Protection Officers in Nigeria, Africa and the global privacy ecosystem.";
-  const ctaLabel = heroCms?.ctaLabel || "Register for the Conference";
-  const ctaHref = heroCms?.ctaHref || "/conferences";
-  const secondaryCtaLabel = (heroCms?.secondaryCtaLabel as string) || "Become a Member";
-  const secondaryCtaHref = (heroCms?.secondaryCtaHref as string) || "/membership";
+    "Join the Data Protection Officers Conference for practical learning, professional connections and cross-sector dialogue on privacy and data protection.";
+  const configuredCtaHref = (heroCms?.ctaHref as string | undefined) || "/conferences";
+  const configuredCtaLabel = (heroCms?.ctaLabel as string | undefined) || "";
+  const ctaPointsToLegacyFlow =
+    /^\/(membership|register|login)(\/|$)/.test(configuredCtaHref) ||
+    /membership|sign[\s-]?in|sign[\s-]?up|create account/i.test(configuredCtaLabel);
+  const ctaLabel = ctaPointsToLegacyFlow
+    ? "Register for the Conference"
+    : configuredCtaLabel || "Register for the Conference";
+  const ctaHref = ctaPointsToLegacyFlow ? "/conferences" : configuredCtaHref;
 
   useEffect(() => {
     if (!usesTypewriter) return;
@@ -176,24 +178,6 @@ function Hero() {
             >
               {ctaLabel} <ArrowRight className="h-4 w-4" />
             </a>
-            <a
-              href={secondaryCtaHref}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-[color:var(--brand-deep)] px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"
-            >
-              {secondaryCtaLabel}
-            </a>
-            <Link
-              to="/benefits"
-              className="inline-flex items-center gap-2 rounded-md border-2 border-[color:var(--brand-green)] px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-green)] hover:bg-[color:var(--brand-tint)]"
-            >
-              Explore Member Benefits
-            </Link>
-            <Link
-              to="/training"
-              className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-green)] hover:text-[color:var(--brand-deep)]"
-            >
-              Explore Training →
-            </Link>
           </div>
           <div className="hero-metrics-bar hero-enter hero-enter--5 mt-10 grid max-w-xl grid-cols-3 overflow-hidden rounded-lg">
             {HERO_METRICS.map((metric) => (
@@ -568,90 +552,6 @@ function CoreBenefits() {
   );
 }
 
-function MembershipTiers() {
-  const tiers = [
-    { name: "Student", for: "Students & aspiring privacy professionals", featured: false },
-    { name: "Associate", for: "Early-career practitioners building competence", featured: false },
-    {
-      name: "Professional",
-      for: "Certified & practising DPOs",
-      featured: true,
-      badge: "Most Popular",
-    },
-    { name: "Fellow", for: "Senior privacy leaders & contributors", featured: false, gold: true },
-    { name: "Corporate", for: "Organisations & team memberships", featured: false },
-  ];
-
-  return (
-    <section className="mx-auto max-w-7xl px-6 py-20 lg:py-28">
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-wider text-[color:var(--brand-green)]">
-          Membership
-        </p>
-        <h2 className="mt-3 text-3xl font-extrabold text-[color:var(--brand-deep)] md:text-4xl">
-          Choose the category that matches your journey.
-        </h2>
-        <p className="mt-4 text-[color:var(--muted-foreground)]">
-          Five membership categories designed for every stage of a privacy career — from student to
-          fellow.
-        </p>
-      </div>
-      <div className="mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        {tiers.map((tier) => (
-          <div
-            key={tier.name}
-            className={`relative rounded-2xl border-2 bg-white p-6 transition-all ${
-              tier.featured
-                ? "border-[color:var(--brand-emerald)] lg:-translate-y-3"
-                : tier.gold
-                  ? "border-[color:var(--brand-gold)]"
-                  : "border-[color:var(--border)]"
-            }`}
-          >
-            {tier.badge && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[color:var(--brand-emerald)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                {tier.badge}
-              </span>
-            )}
-            {tier.gold && (
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-[color:var(--brand-gold)] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-white">
-                Distinguished
-              </span>
-            )}
-            <h3 className="text-xl font-extrabold text-[color:var(--brand-deep)]">{tier.name}</h3>
-            <p className="mt-2 min-h-12 text-xs text-[color:var(--muted-foreground)]">{tier.for}</p>
-            <div className="mt-4 border-y border-[color:var(--border)] py-3">
-              <p className="text-xs text-[color:var(--muted-foreground)]">Annual fee</p>
-              <p className="text-lg font-bold text-[color:var(--brand-deep)]">On application</p>
-            </div>
-            <ul className="mt-4 space-y-2 text-xs text-[color:var(--foreground)]">
-              {["Member directory", "Training access", "CPD credits", "Conference discount"].map(
-                (benefit) => (
-                  <li key={benefit} className="flex gap-2">
-                    <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[color:var(--brand-emerald)]" />
-                    {benefit}
-                  </li>
-                ),
-              )}
-            </ul>
-            <Link
-              to="/register"
-              search={{ redirect: "/portal/apply", category: tier.name.toLowerCase() }}
-              className={`mt-5 block rounded-md px-3 py-2.5 text-center text-sm font-semibold ${
-                tier.featured
-                  ? "gradient-brand text-white"
-                  : "border border-[color:var(--brand-deep)] text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"
-              }`}
-            >
-              Apply Now
-            </Link>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 function ConferenceSpotlight() {
   const q = useQuery({
     queryKey: ["conferences"],
@@ -670,6 +570,8 @@ function ConferenceSpotlight() {
           isFree: boolean;
           fromAmountNgn: number | null;
           datesToBeAnnounced?: boolean;
+          registrationReady?: boolean;
+          packages?: { isActive: boolean }[];
         }[]
       >("/public/conferences"),
   });
@@ -677,8 +579,14 @@ function ConferenceSpotlight() {
   const now = Date.now();
   const upcoming = (q.data ?? []).filter((c) => new Date(c.endsOn).getTime() >= now);
   const spotlightConference = upcoming.find((c) => c.slug === "annual-2027");
+  const isRegistrationReady = (conference: (typeof upcoming)[number]) =>
+    conference.registrationReady ??
+    (conference.fromAmountNgn != null || Boolean(conference.packages?.some((pkg) => pkg.isActive)));
   const cards = spotlightConference
-    ? [spotlightConference, ...upcoming.filter((c) => c.slug !== spotlightConference.slug).slice(0, 2)]
+    ? [
+        spotlightConference,
+        ...upcoming.filter((c) => c.slug !== spotlightConference.slug).slice(0, 2),
+      ]
     : upcoming.slice(0, 3);
   const featured = cards[0];
   return (
@@ -786,19 +694,19 @@ function ConferenceSpotlight() {
                       {c.format ? ` · ${c.format}` : ""}
                     </p>
                     <p className="mt-2 text-sm font-semibold text-[color:var(--brand-gold)]">
-                      {c.isFree
-                        ? "Free"
-                        : c.fromAmountNgn == null
-                          ? "Waitlist open"
-                          : c.fromAmountNgn === 0
-                            ? "Free"
+                      {!isRegistrationReady(c)
+                        ? "Waitlist open"
+                        : c.isFree || c.fromAmountNgn === 0
+                          ? "Free"
+                          : c.fromAmountNgn == null
+                            ? "Registration details coming soon"
                             : `From ${formatNaira(c.fromAmountNgn)}`}
                     </p>
                     {c.theme ? (
                       <p className="mt-2 line-clamp-2 text-sm text-white/75">{c.theme}</p>
                     ) : null}
                     <div className="mt-5 flex flex-wrap gap-3">
-                      {c.fromAmountNgn == null ? (
+                      {!isRegistrationReady(c) ? (
                         <Link
                           to="/conferences/$slug"
                           params={{ slug: c.slug }}
@@ -832,7 +740,7 @@ function ConferenceSpotlight() {
 
           {featured ? (
             <div className="mt-8 flex flex-wrap gap-3">
-              {featured.fromAmountNgn == null ? (
+              {!isRegistrationReady(featured) ? (
                 <Link
                   to="/conferences/$slug"
                   params={{ slug: featured.slug }}
@@ -1023,64 +931,6 @@ function Insights() {
   );
 }
 
-function Testimonials() {
-  const t = [
-    {
-      name: "Member",
-      role: "Financial Services",
-      body: "Data Protection Officers Conference gave me a peer group I can actually pick up the phone to. The quarterly training is exactly what practising DPOs need.",
-    },
-    {
-      name: "Member",
-      role: "Public Sector",
-      body: "The sector community discussions are the most useful conversations I have all quarter — practical and unfiltered.",
-    },
-    {
-      name: "Member",
-      role: "Technology",
-      body: "The annual conference alone justifies membership. It's where regulators, DPOs and industry actually engage as equals.",
-    },
-  ];
-  return (
-    <section className="bg-[color:var(--muted)] py-20 lg:py-28">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="text-center max-w-2xl mx-auto">
-          <p className="text-sm font-semibold text-[color:var(--brand-green)] uppercase tracking-wider">
-            Members
-          </p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold text-[color:var(--brand-deep)]">
-            Trusted by privacy leaders across the continent.
-          </h2>
-        </div>
-        <div className="mt-12 grid md:grid-cols-3 gap-6">
-          {t.map((x) => (
-            <blockquote
-              key={x.name}
-              className="p-7 rounded-2xl bg-white border border-[color:var(--border)]"
-            >
-              <div className="flex gap-1 text-[color:var(--brand-gold)]">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className="h-4 w-4 fill-current" />
-                ))}
-              </div>
-              <p className="mt-4 text-[color:var(--foreground)] leading-relaxed">"{x.body}"</p>
-              <footer className="mt-5 flex items-center gap-3 pt-4 border-t border-[color:var(--border)]">
-                <div className="h-10 w-10 rounded-full gradient-brand grid place-items-center text-white font-bold">
-                  {x.name[0]}
-                </div>
-                <div>
-                  <p className="font-bold text-sm text-[color:var(--brand-deep)]">{x.name}</p>
-                  <p className="text-xs text-[color:var(--muted-foreground)]">{x.role}</p>
-                </div>
-              </footer>
-            </blockquote>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function Newsletter() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1155,7 +1005,7 @@ function FinalCTA() {
   return (
     <section className="mx-auto max-w-7xl px-6 pb-24 text-center">
       <h2 className="text-3xl md:text-5xl font-extrabold text-[color:var(--brand-deep)] max-w-3xl mx-auto leading-tight">
-        Join the community shaping the future of privacy and data governance.
+        Join the Data Protection Officers Conference.
       </h2>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
@@ -1163,12 +1013,6 @@ function FinalCTA() {
           className="inline-flex items-center gap-2 rounded-md px-6 py-3.5 text-sm font-semibold text-white gradient-brand "
         >
           Register for the Conference <ArrowRight className="h-4 w-4" />
-        </Link>
-        <Link
-          to="/membership"
-          className="rounded-md border-2 border-[color:var(--brand-deep)] px-6 py-3.5 text-sm font-semibold text-[color:var(--brand-deep)] hover:bg-[color:var(--brand-tint)]"
-        >
-          Become a Member
         </Link>
         <Link
           to="/contact"

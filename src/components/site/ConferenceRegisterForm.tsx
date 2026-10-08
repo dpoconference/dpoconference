@@ -8,7 +8,10 @@ import { useAuth } from "@/lib/auth";
 import { loadPaymentsConfig, startCheckout } from "@/lib/checkout";
 import { formatConferenceDates, formatNaira } from "@/lib/format";
 import { notify } from "@/lib/toast";
-import { BankTransferCheckout, type BankTransferSession } from "@/components/payments/BankTransferCheckout";
+import {
+  BankTransferCheckout,
+  type BankTransferSession,
+} from "@/components/payments/BankTransferCheckout";
 import {
   PaymentMethodStep,
   resolveDefaultMethod,
@@ -57,7 +60,9 @@ export function ConferenceRegisterForm({
 
   const packages = useMemo(() => {
     const all = q.data?.packages ?? [];
-    const preferred = all.filter((p) => p.participantType === "GENERAL" || p.participantType === "CORPORATE");
+    const preferred = all.filter(
+      (p) => p.participantType === "GENERAL" || p.participantType === "CORPORATE",
+    );
     const pool = preferred.length ? preferred : all;
     return [...pool].sort((a, b) => {
       if (a.participantType === "GENERAL" && b.participantType !== "GENERAL") return -1;
@@ -105,7 +110,9 @@ export function ConferenceRegisterForm({
 
   const selected = packages.find((p) => p.slug === pkg);
   const effectivePackage = selected ?? packages[0];
-  const isFree = Boolean(q.data?.isFree) || (Boolean(effectivePackage) && Number(effectivePackage?.amountNgn) === 0);
+  const isFree =
+    Boolean(q.data?.isFree) ||
+    (Boolean(effectivePackage) && Number(effectivePackage?.amountNgn) === 0);
 
   async function submit() {
     if (!q.data) return;
@@ -203,8 +210,8 @@ export function ConferenceRegisterForm({
         />
         {pendingReg ? (
           <p className="text-sm text-muted-foreground">
-            Registration ID <span className="font-mono font-semibold">{pendingReg.number}</span>. After confirmation, retrieve
-            your e-invite via{" "}
+            Registration ID <span className="font-mono font-semibold">{pendingReg.number}</span>.
+            After confirmation, retrieve your e-invite via{" "}
             <Link to="/conference/lookup" className="font-semibold text-[color:var(--brand-green)]">
               Find e-invite
             </Link>
@@ -216,14 +223,13 @@ export function ConferenceRegisterForm({
   }
 
   const conf = q.data;
-  const summaryPrice =
-    isFree
-      ? "Free"
-      : selected
-        ? formatNaira(Number(selected.amountNgn))
-        : conf.fromAmountNgn == null
-          ? "Unavailable"
-          : `From ${formatNaira(conf.fromAmountNgn)}`;
+  const summaryPrice = isFree
+    ? "Free"
+    : selected
+      ? formatNaira(Number(selected.amountNgn))
+      : conf.fromAmountNgn == null
+        ? "Unavailable"
+        : `From ${formatNaira(conf.fromAmountNgn)}`;
   const payLabel = isFree
     ? "Complete registration"
     : method === "BANK_TRANSFER"
@@ -240,10 +246,14 @@ export function ConferenceRegisterForm({
           </p>
           <p className="mt-2 font-semibold text-[color:var(--brand-green)]">{summaryPrice}</p>
           {conf.registrationOpen === false ? (
-            <p className="mt-2 text-amber-700">Registration is currently closed for this conference.</p>
+            <p className="mt-2 text-amber-700">
+              Registration is currently closed for this conference.
+            </p>
           ) : null}
           {conf.registrationOpen !== false && packages.length === 0 ? (
-            <p className="mt-2 text-amber-700">No ticket categories are currently available for registration.</p>
+            <p className="mt-2 text-amber-700">
+              No ticket categories are currently available for registration.
+            </p>
           ) : null}
         </div>
       ) : (
@@ -253,10 +263,14 @@ export function ConferenceRegisterForm({
             Open to everyone — members and guests. This is a conference ticket, not membership.
           </p>
           {conf.registrationOpen === false ? (
-            <p className="mt-2 text-amber-700">Registration is currently closed for this conference.</p>
+            <p className="mt-2 text-amber-700">
+              Registration is currently closed for this conference.
+            </p>
           ) : null}
           {conf.registrationOpen !== false && packages.length === 0 ? (
-            <p className="mt-2 text-amber-700">No ticket categories are currently available for registration.</p>
+            <p className="mt-2 text-amber-700">
+              No ticket categories are currently available for registration.
+            </p>
           ) : null}
         </div>
       )}
@@ -268,9 +282,16 @@ export function ConferenceRegisterForm({
               key={p.slug}
               className={`rounded-xl border p-4 ${pkg === p.slug ? "border-[color:var(--brand-emerald)]" : "border-[color:var(--border)]"}`}
             >
-              <input type="radio" className="mr-2" checked={pkg === p.slug} onChange={() => setPkg(p.slug)} />
+              <input
+                type="radio"
+                className="mr-2"
+                checked={pkg === p.slug}
+                onChange={() => setPkg(p.slug)}
+              />
               {p.name} · {Number(p.amountNgn) === 0 ? "Free" : formatNaira(Number(p.amountNgn))}
-              {p.description ? <span className="mt-1 block text-sm text-muted-foreground">{p.description}</span> : null}
+              {p.description ? (
+                <span className="mt-1 block text-sm text-muted-foreground">{p.description}</span>
+              ) : null}
             </label>
           ))}
         </div>
@@ -314,8 +335,13 @@ export function ConferenceRegisterForm({
             onChange={(e) => setPrivacyConsent(e.target.checked)}
           />
           <span>
-            I agree that Data Protection Officers Conference may use my information to process this registration in line with the{" "}
-            <Link to="/legal/$slug" params={{ slug: "privacy-notice" }} className="font-semibold text-[color:var(--brand-green)]">
+            I agree that Data Protection Officers Conference may use my information to process this
+            registration in line with the{" "}
+            <Link
+              to="/legal/$slug"
+              params={{ slug: "privacy-notice" }}
+              className="font-semibold text-[color:var(--brand-green)]"
+            >
               Privacy Notice
             </Link>
             .
@@ -331,11 +357,19 @@ export function ConferenceRegisterForm({
           />
           <span>
             I accept the{" "}
-            <Link to="/legal/$slug" params={{ slug: "terms-of-use" }} className="font-semibold text-[color:var(--brand-green)]">
+            <Link
+              to="/legal/$slug"
+              params={{ slug: "terms-of-use" }}
+              className="font-semibold text-[color:var(--brand-green)]"
+            >
               event terms
             </Link>{" "}
             and{" "}
-            <Link to="/legal/$slug" params={{ slug: "refund-policy" }} className="font-semibold text-[color:var(--brand-green)]">
+            <Link
+              to="/legal/$slug"
+              params={{ slug: "refund-policy" }}
+              className="font-semibold text-[color:var(--brand-green)]"
+            >
               refund policy
             </Link>
             .
@@ -348,16 +382,15 @@ export function ConferenceRegisterForm({
             checked={marketingConsent}
             onChange={(e) => setMarketingConsent(e.target.checked)}
           />
-          <span>Send me optional conference and professional updates. I can unsubscribe at any time.</span>
+          <span>
+            Send me optional conference and professional updates. I can unsubscribe at any time.
+          </span>
         </label>
       </div>
 
       <p className="text-xs text-[color:var(--muted-foreground)]">
-        This registers you for a conference ticket only — not membership.{" "}
-        <Link to="/membership" className="font-semibold text-[color:var(--brand-green)]">
-          Want membership as well? Apply separately
-        </Link>
-        .
+        This registers you for a conference ticket only. No account or membership application is
+        required.
       </p>
 
       <Button

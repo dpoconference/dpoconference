@@ -93,7 +93,7 @@ function LoginPage() {
     <AuthLayout variant="login">
       <h2 className="text-2xl font-semibold tracking-tight">Welcome back</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Sign in to continue to your learning and membership workspace.
+        Sign in to continue to your account workspace.
       </p>
       <AuthError message={error} />
       <form className="mt-8 space-y-4" onSubmit={(e) => void signIn(e)}>

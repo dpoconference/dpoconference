@@ -105,8 +105,7 @@ function RegisterPage() {
       <AuthStepper step={1} steps={["Account details", "Verify email"]} />
       <h2 className="text-2xl font-semibold tracking-tight">Create an account</h2>
       <p className="mt-1 text-sm text-muted-foreground">
-        Join Data Protection Officers Conference to apply for membership, register for events and
-        track your CPD.
+        Create an account to access available Data Protection Officers Conference services.
       </p>
       <AuthError message={error} />
       <form onSubmit={onSubmit} className="mt-8 space-y-4">

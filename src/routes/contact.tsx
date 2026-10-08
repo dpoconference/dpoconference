@@ -10,9 +10,16 @@ export const Route = createFileRoute("/contact")({
   head: () => ({
     meta: [
       { title: "Contact | Data Protection Officers Conference" },
-      { name: "description", content: "Get in touch with Data Protection Officers Conference for membership, training, conference, sponsorship, media and partnership enquiries." },
+      {
+        name: "description",
+        content:
+          "Contact the Data Protection Officers Conference Secretariat for event, sponsorship, partnership and general enquiries.",
+      },
       { property: "og:title", content: "Contact Data Protection Officers Conference" },
-      { property: "og:description", content: "Reach the Data Protection Officers Conference Secretariat." },
+      {
+        property: "og:description",
+        content: "Reach the Data Protection Officers Conference Secretariat.",
+      },
     ],
   }),
   component: ContactPage,
@@ -25,7 +32,7 @@ function ContactPage() {
     email: "",
     phone: "",
     organisation: "",
-    category: "Membership",
+    category: "Conference",
     subject: "",
     message: "",
     consent: false,
@@ -34,12 +41,20 @@ function ContactPage() {
 
   return (
     <SiteLayout>
-      <PageHero breadcrumb="Home / Contact" eyebrow="Contact Data Protection Officers Conference" title="Contact Data Protection Officers Conference" subtitle="We welcome enquiries from professionals, organisations, partners, sponsors, speakers, researchers and members of the public." />
+      <PageHero
+        breadcrumb="Home / Contact"
+        eyebrow="Contact Data Protection Officers Conference"
+        title="Contact Data Protection Officers Conference"
+        subtitle="We welcome enquiries from professionals, organisations, partners, sponsors, speakers, researchers and members of the public."
+      />
 
       <section className="mx-auto max-w-7xl px-6 py-20 grid lg:grid-cols-2 gap-10">
         <div className="space-y-4">
           <InfoCard icon={Mail} title="Email" body="info@dpoconference.com" />
-          <a href="tel:+2348033336644" className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-green)]">
+          <a
+            href="tel:+2348033336644"
+            className="block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--brand-green)]"
+          >
             <InfoCard icon={Phone} title="Telephone" body="+234 803 333 6644" />
           </a>
           <InfoCard icon={MapPin} title="Secretariat" body="Abuja, Nigeria" />
@@ -67,39 +82,84 @@ function ContactPage() {
                 website: form.website,
               });
               notify.success("Message sent. We will reply to your email.");
-              setForm({ name: "", email: "", phone: "", organisation: "", category: "Membership", subject: "", message: "", consent: false, website: "" });
+              setForm({
+                name: "",
+                email: "",
+                phone: "",
+                organisation: "",
+                category: "Conference",
+                subject: "",
+                message: "",
+                consent: false,
+                website: "",
+              });
             } finally {
               setLoading(false);
             }
           }}
         >
-          <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">Send us a message</h2>
-          <input type="text" name="website" value={form.website} onChange={(e) => setForm({ ...form, website: e.target.value })} className="hidden" tabIndex={-1} autoComplete="off" aria-hidden />
+          <h2 className="text-2xl font-extrabold text-[color:var(--brand-deep)]">
+            Send us a message
+          </h2>
+          <input
+            type="text"
+            name="website"
+            value={form.website}
+            onChange={(e) => setForm({ ...form, website: e.target.value })}
+            className="hidden"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden
+          />
           <div className="mt-6 grid sm:grid-cols-2 gap-4">
-            <Field label="Full name" value={form.name} onChange={(v) => setForm({ ...form, name: v })} required />
-            <Field label="Email" type="email" value={form.email} onChange={(v) => setForm({ ...form, email: v })} required />
-            <Field label="Telephone" value={form.phone} onChange={(v) => setForm({ ...form, phone: v })} />
-            <Field label="Organisation" value={form.organisation} onChange={(v) => setForm({ ...form, organisation: v })} />
+            <Field
+              label="Full name"
+              value={form.name}
+              onChange={(v) => setForm({ ...form, name: v })}
+              required
+            />
+            <Field
+              label="Email"
+              type="email"
+              value={form.email}
+              onChange={(v) => setForm({ ...form, email: v })}
+              required
+            />
+            <Field
+              label="Telephone"
+              value={form.phone}
+              onChange={(v) => setForm({ ...form, phone: v })}
+            />
+            <Field
+              label="Organisation"
+              value={form.organisation}
+              onChange={(v) => setForm({ ...form, organisation: v })}
+            />
           </div>
           <div className="mt-4">
-            <label className="text-sm font-semibold text-[color:var(--foreground)]">Enquiry category</label>
+            <label className="text-sm font-semibold text-[color:var(--foreground)]">
+              Enquiry category
+            </label>
             <select
               className="mt-1 w-full rounded-md border border-[color:var(--border)] px-3 py-2.5 text-base md:text-sm bg-white"
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
             >
-              <option>Membership</option>
-              <option>Training</option>
               <option>Conference</option>
               <option>Sponsorship</option>
               <option>Partnership</option>
               <option>Media</option>
-              <option>Careers</option>
               <option>Technical support</option>
               <option>General enquiry</option>
             </select>
           </div>
-          <Field className="mt-4" label="Subject" value={form.subject} onChange={(v) => setForm({ ...form, subject: v })} required />
+          <Field
+            className="mt-4"
+            label="Subject"
+            value={form.subject}
+            onChange={(v) => setForm({ ...form, subject: v })}
+            required
+          />
           <div className="mt-4">
             <label className="text-sm font-semibold">Message</label>
             <textarea
@@ -112,10 +172,21 @@ function ContactPage() {
             />
           </div>
           <label className="mt-4 flex items-start gap-2 text-xs text-[color:var(--muted-foreground)]">
-            <input type="checkbox" className="mt-1" checked={form.consent} onChange={(e) => setForm({ ...form, consent: e.target.checked })} />
-            By submitting this form, you acknowledge that the information provided will be processed for the purpose of responding to your enquiry in accordance with the Data Protection Officers Conference Privacy Notice.
+            <input
+              type="checkbox"
+              className="mt-1"
+              checked={form.consent}
+              onChange={(e) => setForm({ ...form, consent: e.target.checked })}
+            />
+            By submitting this form, you acknowledge that the information provided will be processed
+            for the purpose of responding to your enquiry in accordance with the Data Protection
+            Officers Conference Privacy Notice.
           </label>
-          <Button type="submit" loading={loading} className="mt-6 w-full min-h-11 rounded-md gradient-brand text-white font-bold px-4 py-3 text-sm">
+          <Button
+            type="submit"
+            loading={loading}
+            className="mt-6 w-full min-h-11 rounded-md gradient-brand text-white font-bold px-4 py-3 text-sm"
+          >
             Send message
           </Button>
         </form>
@@ -131,7 +202,9 @@ function InfoCard({ icon: Icon, title, body }: { icon: typeof Mail; title: strin
         <Icon className="h-5 w-5" />
       </div>
       <div>
-        <p className="text-xs uppercase text-[color:var(--muted-foreground)] tracking-wider">{title}</p>
+        <p className="text-xs uppercase text-[color:var(--muted-foreground)] tracking-wider">
+          {title}
+        </p>
         <p className="font-bold text-[color:var(--brand-deep)] mt-0.5">{body}</p>
       </div>
     </div>

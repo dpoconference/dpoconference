@@ -2,6 +2,8 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
   ArrowRight,
+  Award,
+  BookOpen,
   Briefcase,
   ClipboardList,
   FileSpreadsheet,
@@ -128,6 +130,20 @@ function Page() {
     },
     ...(hasPermission("cms.manage")
       ? [
+          {
+            to: "/admin/learning",
+            label: "Learning and courses",
+            desc: "Create and publish free or paid continuing-learning courses",
+            icon: BookOpen,
+            meta: "LMS",
+          },
+          {
+            to: "/admin/certificates",
+            label: "Course certificates",
+            desc: "Review, issue and revoke certificates for completed courses",
+            icon: Award,
+            meta: "Certificates",
+          },
           {
             to: "/admin/cms",
             label: "Content",

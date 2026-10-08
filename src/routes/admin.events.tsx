@@ -143,6 +143,17 @@ type Seminar = {
   materials?: { id: string; title: string; url: string }[];
 };
 
+type ConferenceWaitlistEntry = {
+  id: string;
+  name: string;
+  organisationName: string;
+  email: string;
+  phone: string;
+  notificationSentAt: string | null;
+  createdAt: string;
+  conference: { title: string; slug: string };
+};
+
 function Page() {
   const { hasPermission } = useAuth();
   const canManage = hasPermission("events.manage");
@@ -221,11 +232,29 @@ function Page() {
         }[]
       >("/admin/events/conferences/registrations"),
   });
+  const conferenceWaitlist = useQuery({
+    queryKey: ["admin-conference-waitlist"],
+    queryFn: () => apiGet<ConferenceWaitlistEntry[]>("/admin/events/conferences/waitlist"),
+    enabled: canManage,
+  });
   const learnerLoginConfig = useQuery({
     queryKey: ["admin-learner-login"],
     queryFn: () => apiGet<{ enabled: boolean }>("/admin/settings/learner-login"),
     enabled: canManageSettings,
   });
+  const conferenceRegistrations = confRegs.data ?? [];
+  const eligibleRegistrations = conferenceRegistrations.filter((registration) =>
+    ["PAID", "CONFIRMED"].includes(registration.status),
+  );
+  const pendingLoginReleaseCount = eligibleRegistrations.filter(
+    (registration) => registration.loginReleaseStatus === "PENDING_RELEASE",
+  ).length;
+  const sentLoginCount = eligibleRegistrations.filter(
+    (registration) => registration.loginReleaseStatus === "SENT",
+  ).length;
+  const activatedLoginCount = eligibleRegistrations.filter(
+    (registration) => registration.loginReleaseStatus === "ACTIVATED",
+  ).length;
 
   const [confForm, setConfForm] = useState({
     slug: "",
@@ -1337,6 +1366,19 @@ function Page() {
               </Button>
             </div>
           )}
+          <div className="rounded-2xl border border-[color:var(--brand-gold)]/40 bg-[color:var(--brand-tint)]/30 p-5">
+            <h3 className="font-bold">Attendee learner-access queue</h3>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Pending release means the registration is paid or confirmed, but the attendee has not yet
+              received a setup link. Releasing access emails a one-time password-setup link; it does not
+              send or reveal a password. The link expires after one hour.
+            </p>
+            <div className="mt-3 flex flex-wrap gap-4 text-sm">
+              <span><strong>{pendingLoginReleaseCount}</strong> awaiting release</span>
+              <span><strong>{sentLoginCount}</strong> setup link sent/queued</span>
+              <span><strong>{activatedLoginCount}</strong> account activated</span>
+            </div>
+          </div>
           <div className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -1345,12 +1387,29 @@ function Page() {
                   Learner account setup is separate from conference ticket and QR delivery.
                 </p>
               </div>
-              {canManageSettings && (
-                <Button
-                  size="sm"
-                  loading={loading}
-                  disabled={!selectedRegistrationIds.length}
-                  onClick={async () => {
+              <div className="flex flex-wrap gap-2">
+                {canManageSettings && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    disabled={!pendingLoginReleaseCount || loading}
+                    onClick={() =>
+                      setSelectedRegistrationIds(
+                        eligibleRegistrations
+                          .filter((registration) => registration.loginReleaseStatus === "PENDING_RELEASE")
+                          .map((registration) => registration.id),
+                      )
+                    }
+                  >
+                    Select awaiting release ({pendingLoginReleaseCount})
+                  </Button>
+                )}
+                {canManageSettings && (
+                  <Button
+                    size="sm"
+                    loading={loading}
+                    disabled={!selectedRegistrationIds.length}
+                    onClick={async () => {
                     setLoading(true);
                     try {
                       const result = await apiPost<{
@@ -1371,11 +1430,12 @@ function Page() {
                     } finally {
                       setLoading(false);
                     }
-                  }}
-                >
-                  Release / resend setup link ({selectedRegistrationIds.length})
-                </Button>
-              )}
+                    }}
+                  >
+                    Release / resend setup link ({selectedRegistrationIds.length})
+                  </Button>
+                )}
+              </div>
             </div>
             <table className="mt-3 w-full min-w-[1120px] text-left text-sm">
               <thead>
@@ -1495,6 +1555,66 @@ function Page() {
               <p className="mt-3 text-sm text-muted-foreground">No conference registrations.</p>
             )}
           </div>
+
+          <section className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
+            <div>
+              <h3 className="font-bold">Conference registration waitlist</h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                These contacts are waiting for registration to open. This is separate from the learner
+                access queue above; waitlist contacts do not receive LMS setup links until they register
+                and their registration is paid or confirmed.
+              </p>
+            </div>
+            {conferenceWaitlist.isPending ? (
+              <p className="mt-4 text-sm text-muted-foreground">Loading conference waitlist…</p>
+            ) : null}
+            {conferenceWaitlist.isError ? (
+              <div className="mt-4 flex flex-wrap items-center gap-3 text-sm text-destructive">
+                <span>Conference waitlist could not be loaded.</span>
+                <Button size="sm" variant="outline" onClick={() => void conferenceWaitlist.refetch()}>
+                  Try again
+                </Button>
+              </div>
+            ) : null}
+            {!conferenceWaitlist.isPending && !conferenceWaitlist.isError ? (
+              <table className="mt-4 w-full min-w-[760px] text-left text-sm">
+                <thead>
+                  <tr className="border-b text-xs uppercase text-muted-foreground">
+                    <th className="p-2">Name</th>
+                    <th className="p-2">Organisation</th>
+                    <th className="p-2">Email / phone</th>
+                    <th className="p-2">Conference</th>
+                    <th className="p-2">Joined waitlist</th>
+                    <th className="p-2">Registration notice</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(conferenceWaitlist.data ?? []).map((entry) => (
+                    <tr key={entry.id} className="border-t">
+                      <td className="p-2 font-medium">{entry.name}</td>
+                      <td className="p-2">{entry.organisationName || "—"}</td>
+                      <td className="p-2">
+                        {entry.email}
+                        <span className="mt-0.5 block text-xs text-muted-foreground">{entry.phone}</span>
+                      </td>
+                      <td className="p-2">{entry.conference.title}</td>
+                      <td className="p-2">{new Date(entry.createdAt).toLocaleString()}</td>
+                      <td className="p-2">
+                        {entry.notificationSentAt
+                          ? `Sent ${new Date(entry.notificationSentAt).toLocaleString()}`
+                          : "Waiting for registration to open"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : null}
+            {!conferenceWaitlist.isPending &&
+            !conferenceWaitlist.isError &&
+            !conferenceWaitlist.data?.length ? (
+              <p className="mt-4 text-sm text-muted-foreground">No conference waitlist entries.</p>
+            ) : null}
+          </section>
 
           <GroupParticipantOnboarding />
 

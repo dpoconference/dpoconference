@@ -7,12 +7,14 @@ export function StatCard({
   hint,
   icon: Icon,
   well = "primary",
+  className,
 }: {
   label: string;
   value: React.ReactNode;
   hint?: string;
   icon?: LucideIcon;
   well?: "primary" | "gold" | "success" | "warning" | "destructive";
+  className?: string;
 }) {
   const wells = {
     primary: "bg-primary/10 text-primary",
@@ -23,7 +25,7 @@ export function StatCard({
   };
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5  transition ">
+    <div className={cn("rounded-xl border border-border bg-card p-5 transition", className)}>
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{label}</p>
         {Icon && (

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,10 @@ function emptyPackageForm(conferenceId = "") {
 }
 
 export const Route = createFileRoute("/admin/events")({
+  validateSearch: (search: Record<string, unknown>): { tab?: "setup" | "regs"; section?: string } => ({
+    tab: search.tab === "regs" || search.tab === "setup" ? search.tab : undefined,
+    section: typeof search.section === "string" ? search.section : undefined,
+  }),
   component: Page,
 });
 
@@ -155,6 +159,7 @@ type ConferenceWaitlistEntry = {
 };
 
 function Page() {
+  const { tab: requestedTab, section } = Route.useSearch();
   const { hasPermission } = useAuth();
   const canManage = hasPermission("events.manage");
   const canManageSettings = hasPermission("settings.manage");
@@ -162,6 +167,17 @@ function Page() {
   const [loading, setLoading] = useState(false);
   const [selectedRegistrationIds, setSelectedRegistrationIds] = useState<string[]>([]);
   const prospectusRef = useRef<HTMLInputElement>(null);
+  const waitlistRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (requestedTab) setTab(requestedTab);
+  }, [requestedTab]);
+
+  useEffect(() => {
+    if (tab === "regs" && section === "waitlist") {
+      waitlistRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, [tab, section]);
 
   const dash = useQuery({
     queryKey: ["ev-dash"],
@@ -1553,7 +1569,11 @@ function Page() {
             )}
           </div>
 
-          <section className="overflow-x-auto rounded-2xl border border-border bg-card p-6">
+          <section
+            id="conference-waitlist"
+            ref={waitlistRef}
+            className="scroll-mt-6 overflow-x-auto rounded-2xl border border-border bg-card p-6"
+          >
             <div>
               <h3 className="font-bold">Conference registration waitlist</h3>
               <p className="mt-1 text-sm text-muted-foreground">

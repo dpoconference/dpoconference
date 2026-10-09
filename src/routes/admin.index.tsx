@@ -111,57 +111,114 @@ function Page() {
       <section>
         <h2 className="mb-3 text-sm font-semibold">Conference and LMS overview</h2>
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard
-            label="Conference registrations"
-            value={totals.conferenceRegistrations}
-            hint={`${totals.confirmedConferenceRegistrations} paid or confirmed`}
-            icon={Ticket}
-          />
-          <StatCard
-            label="Awaiting learner access"
-            value={totals.pendingLoginReleases}
-            hint="Conference and seminar participants awaiting setup-link release"
-            icon={GraduationCap}
-            well={totals.pendingLoginReleases ? "warning" : undefined}
-          />
-          <StatCard
-            label="Conference waitlist"
-            value={totals.waitlistEntries}
-            hint={`${totals.groupRegistrations} organisation registrations`}
-            icon={BookOpen}
-          />
-          <StatCard
-            label="Published courses"
-            value={totals.publishedCourses}
-            hint={`${totals.courseEnrollments} learner enrolments`}
-            icon={Award}
-          />
-          <StatCard
-            label="Course certificates"
-            value={totals.courseCertificates}
-            hint="Issued certificates"
-            icon={Award}
-          />
-          <StatCard
-            label="Event revenue"
-            value={formatNaira(totalRevenue)}
-            hint={`${conference.paidCount + seminar.paidCount} successful event payments`}
-            icon={Wallet}
-            well="gold"
-          />
-          <StatCard
-            label="Awaiting payment"
-            value={totals.pendingConferenceRegistrations}
-            hint="Conference registrations not yet fulfilled"
-            icon={Ticket}
-            well={totals.pendingConferenceRegistrations ? "warning" : undefined}
-          />
-          <StatCard
-            label="Seminar payments"
-            value={seminar.paidCount}
-            hint={formatNaira(seminar.revenue)}
-            icon={GraduationCap}
-          />
+          <Link
+            to="/admin/events"
+            aria-label="View conference registrations"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Conference registrations"
+              value={totals.conferenceRegistrations}
+              hint={`${totals.confirmedConferenceRegistrations} paid or confirmed`}
+              icon={Ticket}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/learners"
+            aria-label="Manage learners awaiting access"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Awaiting learner access"
+              value={totals.pendingLoginReleases}
+              hint="Conference and seminar participants awaiting setup-link release"
+              icon={GraduationCap}
+              well={totals.pendingLoginReleases ? "warning" : undefined}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/events"
+            search={{ tab: "regs", section: "waitlist" }}
+            aria-label="View conference waitlist"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Conference waitlist"
+              value={totals.waitlistEntries}
+              hint={`${totals.groupRegistrations} organisation registrations`}
+              icon={BookOpen}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/learning"
+            aria-label="Manage published courses"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Published courses"
+              value={totals.publishedCourses}
+              hint={`${totals.courseEnrollments} learner enrolments`}
+              icon={Award}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/certificates"
+            aria-label="View course certificates"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Course certificates"
+              value={totals.courseCertificates}
+              hint="Issued certificates"
+              icon={Award}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/payments"
+            aria-label="View event revenue and payments"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Event revenue"
+              value={formatNaira(totalRevenue)}
+              hint={`${conference.paidCount + seminar.paidCount} successful event payments`}
+              icon={Wallet}
+              well="gold"
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/payments"
+            aria-label="Review conference registrations awaiting payment"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Awaiting payment"
+              value={totals.pendingConferenceRegistrations}
+              hint="Conference registrations not yet fulfilled"
+              icon={Ticket}
+              well={totals.pendingConferenceRegistrations ? "warning" : undefined}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
+          <Link
+            to="/admin/payments"
+            aria-label="View seminar payments"
+            className="group block rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <StatCard
+              label="Seminar payments"
+              value={seminar.paidCount}
+              hint={formatNaira(seminar.revenue)}
+              icon={GraduationCap}
+              className="group-hover:border-primary/40 group-hover:bg-muted/30"
+            />
+          </Link>
         </div>
       </section>
 

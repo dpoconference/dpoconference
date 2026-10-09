@@ -25,8 +25,7 @@ import { formatConferenceDateLabel, formatNaira } from "@/lib/format";
 import { notify } from "@/lib/toast";
 import { Button } from "@/components/ui/button";
 
-const DEFAULT_HERO_HEADLINE =
-  "Join the people shaping data protection and privacy.";
+const DEFAULT_HERO_HEADLINE = "Join the people shaping data protection and privacy.";
 const BOARD_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790941351/board.png";
 const COMMISSIONER_IMAGE = "https://res.cloudinary.com/o00thbsd/image/upload/v1790937623/nc.jpg";
 const CONFERENCE_SPOTLIGHT_IMAGE =
@@ -48,8 +47,7 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       {
-        title:
-          "DPO Conference | Data Protection, Privacy and Learning",
+        title: "DPO Conference | Data Protection, Privacy and Learning",
       },
       {
         name: "description",
@@ -58,8 +56,7 @@ export const Route = createFileRoute("/")({
       },
       {
         property: "og:title",
-        content:
-          "DPO Conference | Data Protection, Privacy and Learning",
+        content: "DPO Conference | Data Protection, Privacy and Learning",
       },
       {
         property: "og:description",
@@ -588,7 +585,6 @@ function ConferenceSpotlight() {
         ...upcoming.filter((c) => c.slug !== spotlightConference.slug).slice(0, 2),
       ]
     : upcoming.slice(0, 3);
-  const featured = cards[0];
   return (
     <section className="relative overflow-hidden">
       <div className="absolute inset-0 gradient-brand" />
@@ -599,25 +595,9 @@ function ConferenceSpotlight() {
             "radial-gradient(circle at 15% 30%, rgba(214,168,75,0.4), transparent 40%)",
         }}
       />
-      <div className="relative mx-auto grid max-w-7xl gap-10 px-6 py-20 text-white lg:grid-cols-2 lg:items-stretch lg:py-28">
+      <div className="relative mx-auto max-w-7xl px-6 py-20 text-white lg:py-28">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-end justify-between gap-4">
-            <div className="max-w-2xl">
-              <span className="inline-block text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)] border border-[color:var(--brand-gold)]/50 px-3 py-1 rounded-full">
-                {featured ? "Data Protection Officers Conference" : "Coming Soon"}
-              </span>
-              <h2 className="mt-5 text-4xl md:text-5xl font-extrabold leading-tight">
-                {featured
-                  ? featured.title
-                  : "The Data Protection Officers Conference is coming soon."}
-              </h2>
-              <p className="mt-4 text-white/85 text-lg max-w-lg">
-                {featured
-                  ? featured.theme ||
-                    "Join DPOs, regulators and privacy leaders for practical learning, professional connections and cross-sector dialogue."
-                  : "We are preparing a gathering for DPOs, regulators and privacy professionals to share practical insight, strengthen connections and advance trusted data protection across Africa. Dates, venue and programme details will be announced here."}
-              </p>
-            </div>
+          <div className="mb-5 flex justify-end">
             <Link
               to="/conferences"
               className="text-sm font-semibold text-[color:var(--brand-gold)] hover:text-white"
@@ -668,27 +648,26 @@ function ConferenceSpotlight() {
               </div>
             </article>
           ) : (
-            <div className="mt-12 grid gap-6">
+            <div className="mt-6 grid gap-6">
               {cards.map((c) => (
                 <article
                   key={c.slug}
-                  className="overflow-hidden rounded-2xl border border-white/20 bg-white/5 backdrop-blur"
+                  className="grid overflow-hidden rounded-2xl border border-white/20 bg-white/5 backdrop-blur sm:grid-cols-[minmax(0,1fr)_minmax(220px,0.8fr)]"
                 >
-                  <div className="aspect-video overflow-hidden">
-                    <img
-                      src={c.coverUrl || CONFERENCE_SPOTLIGHT_IMAGE}
-                      alt=""
-                      className="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <div className="p-5">
+                  <div className="flex flex-col p-6 md:p-8">
+                    <span className="mb-4 inline-flex w-fit rounded-full border border-[color:var(--brand-gold)]/50 px-3 py-1 text-xs font-bold uppercase tracking-widest text-[color:var(--brand-gold)]">
+                      Data Protection Officers Conference
+                    </span>
+                    <h2 className="text-3xl font-extrabold leading-tight md:text-4xl">{c.title}</h2>
+                    <p className="mt-3 max-w-xl text-base leading-relaxed text-white/85">
+                      {c.theme ||
+                        "Join DPOs, regulators and privacy leaders for practical learning, professional connections and cross-sector dialogue."}
+                    </p>
                     <p className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-white/60">
                       <Calendar className="h-3.5 w-3.5" />
                       {formatConferenceDateLabel(c.startsOn, c.endsOn, c.datesToBeAnnounced)}
                     </p>
-                    <h3 className="mt-2 text-lg font-bold leading-snug">{c.title}</h3>
-                    <p className="mt-2 flex items-center gap-1.5 text-sm text-white/80">
+                    <p className="mt-3 flex items-center gap-1.5 text-sm text-white/80">
                       <MapPin className="h-4 w-4 shrink-0" />
                       {c.city}
                       {c.format ? ` · ${c.format}` : ""}
@@ -702,10 +681,7 @@ function ConferenceSpotlight() {
                             ? "Registration details coming soon"
                             : `From ${formatNaira(c.fromAmountNgn)}`}
                     </p>
-                    {c.theme ? (
-                      <p className="mt-2 line-clamp-2 text-sm text-white/75">{c.theme}</p>
-                    ) : null}
-                    <div className="mt-5 flex flex-wrap gap-3">
+                    <div className="mt-auto flex flex-wrap gap-3 pt-6">
                       {!isRegistrationReady(c) ? (
                         <Link
                           to="/conferences/$slug"
@@ -713,7 +689,7 @@ function ConferenceSpotlight() {
                           hash="register"
                           className="rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
                         >
-                          Join Waitlist
+                          Join waitlist
                         </Link>
                       ) : (
                         <Link
@@ -721,7 +697,7 @@ function ConferenceSpotlight() {
                           params={{ slug: c.slug }}
                           className="rounded-md bg-[color:var(--brand-gold)] px-4 py-2 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
                         >
-                          Register
+                          Register now
                         </Link>
                       )}
                       <Link
@@ -729,59 +705,23 @@ function ConferenceSpotlight() {
                         params={{ slug: c.slug }}
                         className="rounded-md border border-white/40 px-4 py-2 text-sm font-semibold text-white hover:bg-white/10"
                       >
-                        Details
+                        View programme
                       </Link>
                     </div>
+                  </div>
+                  <div className="flex min-h-64 items-center justify-center bg-black/10 p-5 sm:min-h-full sm:p-7">
+                    <img
+                      src={c.coverUrl || CONFERENCE_SPOTLIGHT_IMAGE}
+                      alt={`${c.title} conference artwork`}
+                      className="max-h-[28rem] w-full object-contain"
+                      loading="lazy"
+                    />
                   </div>
                 </article>
               ))}
             </div>
           )}
-
-          {featured ? (
-            <div className="mt-8 flex flex-wrap gap-3">
-              {!isRegistrationReady(featured) ? (
-                <Link
-                  to="/conferences/$slug"
-                  params={{ slug: featured.slug }}
-                  hash="register"
-                  className="rounded-md bg-[color:var(--brand-gold)] px-6 py-3 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
-                >
-                  Join Waitlist
-                </Link>
-              ) : (
-                <Link
-                  to="/conferences/$slug/register"
-                  params={{ slug: featured.slug }}
-                  className="rounded-md bg-[color:var(--brand-gold)] px-6 py-3 text-sm font-semibold text-[color:var(--brand-deep)] hover:opacity-90"
-                >
-                  Register Now
-                </Link>
-              )}
-              <Link
-                to="/conferences/$slug"
-                params={{ slug: featured.slug }}
-                className="rounded-md border border-white/40 px-6 py-3 text-sm font-semibold text-white hover:bg-white/10"
-              >
-                View Programme
-              </Link>
-              <Link
-                to="/conference/sponsor"
-                className="rounded-md px-6 py-3 text-sm font-semibold text-white/90 hover:text-white"
-              >
-                Become a Sponsor →
-              </Link>
-            </div>
-          ) : null}
         </div>
-        <figure className="relative min-h-72 self-stretch overflow-hidden rounded-xl border border-white/20 bg-white/5 p-5">
-          <img
-            src={CONFERENCE_SPOTLIGHT_IMAGE}
-            alt="Data Protection Officers Conference"
-            className="h-full w-full object-contain"
-            loading="lazy"
-          />
-        </figure>
       </div>
     </section>
   );
@@ -795,9 +735,7 @@ function LearningSpotlight() {
           <p className="text-sm font-semibold text-[color:var(--brand-gold)] uppercase tracking-wider">
             Learning beyond the conference
           </p>
-          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">
-            Keep learning all year.
-          </h2>
+          <h2 className="mt-3 text-3xl md:text-4xl font-extrabold">Keep learning all year.</h2>
           <p className="mt-4 text-white/80">
             Continue your professional development with free and paid courses, practical seminars
             and CPD learning connected to the conference community.

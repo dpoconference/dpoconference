@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import {
   Award,
@@ -13,7 +13,7 @@ import {
   Users,
   Wallet,
 } from "lucide-react";
-import { apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
 import { apiUpload } from "@/lib/upload";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/toast";
@@ -49,16 +49,27 @@ type LearningAsset = {
   summary: string;
   bodyHtml?: string | null;
   coverUrl?: string | null;
-  fileUrl: string;
+  fileUrl?: string | null;
   mimeType?: string | null;
   audience: string;
   isPublished: boolean;
   isCourse: boolean;
   guestAccess: boolean;
   priceNgn: number | string;
+  _count?: { chapters: number };
 };
 
 type Category = { slug: string; name: string };
+type LearningChapter = {
+  id: string;
+  title: string;
+  summary: string;
+  bodyText: string;
+  fileUrl: string | null;
+  mimeType: string | null;
+  sortOrder: number;
+  isPublished: boolean;
+};
 
 const emptyForm = {
   id: "",
@@ -77,6 +88,7 @@ const emptyForm = {
 
 function Page() {
   const { hasPermission } = useAuth();
+  const queryClient = useQueryClient();
   const can = hasPermission("cms.manage");
   const canManageUsers = hasPermission("users.manage");
   const canManageSettings = hasPermission("settings.manage");
@@ -475,10 +487,6 @@ function Page() {
               className="space-y-5 rounded-2xl border border-border bg-card p-5 lg:p-7"
               onSubmit={async (e) => {
                 e.preventDefault();
-                if (!form.fileUrl) {
-                  notify.error("Upload a learning file first.");
-                  return;
-                }
                 setLoading(true);
                 try {
                   const body = {
@@ -486,7 +494,7 @@ function Page() {
                     summary: form.summary,
                     bodyHtml: form.bodyHtml,
                     coverUrl: form.coverUrl || null,
-                    fileUrl: form.fileUrl,
+                    fileUrl: form.fileUrl || null,
                     mimeType: form.mimeType || null,
                     audience: form.audience,
                     isPublished: form.isPublished,
@@ -496,16 +504,15 @@ function Page() {
                   };
                   if (form.id) {
                     await apiPatch(`/admin/learning-assets/${form.id}`, body);
-                    notify.success("Course updated.");
+                    notify.success("Course updated. Add or update its chapters below.");
                   } else {
-                    await apiPost("/admin/learning-assets", body);
+                    const created = await apiPost<{ id: string }>("/admin/learning-assets", body);
+                    setForm((current) => ({ ...current, id: created.id }));
                     notify.success(
-                      form.isPublished ? "Course published." : "Course saved as a draft.",
+                      `${form.isPublished ? "Course published." : "Course saved as a draft."} Add course chapters below.`,
                     );
                   }
-                  setForm(emptyForm);
                   await assets.refetch();
-                  setSection("manage");
                 } catch (error) {
                   notify.error(
                     error instanceof Error ? error.message : "Could not save the course.",
@@ -651,10 +658,9 @@ function Page() {
                 <p className="text-xs font-semibold">Learning file</p>
                 <input
                   className="w-full rounded-md border px-3 py-2 text-sm"
-                  placeholder="File URL"
+                  placeholder="Optional course overview file URL"
                   value={form.fileUrl}
                   onChange={(e) => setForm({ ...form, fileUrl: e.target.value })}
-                  required
                 />
                 <input
                   ref={fileRef}
@@ -679,7 +685,7 @@ function Page() {
                   variant="outline"
                   onClick={() => fileRef.current?.click()}
                 >
-                  Upload file
+                  Upload overview file
                 </Button>
               </div>
               <textarea
@@ -789,6 +795,9 @@ function Page() {
                         </p>
                       </div>
                       <span className="text-xs text-muted-foreground">
+                        {asset._count?.chapters ?? 0} chapters
+                      </span>
+                      <span className="text-xs text-muted-foreground">
                         {Number(asset.priceNgn) > 0
                           ? `Paid · ${new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN" }).format(Number(asset.priceNgn))}`
                           : asset.guestAccess
@@ -815,7 +824,7 @@ function Page() {
                             summary: asset.summary ?? "",
                             bodyHtml: asset.bodyHtml ?? "",
                             coverUrl: asset.coverUrl ?? "",
-                            fileUrl: asset.fileUrl,
+                            fileUrl: asset.fileUrl ?? "",
                             mimeType: asset.mimeType ?? "",
                             audience: asset.audience,
                             isPublished: asset.isPublished,
@@ -835,10 +844,250 @@ function Page() {
             </section>
           )}
 
+          {section === "add" && form.id && form.isCourse ? (
+            <ChapterPanel
+              assetId={form.id}
+              onChanged={() => {
+                void queryClient.invalidateQueries({ queryKey: ["admin-learning-assets"] });
+              }}
+            />
+          ) : null}
           {section === "add" && form.id ? <AssignmentPanel assetId={form.id} /> : null}
         </>
       )}
     </div>
+  );
+}
+
+function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () => void }) {
+  const queryClient = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState("");
+  const [chapter, setChapter] = useState({
+    title: "",
+    summary: "",
+    bodyText: "",
+    fileUrl: "",
+    mimeType: "",
+    isPublished: false,
+  });
+  const chapters = useQuery({
+    queryKey: ["admin-learning-chapters", assetId],
+    queryFn: () => apiGet<LearningChapter[]>(`/admin/learning-assets/${assetId}/chapters`),
+  });
+
+  async function saveChapter(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setBusy(true);
+    try {
+      const payload = {
+        ...chapter,
+        fileUrl: chapter.fileUrl || null,
+        mimeType: chapter.mimeType || null,
+      };
+      if (editingId) {
+        await apiPatch(`/admin/learning-chapters/${editingId}`, payload);
+        notify.success("Course chapter updated.");
+      } else {
+        await apiPost(`/admin/learning-assets/${assetId}/chapters`, payload);
+        notify.success("Course chapter added.");
+      }
+      setEditingId("");
+      setChapter({
+        title: "",
+        summary: "",
+        bodyText: "",
+        fileUrl: "",
+        mimeType: "",
+        isPublished: false,
+      });
+      await queryClient.invalidateQueries({ queryKey: ["admin-learning-chapters", assetId] });
+      onChanged();
+    } catch (error) {
+      notify.error(error instanceof Error ? error.message : "Could not save course chapter.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function removeChapter(item: LearningChapter) {
+    if (!window.confirm(`Delete chapter "${item.title}"?`)) return;
+    setBusy(true);
+    try {
+      await apiDelete(`/admin/learning-chapters/${item.id}`);
+      notify.success("Course chapter deleted.");
+      await queryClient.invalidateQueries({ queryKey: ["admin-learning-chapters", assetId] });
+      onChanged();
+    } catch (error) {
+      notify.error(error instanceof Error ? error.message : "Could not delete course chapter.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="space-y-5 rounded-2xl border border-border bg-card p-5 lg:p-7">
+      <div>
+        <h2 className="font-semibold">Course chapters</h2>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Upload and publish course material chapter by chapter. Draft chapters are visible only to
+          admins until published.
+        </p>
+      </div>
+      {chapters.isError ? (
+        <div className="text-sm text-destructive">
+          Chapters could not be loaded.{" "}
+          <Button size="sm" variant="outline" onClick={() => void chapters.refetch()}>
+            Retry
+          </Button>
+        </div>
+      ) : chapters.isPending ? (
+        <Skeleton className="h-20" />
+      ) : chapters.data.length ? (
+        <ol className="space-y-2">
+          {chapters.data.map((item, index) => (
+            <li
+              key={item.id}
+              className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border p-3"
+            >
+              <div>
+                <p className="text-sm font-semibold">
+                  {index + 1}. {item.title}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {item.isPublished ? "Published" : "Draft"}
+                  {item.fileUrl ? " · File attached" : " · Text only"}
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setEditingId(item.id);
+                    setChapter({
+                      title: item.title,
+                      summary: item.summary,
+                      bodyText: item.bodyText,
+                      fileUrl: item.fileUrl ?? "",
+                      mimeType: item.mimeType ?? "",
+                      isPublished: item.isPublished,
+                    });
+                  }}
+                >
+                  Edit
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => void removeChapter(item)}
+                >
+                  Delete
+                </Button>
+              </div>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="rounded-xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+          No chapters added yet. Add the first chapter below.
+        </p>
+      )}
+      <form
+        onSubmit={(event) => void saveChapter(event)}
+        className="space-y-3 rounded-xl bg-muted/30 p-4"
+      >
+        <h3 className="text-sm font-semibold">{editingId ? "Edit chapter" : "Add a chapter"}</h3>
+        <Input
+          required
+          minLength={2}
+          maxLength={200}
+          placeholder="Chapter title"
+          value={chapter.title}
+          onChange={(event) => setChapter({ ...chapter, title: event.target.value })}
+        />
+        <Input
+          maxLength={2000}
+          placeholder="Short chapter description (optional)"
+          value={chapter.summary}
+          onChange={(event) => setChapter({ ...chapter, summary: event.target.value })}
+        />
+        <textarea
+          className="min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+          placeholder="Chapter notes or text (optional if a file is uploaded)"
+          value={chapter.bodyText}
+          onChange={(event) => setChapter({ ...chapter, bodyText: event.target.value })}
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <Input
+            className="min-w-[min(100%,20rem)] flex-1"
+            placeholder="Uploaded chapter file URL"
+            value={chapter.fileUrl}
+            onChange={(event) => setChapter({ ...chapter, fileUrl: event.target.value })}
+          />
+          <input
+            ref={fileRef}
+            type="file"
+            accept="application/pdf,image/*,video/*"
+            className="hidden"
+            onChange={async (event) => {
+              const file = event.target.files?.[0];
+              if (!file) return;
+              try {
+                const uploaded = await apiUpload(file, "ndpo/learning/chapters");
+                setChapter((current) => ({
+                  ...current,
+                  fileUrl: uploaded.url,
+                  mimeType: uploaded.mime || file.type,
+                }));
+                notify.success("Chapter file uploaded.");
+              } catch (error) {
+                notify.error(error instanceof Error ? error.message : "Chapter upload failed.");
+              }
+            }}
+          />
+          <Button type="button" variant="outline" onClick={() => fileRef.current?.click()}>
+            Upload chapter file
+          </Button>
+        </div>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={chapter.isPublished}
+            onChange={(event) => setChapter({ ...chapter, isPublished: event.target.checked })}
+          />
+          Publish this chapter
+        </label>
+        <div className="flex gap-2">
+          <Button type="submit" loading={busy}>
+            {editingId ? "Save chapter" : "Add chapter"}
+          </Button>
+          {editingId ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setEditingId("");
+                setChapter({
+                  title: "",
+                  summary: "",
+                  bodyText: "",
+                  fileUrl: "",
+                  mimeType: "",
+                  isPublished: false,
+                });
+              }}
+            >
+              Cancel edit
+            </Button>
+          ) : null}
+        </div>
+      </form>
+    </section>
   );
 }
 

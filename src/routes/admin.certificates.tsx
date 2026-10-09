@@ -15,6 +15,7 @@ type CourseCertificate = {
   certificateNumber: string;
   issuedAt: string;
   title: string | null;
+  cpdCredits: number;
   user: { id: string; firstName: string; lastName: string; email: string };
   asset: { id: string; title: string } | null;
 };
@@ -31,6 +32,7 @@ function Page() {
   const [email, setEmail] = useState("");
   const [certificateTitle, setCertificateTitle] = useState("");
   const [assetId, setAssetId] = useState("");
+  const [cpdCredits, setCpdCredits] = useState("0");
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<"manage" | "generate" | "verify">("manage");
   const [verificationInput, setVerificationInput] = useState("");
@@ -71,11 +73,13 @@ function Page() {
         email: email.trim().toLowerCase(),
         title: certificateTitle.trim(),
         ...(assetId ? { assetId } : {}),
+        cpdCredits: Number(cpdCredits),
       });
       notify.success(`Certificate ${result.certificateNumber} issued.`);
       setEmail("");
       setCertificateTitle("");
       setAssetId("");
+      setCpdCredits("0");
       await certificates.refetch();
     } catch (err) {
       notify.error(err instanceof Error ? err.message : "Could not issue certificate.");
@@ -164,7 +168,7 @@ function Page() {
               have an account so the certificate appears in their portal.
             </p>
           </div>
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="grid gap-3 md:grid-cols-3">
             <label className="space-y-1 text-sm font-medium">
               Recipient email
               <Input
@@ -184,6 +188,17 @@ function Page() {
                 placeholder="e.g. Certificate of Achievement"
                 value={certificateTitle}
                 onChange={(e) => setCertificateTitle(e.target.value)}
+              />
+            </label>
+            <label className="space-y-1 text-sm font-medium">
+              CPD credits
+              <Input
+                type="number"
+                min="0"
+                max="500"
+                step="1"
+                value={cpdCredits}
+                onChange={(e) => setCpdCredits(e.target.value)}
               />
             </label>
           </div>
@@ -275,6 +290,7 @@ function Page() {
                 <th className="p-2">Learner</th>
                 <th className="p-2">Certificate title</th>
                 <th className="p-2">Certificate number</th>
+                <th className="p-2">CPD credits</th>
                 <th className="p-2">Issued</th>
                 <th className="p-2" />
               </tr>
@@ -297,6 +313,7 @@ function Page() {
                     ) : null}
                   </td>
                   <td className="p-2 font-mono text-xs">{certificate.certificateNumber}</td>
+                  <td className="p-2">{certificate.cpdCredits}</td>
                   <td className="p-2">{new Date(certificate.issuedAt).toLocaleDateString()}</td>
                   <td className="p-2 text-right">
                     <Button

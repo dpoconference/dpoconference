@@ -32,6 +32,16 @@ type Course = {
   bodyHtml: string;
   coverUrl?: string | null;
   mimeType?: string | null;
+  hasMaterial: boolean;
+  chapters: {
+    id: string;
+    title: string;
+    summary: string;
+    bodyText: string;
+    mimeType?: string | null;
+    sortOrder: number;
+    hasFile: boolean;
+  }[];
   priceNgn: number;
   guestAccess: boolean;
   isEnrolled: boolean;
@@ -51,6 +61,9 @@ function CoursePage() {
   const { user } = useAuth();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [selectedChapterId, setSelectedChapterId] = useState("");
+  const [chapterFileUrl, setChapterFileUrl] = useState<string | null>(null);
+  const [chapterFileError, setChapterFileError] = useState<string | null>(null);
   const [percent, setPercent] = useState(0);
   const [method, setMethod] = useState<PaymentMethodChoice>("PAYSTACK");
   const [bankSession, setBankSession] = useState<BankTransferSession | null>(null);
@@ -83,7 +96,7 @@ function CoursePage() {
     let cancelled = false;
     setFileUrl(null);
     setFileError(null);
-    if (!course?.canAccess) return;
+    if (!course?.canAccess || !course.hasMaterial) return;
     void apiObjectUrl(`/public/courses/${id}/file`)
       .then(({ url }) => {
         if (cancelled) {
@@ -103,7 +116,46 @@ function CoursePage() {
       cancelled = true;
       if (revoked) URL.revokeObjectURL(revoked);
     };
-  }, [id, course?.canAccess]);
+  }, [id, course?.canAccess, course?.hasMaterial]);
+
+  useEffect(() => {
+    const chapters = course?.chapters ?? [];
+    const selectedChapter =
+      chapters.find((chapter) => chapter.id === selectedChapterId) ?? chapters[0];
+    setChapterFileUrl(null);
+    setChapterFileError(null);
+    if (!selectedChapter) {
+      if (selectedChapterId) setSelectedChapterId("");
+      return;
+    }
+    if (selectedChapter.id !== selectedChapterId) {
+      setSelectedChapterId(selectedChapter.id);
+      return;
+    }
+    if (!course?.canAccess || !selectedChapter.hasFile) return;
+
+    let revoked: string | null = null;
+    let cancelled = false;
+    void apiObjectUrl(`/public/courses/${id}/chapters/${selectedChapter.id}/file`)
+      .then(({ url }) => {
+        if (cancelled) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        revoked = url;
+        setChapterFileUrl(url);
+      })
+      .catch((error) => {
+        if (!cancelled)
+          setChapterFileError(
+            error instanceof Error ? error.message : "Chapter file could not be loaded.",
+          );
+      });
+    return () => {
+      cancelled = true;
+      if (revoked) URL.revokeObjectURL(revoked);
+    };
+  }, [id, course?.canAccess, course?.chapters, selectedChapterId]);
 
   if (courseQuery.isPending)
     return (
@@ -190,7 +242,10 @@ function CoursePage() {
   }
 
   async function purchaseCourse() {
-    if (!user && (!guestBuyer.fullName.trim() || !guestBuyer.email.trim() || !guestBuyer.phone.trim())) {
+    if (
+      !user &&
+      (!guestBuyer.fullName.trim() || !guestBuyer.email.trim() || !guestBuyer.phone.trim())
+    ) {
       notify.error("Enter your name, email, and phone number to continue.");
       return;
     }
@@ -325,7 +380,9 @@ function CoursePage() {
                 <BankTransferCheckout
                   session={bankSession}
                   onSubmitted={() =>
-                    notify.success("Receipt received. Course access and account setup follow payment approval.")
+                    notify.success(
+                      "Receipt received. Course access and account setup follow payment approval.",
+                    )
                   }
                 />
               ) : (
@@ -421,7 +478,11 @@ function CoursePage() {
                     </span>
                   </label>
                   {payConfig.data ? (
-                    <PaymentMethodStep config={payConfig.data} value={method} onChange={setMethod} />
+                    <PaymentMethodStep
+                      config={payConfig.data}
+                      value={method}
+                      onChange={setMethod}
+                    />
                   ) : null}
                   {payConfig.isError ? (
                     <p className="text-sm text-destructive">
@@ -439,7 +500,11 @@ function CoursePage() {
                   </Button>
                   <p className="text-xs text-muted-foreground">
                     Already have an account?{" "}
-                    <Link to="/login" search={{ redirect: `/courses/${id}` }} className="font-semibold text-primary">
+                    <Link
+                      to="/login"
+                      search={{ redirect: `/courses/${id}` }}
+                      className="font-semibold text-primary"
+                    >
                       Sign in before purchasing
                     </Link>
                   </p>
@@ -494,15 +559,97 @@ function CoursePage() {
 
         {course.canAccess ? (
           <>
-            <article className="prose prose-sm max-w-none rounded-2xl border border-border bg-card p-6">
-              {course.bodyHtml ? (
+            {course.bodyHtml ? (
+              <article className="prose prose-sm max-w-none rounded-2xl border border-border bg-card p-6">
                 <div dangerouslySetInnerHTML={{ __html: course.bodyHtml }} />
-              ) : (
-                <p className="text-sm text-muted-foreground">
-                  Course content is available in the learning material below.
-                </p>
-              )}
-            </article>
+              </article>
+            ) : null}
+            {course.chapters.length > 0 ? (
+              <section className="grid gap-5 rounded-2xl border border-border bg-card p-5 lg:grid-cols-[minmax(14rem,0.7fr)_minmax(0,1.5fr)]">
+                <div>
+                  <h2 className="flex items-center gap-2 font-semibold">
+                    <BookOpen className="h-4 w-4" /> Course chapters
+                  </h2>
+                  <ol className="mt-3 space-y-2">
+                    {course.chapters.map((chapter, index) => (
+                      <li key={chapter.id}>
+                        <button
+                          type="button"
+                          aria-current={selectedChapterId === chapter.id ? "step" : undefined}
+                          className={`w-full rounded-lg border p-3 text-left text-sm transition ${
+                            selectedChapterId === chapter.id
+                              ? "border-primary bg-primary/5"
+                              : "border-border hover:bg-muted/40"
+                          }`}
+                          onClick={() => setSelectedChapterId(chapter.id)}
+                        >
+                          <span className="block text-xs text-muted-foreground">
+                            Chapter {index + 1}
+                          </span>
+                          <span className="mt-1 block font-medium">{chapter.title}</span>
+                          {chapter.summary ? (
+                            <span className="mt-1 block text-xs text-muted-foreground">
+                              {chapter.summary}
+                            </span>
+                          ) : null}
+                        </button>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+                {(() => {
+                  const activeChapter = course.chapters.find(
+                    (chapter) => chapter.id === selectedChapterId,
+                  );
+                  if (!activeChapter) return null;
+                  return (
+                    <div className="min-w-0 space-y-4">
+                      <div>
+                        <h3 className="text-lg font-semibold">{activeChapter.title}</h3>
+                        {activeChapter.summary ? (
+                          <p className="mt-1 text-sm text-muted-foreground">
+                            {activeChapter.summary}
+                          </p>
+                        ) : null}
+                      </div>
+                      {activeChapter.bodyText ? (
+                        <div className="whitespace-pre-wrap text-sm leading-7">
+                          {activeChapter.bodyText}
+                        </div>
+                      ) : null}
+                      {chapterFileError ? (
+                        <p className="text-sm text-destructive">{chapterFileError}</p>
+                      ) : null}
+                      {chapterFileUrl ? (
+                        activeChapter.mimeType?.startsWith("image/") ? (
+                          <img
+                            src={chapterFileUrl}
+                            alt={activeChapter.title}
+                            className="max-h-[75vh] w-full rounded-xl object-contain"
+                          />
+                        ) : activeChapter.mimeType?.startsWith("video/") ? (
+                          <video
+                            controls
+                            src={chapterFileUrl}
+                            className="max-h-[75vh] w-full rounded-xl"
+                          >
+                            Your browser does not support embedded video.
+                          </video>
+                        ) : (
+                          <iframe
+                            title={`${activeChapter.title} chapter file`}
+                            src={chapterFileUrl}
+                            className="h-[70vh] w-full rounded-xl border border-border"
+                          />
+                        )
+                      ) : activeChapter.hasFile && !chapterFileError ? (
+                        <p className="text-sm text-muted-foreground">Loading chapter file…</p>
+                      ) : null}
+                    </div>
+                  );
+                })()}
+              </section>
+            ) : null}
             {fileUrl ? (
               <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
                 <h2 className="flex items-center gap-2 font-semibold">

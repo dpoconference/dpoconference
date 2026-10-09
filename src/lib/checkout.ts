@@ -10,6 +10,15 @@ export type CheckoutInput = {
   purpose: "MEMBERSHIP_APPLICATION" | "MEMBERSHIP_RENEWAL" | "CONFERENCE" | "SEMINAR" | "COURSE";
   linkedId?: string;
   email?: string;
+  buyer?: {
+    fullName: string;
+    phone: string;
+    country?: string;
+    billingAddress?: string;
+    termsAccepted: true;
+    privacyAccepted: true;
+    refundPolicyAccepted: true;
+  };
   /** Preferred method when both are enabled. Ignored when only one method is available. */
   method?: PaymentMethodChoice;
 };
@@ -54,6 +63,7 @@ export async function startCheckout(input: CheckoutInput): Promise<CheckoutResul
       purpose: input.purpose,
       linkedId: input.linkedId,
       email: input.email,
+      buyer: input.buyer,
     });
     return { mode: "bank", verified: false, cancelled: false, session };
   }
@@ -62,6 +72,7 @@ export async function startCheckout(input: CheckoutInput): Promise<CheckoutResul
     purpose: input.purpose,
     linkedId: input.linkedId,
     email: input.email,
+    buyer: input.buyer,
   });
   return {
     mode: "paystack",

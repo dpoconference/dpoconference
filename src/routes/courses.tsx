@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, BookOpen, GraduationCap, LockKeyhole } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowRight, BookOpen, GraduationCap, LockKeyhole, Search } from "lucide-react";
 import { SiteLayout, PageHero } from "@/components/site/Layout";
 import { apiGet } from "@/lib/api";
 import { formatNaira } from "@/lib/format";
@@ -31,11 +32,81 @@ type Course = {
   percent: number;
 };
 
+const COURSE_CATALOG_CACHE_KEY = "dpo-public-course-catalog-v1";
+
+function readCachedCatalog(): Course[] | null {
+  try {
+    const cached = localStorage.getItem(COURSE_CATALOG_CACHE_KEY);
+    if (!cached) return null;
+    const parsed: unknown = JSON.parse(cached);
+    if (!Array.isArray(parsed)) return null;
+    return parsed.filter(
+      (course): course is Course =>
+        typeof course === "object" &&
+        course !== null &&
+        typeof course.id === "string" &&
+        typeof course.title === "string" &&
+        typeof course.summary === "string" &&
+        typeof course.guestAccess === "boolean" &&
+        (typeof course.priceNgn === "number" || typeof course.priceNgn === "string"),
+    );
+  } catch {
+    return null;
+  }
+}
+
 function CoursesPage() {
+  const [search, setSearch] = useState("");
+  const [accessFilter, setAccessFilter] = useState<"all" | "free" | "paid" | "guest">("all");
   const q = useQuery({
     queryKey: ["public-courses"],
-    queryFn: () => apiGet<Course[]>("/public/courses"),
+    queryFn: async () => {
+      try {
+        const courses = await apiGet<Course[]>("/public/courses");
+        const publicOnly = courses.map(
+          ({ id, title, summary, coverUrl, guestAccess, priceNgn }) => ({
+            id,
+            title,
+            summary,
+            coverUrl,
+            guestAccess,
+            priceNgn,
+          }),
+        );
+        try {
+          localStorage.setItem(COURSE_CATALOG_CACHE_KEY, JSON.stringify(publicOnly));
+        } catch {
+          // Catalog browsing remains functional when browser storage is unavailable.
+        }
+        return { courses, isCached: false };
+      } catch (error) {
+        const cached = readCachedCatalog();
+        if (cached) {
+          return {
+            courses: cached.map((course) => ({ ...course, isEnrolled: false, percent: 0 })),
+            isCached: true,
+          };
+        }
+        throw error;
+      }
+    },
   });
+  const filteredCourses = useMemo(
+    () =>
+      (q.data?.courses ?? []).filter((course) => {
+        const isFree = Number(course.priceNgn) === 0;
+        const matchesSearch = `${course.title} ${course.summary}`
+          .toLowerCase()
+          .includes(search.trim().toLowerCase());
+        const matchesAccess =
+          accessFilter === "all" ||
+          (accessFilter === "free" && isFree) ||
+          (accessFilter === "paid" && !isFree) ||
+          (accessFilter === "guest" && course.guestAccess && isFree);
+        return matchesSearch && matchesAccess;
+      }),
+    [q.data, search, accessFilter],
+  );
 
   return (
     <SiteLayout>
@@ -67,14 +138,55 @@ function CoursesPage() {
             </Button>
           </div>
         ) : null}
-        {!q.isPending && !q.isError && q.data?.length === 0 ? (
+        {!q.isPending && !q.isError && q.data?.courses.length === 0 ? (
           <div className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground">
             No courses are published yet. Check back soon.
           </div>
         ) : null}
 
+        {!q.isPending && !q.isError && q.data && q.data.courses.length > 0 ? (
+          <div className="grid gap-3 rounded-2xl border border-border bg-card p-4 sm:grid-cols-[minmax(0,1fr)_14rem]">
+            <label className="flex items-center gap-2 rounded-md border border-input px-3">
+              <Search className="h-4 w-4 shrink-0 text-muted-foreground" />
+              <input
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                placeholder="Search courses"
+                aria-label="Search courses"
+                className="min-h-11 w-full bg-transparent text-sm outline-none"
+              />
+            </label>
+            <label className="flex items-center gap-3 rounded-md border border-input px-3 text-sm">
+              <span className="shrink-0 text-muted-foreground">Show</span>
+              <select
+                value={accessFilter}
+                onChange={(event) =>
+                  setAccessFilter(event.target.value as "all" | "free" | "paid" | "guest")
+                }
+                aria-label="Filter courses by price and access"
+                className="min-h-11 w-full bg-transparent font-medium outline-none"
+              >
+                <option value="all">All courses</option>
+                <option value="free">Free</option>
+                <option value="paid">Paid</option>
+                <option value="guest">Free guest access</option>
+              </select>
+            </label>
+          </div>
+        ) : null}
+        {q.data?.isCached ? (
+          <p
+            role="status"
+            className="rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950"
+          >
+            Showing the last saved course catalogue while the course service is unavailable.
+            Enrollment and checkout require a live connection.
+          </p>
+        ) : null}
+
         <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-          {(q.data ?? []).map((course) => {
+          {filteredCourses.map((course) => {
             const isFree = Number(course.priceNgn) === 0;
             return (
               <article
@@ -135,6 +247,11 @@ function CoursesPage() {
               </article>
             );
           })}
+          {!q.isPending && !q.isError && q.data?.courses.length && filteredCourses.length === 0 ? (
+            <p className="rounded-2xl border border-border bg-card p-8 text-center text-sm text-muted-foreground sm:col-span-2 xl:col-span-3">
+              No courses match those filters. Try a different search or access option.
+            </p>
+          ) : null}
         </section>
       </main>
     </SiteLayout>

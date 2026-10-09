@@ -55,6 +55,8 @@ function CoursePage() {
   const [method, setMethod] = useState<PaymentMethodChoice>("PAYSTACK");
   const [bankSession, setBankSession] = useState<BankTransferSession | null>(null);
   const [working, setWorking] = useState(false);
+  const [guestBuyer, setGuestBuyer] = useState({ fullName: "", email: "", phone: "", country: "" });
+  const [guestConsent, setGuestConsent] = useState(false);
   const [assignmentNotes, setAssignmentNotes] = useState<Record<string, string>>({});
 
   const courseQuery = useQuery({
@@ -65,7 +67,7 @@ function CoursePage() {
   const payConfig = useQuery({
     queryKey: ["payments-config"],
     queryFn: () => loadPaymentsConfig(),
-    enabled: Boolean(user && course && course.priceNgn > 0 && !course.isEnrolled),
+    enabled: Boolean(course && course.priceNgn > 0 && !course.isEnrolled),
   });
 
   useEffect(() => {
@@ -188,14 +190,33 @@ function CoursePage() {
   }
 
   async function purchaseCourse() {
-    if (!user) return;
+    if (!user && (!guestBuyer.fullName.trim() || !guestBuyer.email.trim() || !guestBuyer.phone.trim())) {
+      notify.error("Enter your name, email, and phone number to continue.");
+      return;
+    }
+    if (!user && !guestConsent) {
+      notify.error("Accept the terms, privacy notice, and refund policy to continue.");
+      return;
+    }
     setWorking(true);
     try {
       const result = await startCheckout({
         purpose: "COURSE",
         linkedId: id,
-        email: user.email,
+        email: user?.email ?? guestBuyer.email.trim().toLowerCase(),
         method,
+        ...(!user
+          ? {
+              buyer: {
+                fullName: guestBuyer.fullName.trim(),
+                phone: guestBuyer.phone.trim(),
+                ...(guestBuyer.country.trim() ? { country: guestBuyer.country.trim() } : {}),
+                termsAccepted: true as const,
+                privacyAccepted: true as const,
+                refundPolicyAccepted: true as const,
+              },
+            }
+          : {}),
       });
       if (result.mode === "bank") {
         setBankSession(result.session);
@@ -206,8 +227,12 @@ function CoursePage() {
         return;
       }
       if (result.verified) {
-        notify.success("Payment confirmed. You are enrolled.");
-        await courseQuery.refetch();
+        if (user) {
+          notify.success("Payment confirmed. You are enrolled.");
+          await courseQuery.refetch();
+        } else {
+          notify.success("Payment confirmed. Check your email for the secure account setup link.");
+        }
       }
     } catch (error) {
       notify.error(
@@ -282,7 +307,7 @@ function CoursePage() {
                 </p>
               </div>
             </div>
-            {!user ? (
+            {!user && free ? (
               <div className="flex flex-wrap gap-3">
                 <Button asChild>
                   <Link to="/register" search={{ redirect: `/courses/${id}` }}>
@@ -295,6 +320,131 @@ function CoursePage() {
                   </Link>
                 </Button>
               </div>
+            ) : !user ? (
+              bankSession ? (
+                <BankTransferCheckout
+                  session={bankSession}
+                  onSubmitted={() =>
+                    notify.success("Receipt received. Course access and account setup follow payment approval.")
+                  }
+                />
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Buy this course without an existing account. After payment is confirmed, we’ll
+                    create your learner account and email you a one-time password setup link.
+                  </p>
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <label className="space-y-1 text-sm">
+                      Full name
+                      <input
+                        required
+                        autoComplete="name"
+                        className="w-full rounded-md border px-3 py-2"
+                        value={guestBuyer.fullName}
+                        onChange={(event) =>
+                          setGuestBuyer({ ...guestBuyer, fullName: event.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="space-y-1 text-sm">
+                      Email
+                      <input
+                        required
+                        type="email"
+                        autoComplete="email"
+                        className="w-full rounded-md border px-3 py-2"
+                        value={guestBuyer.email}
+                        onChange={(event) =>
+                          setGuestBuyer({ ...guestBuyer, email: event.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="space-y-1 text-sm">
+                      Phone number
+                      <input
+                        required
+                        type="tel"
+                        autoComplete="tel"
+                        className="w-full rounded-md border px-3 py-2"
+                        value={guestBuyer.phone}
+                        onChange={(event) =>
+                          setGuestBuyer({ ...guestBuyer, phone: event.target.value })
+                        }
+                      />
+                    </label>
+                    <label className="space-y-1 text-sm">
+                      Country (optional)
+                      <input
+                        autoComplete="country-name"
+                        className="w-full rounded-md border px-3 py-2"
+                        value={guestBuyer.country}
+                        onChange={(event) =>
+                          setGuestBuyer({ ...guestBuyer, country: event.target.value })
+                        }
+                      />
+                    </label>
+                  </div>
+                  <label className="flex items-start gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      className="mt-1"
+                      checked={guestConsent}
+                      onChange={(event) => setGuestConsent(event.target.checked)}
+                    />
+                    <span>
+                      I agree to the{" "}
+                      <Link
+                        to="/legal/$slug"
+                        params={{ slug: "terms-of-use" }}
+                        className="font-semibold text-primary"
+                      >
+                        terms
+                      </Link>
+                      ,{" "}
+                      <Link
+                        to="/legal/$slug"
+                        params={{ slug: "privacy-notice" }}
+                        className="font-semibold text-primary"
+                      >
+                        privacy notice
+                      </Link>
+                      , and{" "}
+                      <Link
+                        to="/legal/$slug"
+                        params={{ slug: "refund-policy" }}
+                        className="font-semibold text-primary"
+                      >
+                        refund policy
+                      </Link>
+                      .
+                    </span>
+                  </label>
+                  {payConfig.data ? (
+                    <PaymentMethodStep config={payConfig.data} value={method} onChange={setMethod} />
+                  ) : null}
+                  {payConfig.isError ? (
+                    <p className="text-sm text-destructive">
+                      Payment options could not be loaded. Please try again.
+                    </p>
+                  ) : null}
+                  <Button
+                    loading={working || payConfig.isPending}
+                    disabled={!payConfig.data || !guestConsent}
+                    onClick={() => void purchaseCourse()}
+                  >
+                    {method === "BANK_TRANSFER"
+                      ? "Continue to bank transfer"
+                      : `Buy course · ${formatNaira(Number(course.priceNgn))}`}
+                  </Button>
+                  <p className="text-xs text-muted-foreground">
+                    Already have an account?{" "}
+                    <Link to="/login" search={{ redirect: `/courses/${id}` }} className="font-semibold text-primary">
+                      Sign in before purchasing
+                    </Link>
+                  </p>
+                </div>
+              )
             ) : free ? (
               <Button loading={working} onClick={() => void enrollFree()}>
                 Enroll for free

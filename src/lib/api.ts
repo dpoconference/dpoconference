@@ -134,7 +134,20 @@ export async function apiBlob(path: string, filename: string) {
   URL.revokeObjectURL(url);
 }
 
-export async function payThenVerify(body: { purpose: string; linkedId?: string; email?: string }) {
+export async function payThenVerify(body: {
+  purpose: string;
+  linkedId?: string;
+  email?: string;
+  buyer?: {
+    fullName: string;
+    phone: string;
+    country?: string;
+    billingAddress?: string;
+    termsAccepted: true;
+    privacyAccepted: true;
+    refundPolicyAccepted: true;
+  };
+}) {
   const pay = await apiPost<{
     authorizationUrl: string | null;
     accessCode: string | null;

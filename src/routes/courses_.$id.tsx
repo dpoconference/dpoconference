@@ -33,6 +33,7 @@ type Course = {
   coverUrl?: string | null;
   mimeType?: string | null;
   hasMaterial: boolean;
+  hasVideo?: boolean;
   chapters: {
     id: string;
     title: string;
@@ -41,6 +42,13 @@ type Course = {
     mimeType?: string | null;
     sortOrder: number;
     hasFile: boolean;
+    isLocked?: boolean;
+    isCompleted?: boolean;
+    exam?: { id: string; prompt: string; options: string[] }[];
+    examPassMark?: number;
+    examScore?: number | null;
+    examPassed?: boolean;
+    attemptCount?: number;
   }[];
   priceNgn: number;
   guestAccess: boolean;
@@ -61,6 +69,8 @@ function CoursePage() {
   const { user } = useAuth();
   const [fileUrl, setFileUrl] = useState<string | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
   const [selectedChapterId, setSelectedChapterId] = useState("");
   const [chapterFileUrl, setChapterFileUrl] = useState<string | null>(null);
   const [chapterFileError, setChapterFileError] = useState<string | null>(null);
@@ -71,6 +81,10 @@ function CoursePage() {
   const [guestBuyer, setGuestBuyer] = useState({ fullName: "", email: "", phone: "", country: "" });
   const [guestConsent, setGuestConsent] = useState(false);
   const [assignmentNotes, setAssignmentNotes] = useState<Record<string, string>>({});
+  const [chapterAnswers, setChapterAnswers] = useState<Record<string, Record<string, number>>>({});
+  const [examResults, setExamResults] = useState<
+    Record<string, { score: number; passed: boolean; attemptCount: number }>
+  >({});
 
   const courseQuery = useQuery({
     queryKey: ["public-course", id, user?.id],
@@ -117,6 +131,31 @@ function CoursePage() {
       if (revoked) URL.revokeObjectURL(revoked);
     };
   }, [id, course?.canAccess, course?.hasMaterial]);
+
+  useEffect(() => {
+    let revoked: string | null = null;
+    let cancelled = false;
+    setVideoUrl(null);
+    setVideoError(null);
+    if (!course?.canAccess || !course.hasVideo) return;
+    void apiObjectUrl(`/public/courses/${id}/video`)
+      .then(({ url }) => {
+        if (cancelled) {
+          URL.revokeObjectURL(url);
+          return;
+        }
+        revoked = url;
+        setVideoUrl(url);
+      })
+      .catch((error) => {
+        if (!cancelled)
+          setVideoError(error instanceof Error ? error.message : "Course video could not be loaded.");
+      });
+    return () => {
+      cancelled = true;
+      if (revoked) URL.revokeObjectURL(revoked);
+    };
+  }, [id, course?.canAccess, course?.hasVideo]);
 
   useEffect(() => {
     const chapters = course?.chapters ?? [];
@@ -183,6 +222,11 @@ function CoursePage() {
   const free = Number(course.priceNgn) === 0;
   const isGuestPreview = course.guestAccess && free && !user;
   const locked = !course.canAccess;
+  const hasChapterFlow =
+    course.chapters.length > 0 &&
+    course.chapters.every(
+      (chapter) => typeof chapter.isLocked === "boolean" && Array.isArray(chapter.exam),
+    );
 
   async function enrollFree() {
     setWorking(true);
@@ -218,6 +262,59 @@ function CoursePage() {
     } catch (error) {
       notify.error(
         error instanceof ApiRequestError ? error.message : "Could not save course progress.",
+      );
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function submitChapterExam(chapterId: string) {
+    setWorking(true);
+    try {
+      const result = await apiPost<{
+        score: number;
+        passed: boolean;
+        attemptCount: number;
+      }>(`/portal/courses/${id}/chapters/${chapterId}/exam`, {
+        answers: chapterAnswers[chapterId] ?? {},
+      });
+      setExamResults((current) => ({ ...current, [chapterId]: result }));
+      await courseQuery.refetch();
+      notify.success(
+        result.passed
+          ? `Chapter exam passed with ${result.score}%.`
+          : `You scored ${result.score}%. Review the lesson and try again.`,
+      );
+    } catch (error) {
+      notify.error(
+        error instanceof ApiRequestError ? error.message : "Could not submit the chapter exam.",
+      );
+    } finally {
+      setWorking(false);
+    }
+  }
+
+  async function completeChapter(chapterId: string) {
+    const activeCourse = courseQuery.data;
+    if (!activeCourse) return;
+    setWorking(true);
+    try {
+      const result = await apiPost<{
+        progress: { percent: number };
+        certificate: { certificateNumber: string } | null;
+      }>(`/portal/courses/${id}/chapters/${chapterId}/complete`);
+      setPercent(result.progress.percent);
+      const currentIndex = activeCourse.chapters.findIndex((chapter) => chapter.id === chapterId);
+      setSelectedChapterId(activeCourse.chapters[currentIndex + 1]?.id ?? chapterId);
+      await courseQuery.refetch();
+      if (result.certificate)
+        notify.success(
+          `Course complete. Certificate ${result.certificate.certificateNumber} is ready in your portal.`,
+        );
+      else notify.success("Chapter complete. The next lesson is unlocked.");
+    } catch (error) {
+      notify.error(
+        error instanceof ApiRequestError ? error.message : "Could not complete this chapter.",
       );
     } finally {
       setWorking(false);
@@ -559,6 +656,24 @@ function CoursePage() {
 
         {course.canAccess ? (
           <>
+            {videoUrl ? (
+              <section className="space-y-3 rounded-2xl border border-border bg-card p-5">
+                <h2 className="flex items-center gap-2 font-semibold">
+                  <BookOpen className="h-4 w-4" /> Course video
+                </h2>
+                <video
+                  controls
+                  playsInline
+                  controlsList="nodownload noremoteplayback"
+                  disablePictureInPicture
+                  src={videoUrl}
+                  className="aspect-video w-full rounded-xl bg-black"
+                >
+                  Your browser does not support embedded video.
+                </video>
+              </section>
+            ) : null}
+            {videoError ? <p className="text-sm text-destructive">{videoError}</p> : null}
             {course.bodyHtml ? (
               <article className="prose prose-sm max-w-none rounded-2xl border border-border bg-card p-6">
                 <div dangerouslySetInnerHTML={{ __html: course.bodyHtml }} />
@@ -568,15 +683,25 @@ function CoursePage() {
               <section className="grid gap-5 rounded-2xl border border-border bg-card p-5 lg:grid-cols-[minmax(14rem,0.7fr)_minmax(0,1.5fr)]">
                 <div>
                   <h2 className="flex items-center gap-2 font-semibold">
-                    <BookOpen className="h-4 w-4" /> Course chapters
+                    <BookOpen className="h-4 w-4" /> Course lessons
                   </h2>
+                  {user && course.isEnrolled && hasChapterFlow ? (
+                    <div className="mt-3 space-y-1">
+                      <div className="flex justify-between text-xs">
+                        <span>Course completion</span>
+                        <span className="font-semibold">{course.percent}%</span>
+                      </div>
+                      <progress className="h-2 w-full accent-primary" max={100} value={course.percent} />
+                    </div>
+                  ) : null}
                   <ol className="mt-3 space-y-2">
                     {course.chapters.map((chapter, index) => (
                       <li key={chapter.id}>
                         <button
                           type="button"
+                          disabled={chapter.isLocked}
                           aria-current={selectedChapterId === chapter.id ? "step" : undefined}
-                          className={`w-full rounded-lg border p-3 text-left text-sm transition ${
+                          className={`w-full rounded-lg border p-3 text-left text-sm transition disabled:cursor-not-allowed disabled:opacity-55 ${
                             selectedChapterId === chapter.id
                               ? "border-primary bg-primary/5"
                               : "border-border hover:bg-muted/40"
@@ -585,6 +710,11 @@ function CoursePage() {
                         >
                           <span className="block text-xs text-muted-foreground">
                             Chapter {index + 1}
+                            {chapter.isCompleted
+                              ? " · Completed"
+                              : chapter.isLocked
+                                ? " · Locked"
+                                : " · In progress"}
                           </span>
                           <span className="mt-1 block font-medium">{chapter.title}</span>
                           {chapter.summary ? (
@@ -602,10 +732,16 @@ function CoursePage() {
                     (chapter) => chapter.id === selectedChapterId,
                   );
                   if (!activeChapter) return null;
+                  const examResult = examResults[activeChapter.id];
+                  const answers = chapterAnswers[activeChapter.id] ?? {};
+                  const examQuestions = activeChapter.exam ?? [];
                   return (
                     <div className="min-w-0 space-y-4">
                       <div>
-                        <h3 className="text-lg font-semibold">{activeChapter.title}</h3>
+                        <p className="text-xs font-semibold uppercase text-muted-foreground">
+                          Chapter {activeChapter.sortOrder + 1}
+                        </p>
+                        <h3 className="mt-1 text-lg font-semibold">{activeChapter.title}</h3>
                         {activeChapter.summary ? (
                           <p className="mt-1 text-sm text-muted-foreground">
                             {activeChapter.summary}
@@ -613,9 +749,9 @@ function CoursePage() {
                         ) : null}
                       </div>
                       {activeChapter.bodyText ? (
-                        <div className="whitespace-pre-wrap text-sm leading-7">
+                        <article className="whitespace-pre-wrap text-sm leading-7">
                           {activeChapter.bodyText}
-                        </div>
+                        </article>
                       ) : null}
                       {chapterFileError ? (
                         <p className="text-sm text-destructive">{chapterFileError}</p>
@@ -630,20 +766,103 @@ function CoursePage() {
                         ) : activeChapter.mimeType?.startsWith("video/") ? (
                           <video
                             controls
+                            playsInline
+                            controlsList="nodownload noremoteplayback"
+                            disablePictureInPicture
                             src={chapterFileUrl}
-                            className="max-h-[75vh] w-full rounded-xl"
+                            className="aspect-video w-full rounded-xl bg-black"
                           >
                             Your browser does not support embedded video.
                           </video>
                         ) : (
                           <iframe
                             title={`${activeChapter.title} chapter file`}
-                            src={chapterFileUrl}
+                            src={`${chapterFileUrl}#toolbar=0&navpanes=0`}
                             className="h-[70vh] w-full rounded-xl border border-border"
                           />
                         )
                       ) : activeChapter.hasFile && !chapterFileError ? (
-                        <p className="text-sm text-muted-foreground">Loading chapter file…</p>
+                        <p className="text-sm text-muted-foreground">Loading lesson material…</p>
+                      ) : null}
+                      {examQuestions.length > 0 ? (
+                        <section className="space-y-4 rounded-xl border border-border p-4">
+                          <div>
+                            <h4 className="font-semibold">Chapter exam</h4>
+                            <p className="text-xs text-muted-foreground">
+                              Pass mark: {activeChapter.examPassMark ?? 70}%
+                            </p>
+                          </div>
+                          {examQuestions.map((question, questionIndex) => (
+                            <fieldset key={question.id} className="space-y-2">
+                              <legend className="text-sm font-medium">
+                                {questionIndex + 1}. {question.prompt}
+                              </legend>
+                              {question.options.map((option, optionIndex) => (
+                                <label
+                                  key={optionIndex}
+                                  className="flex items-start gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-muted/40"
+                                >
+                                  <input
+                                    type="radio"
+                                    name={`${activeChapter.id}-${question.id}`}
+                                    checked={answers[question.id] === optionIndex}
+                                    disabled={activeChapter.isCompleted || activeChapter.examPassed}
+                                    onChange={() =>
+                                      setChapterAnswers((current) => ({
+                                        ...current,
+                                        [activeChapter.id]: {
+                                          ...(current[activeChapter.id] ?? {}),
+                                          [question.id]: optionIndex,
+                                        },
+                                      }))
+                                    }
+                                  />
+                                  <span>{option}</span>
+                                </label>
+                              ))}
+                            </fieldset>
+                          ))}
+                          {examResult ? (
+                            <p className="text-sm font-medium" role="status">
+                              Attempt {examResult.attemptCount}: {examResult.score}%
+                              {examResult.passed ? " · Passed" : " · Not passed yet"}
+                            </p>
+                          ) : (activeChapter.attemptCount ?? 0) > 0 ? (
+                            <p className="text-sm text-muted-foreground" role="status">
+                              Last score: {activeChapter.examScore}%
+                              {activeChapter.examPassed ? " · Passed" : " · Try again"}
+                            </p>
+                          ) : null}
+                          {user && course.isEnrolled && hasChapterFlow && !activeChapter.isCompleted ? (
+                            <div className="flex flex-wrap gap-2">
+                              {!activeChapter.examPassed ? (
+                                <Button
+                                  loading={working}
+                                  disabled={Object.keys(answers).length !== examQuestions.length}
+                                  onClick={() => void submitChapterExam(activeChapter.id)}
+                                >
+                                  Submit exam
+                                </Button>
+                              ) : null}
+                              {activeChapter.examPassed ? (
+                                <Button
+                                  loading={working}
+                                  onClick={() => void completeChapter(activeChapter.id)}
+                                >
+                                  Complete chapter
+                                </Button>
+                              ) : null}
+                            </div>
+                          ) : null}
+                        </section>
+                      ) : user && course.isEnrolled && hasChapterFlow ? (
+                        <Button
+                          loading={working}
+                          disabled={activeChapter.isCompleted}
+                          onClick={() => void completeChapter(activeChapter.id)}
+                        >
+                          {activeChapter.isCompleted ? "Chapter completed" : "Complete chapter"}
+                        </Button>
                       ) : null}
                     </div>
                   );
@@ -664,7 +883,7 @@ function CoursePage() {
                 ) : (
                   <iframe
                     title={`${course.title} course material`}
-                    src={fileUrl}
+                    src={`${fileUrl}#toolbar=0&navpanes=0`}
                     className="h-[70vh] w-full rounded-xl border border-border"
                   />
                 )}
@@ -732,35 +951,49 @@ function CoursePage() {
             {user && course.isEnrolled ? (
               <section className="space-y-4 rounded-2xl border border-border bg-card p-5">
                 <h2 className="font-semibold">Your learning progress</h2>
-                <label className="flex items-center gap-3 text-sm">
-                  <span>Progress</span>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={percent}
-                    className="flex-1"
-                    onChange={(event) => setPercent(Number(event.target.value))}
-                  />
-                  <span className="w-12 text-right font-semibold">{percent}%</span>
-                </label>
-                <div className="flex flex-wrap gap-3">
-                  <Button
-                    variant="outline"
-                    loading={working}
-                    onClick={() => void saveProgress(percent)}
-                  >
-                    Save progress
+                {hasChapterFlow ? (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span>
+                        {course.chapters.filter((chapter) => chapter.isCompleted).length} of {course.chapters.length} chapters complete
+                      </span>
+                      <span className="font-semibold">{course.percent}%</span>
+                    </div>
+                    <progress className="h-2 w-full accent-primary" max={100} value={course.percent} />
+                  </>
+                ) : (
+                  <>
+                    <label className="flex items-center gap-3 text-sm">
+                      <span>Progress</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={percent}
+                        className="flex-1"
+                        onChange={(event) => setPercent(Number(event.target.value))}
+                      />
+                      <span className="w-12 text-right font-semibold">{percent}%</span>
+                    </label>
+                    <div className="flex flex-wrap gap-3">
+                      <Button
+                        variant="outline"
+                        loading={working}
+                        onClick={() => void saveProgress(percent)}
+                      >
+                        Save progress
+                      </Button>
+                      <Button loading={working} onClick={() => void saveProgress(100)}>
+                        Complete course
+                      </Button>
+                    </div>
+                  </>
+                )}
+                {course.percent >= 100 ? (
+                  <Button asChild variant="outline">
+                    <Link to="/portal/certificates">View certificates</Link>
                   </Button>
-                  <Button loading={working} onClick={() => void saveProgress(100)}>
-                    Complete course
-                  </Button>
-                  {percent >= 100 ? (
-                    <Button asChild variant="outline">
-                      <Link to="/portal/certificates">View certificates</Link>
-                    </Button>
-                  ) : null}
-                </div>
+                ) : null}
               </section>
             ) : isGuestPreview ? (
               <section className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-border bg-[color:var(--brand-tint)]/40 p-5">

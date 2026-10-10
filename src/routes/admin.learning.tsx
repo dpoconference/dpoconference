@@ -14,7 +14,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
-import { apiUpload } from "@/lib/upload";
+import { apiLearningVideoUpload, apiUpload } from "@/lib/upload";
 import { useAuth } from "@/lib/auth";
 import { notify } from "@/lib/toast";
 import { PageHeader } from "@/components/app/PageHeader";
@@ -51,6 +51,7 @@ type LearningAsset = {
   coverUrl?: string | null;
   fileUrl?: string | null;
   mimeType?: string | null;
+  videoUrl?: string | null;
   audience: string;
   isPublished: boolean;
   isCourse: boolean;
@@ -69,6 +70,15 @@ type LearningChapter = {
   mimeType: string | null;
   sortOrder: number;
   isPublished: boolean;
+  exam: LearningExamQuestion[];
+  examPassMark: number;
+};
+
+type LearningExamQuestion = {
+  id: string;
+  prompt: string;
+  options: string[];
+  correctOption: number;
 };
 
 const emptyForm = {
@@ -79,6 +89,7 @@ const emptyForm = {
   coverUrl: "",
   fileUrl: "",
   mimeType: "",
+  videoUrl: "",
   audience: "ALL",
   isPublished: false,
   isCourse: true,
@@ -94,6 +105,7 @@ function Page() {
   const canManageSettings = hasPermission("settings.manage");
   const coverRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [section, setSection] = useState<"overview" | "manage" | "add">("overview");
   const [courseSearch, setCourseSearch] = useState("");
@@ -496,6 +508,13 @@ function Page() {
                     coverUrl: form.coverUrl || null,
                     fileUrl: form.fileUrl || null,
                     mimeType: form.mimeType || null,
+                    ...(form.videoUrl ||
+                    (form.id &&
+                      assets.data?.some((asset) =>
+                        Object.prototype.hasOwnProperty.call(asset, "videoUrl"),
+                      ))
+                      ? { videoUrl: form.videoUrl || null }
+                      : {}),
                     audience: form.audience,
                     isPublished: form.isPublished,
                     isCourse: form.isCourse,
@@ -688,6 +707,39 @@ function Page() {
                   Upload overview file
                 </Button>
               </div>
+              <div className="space-y-2">
+                <p className="text-xs font-semibold">Optional course video</p>
+                <Input
+                  placeholder="Course video URL"
+                  value={form.videoUrl}
+                  onChange={(event) => setForm({ ...form, videoUrl: event.target.value })}
+                />
+                <input
+                  ref={videoRef}
+                  type="file"
+                  accept="video/mp4,video/webm,video/ogg"
+                  className="hidden"
+                  onChange={async (event) => {
+                    const file = event.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      const uploaded = await apiLearningVideoUpload(file);
+                      setForm((current) => ({ ...current, videoUrl: uploaded.url }));
+                      notify.success("Course video uploaded.");
+                    } catch (error) {
+                      notify.error(error instanceof Error ? error.message : "Video upload failed.");
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => videoRef.current?.click()}
+                >
+                  Upload course video
+                </Button>
+              </div>
               <textarea
                 className="min-h-28 w-full rounded-md border px-3 py-2 text-sm"
                 placeholder="Body (HTML or notes)"
@@ -826,6 +878,7 @@ function Page() {
                             coverUrl: asset.coverUrl ?? "",
                             fileUrl: asset.fileUrl ?? "",
                             mimeType: asset.mimeType ?? "",
+                            videoUrl: asset.videoUrl ?? "",
                             audience: asset.audience,
                             isPublished: asset.isPublished,
                             isCourse: asset.isCourse,
@@ -871,6 +924,8 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
     fileUrl: "",
     mimeType: "",
     isPublished: false,
+    exam: [] as LearningExamQuestion[],
+    examPassMark: 70,
   });
   const chapters = useQuery({
     queryKey: ["admin-learning-chapters", assetId],
@@ -885,6 +940,13 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
         ...chapter,
         fileUrl: chapter.fileUrl || null,
         mimeType: chapter.mimeType || null,
+        ...(chapter.exam.length > 0 ||
+        chapter.examPassMark !== 70 ||
+        chapters.data?.some((item) =>
+          Object.prototype.hasOwnProperty.call(item, "exam"),
+        )
+          ? { exam: chapter.exam, examPassMark: chapter.examPassMark }
+          : {}),
       };
       if (editingId) {
         await apiPatch(`/admin/learning-chapters/${editingId}`, payload);
@@ -901,6 +963,8 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
         fileUrl: "",
         mimeType: "",
         isPublished: false,
+        exam: [],
+        examPassMark: 70,
       });
       await queryClient.invalidateQueries({ queryKey: ["admin-learning-chapters", assetId] });
       onChanged();
@@ -974,6 +1038,8 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
                       fileUrl: item.fileUrl ?? "",
                       mimeType: item.mimeType ?? "",
                       isPublished: item.isPublished,
+                      exam: item.exam ?? [],
+                      examPassMark: item.examPassMark ?? 70,
                     });
                   }}
                 >
@@ -1054,6 +1120,12 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
             Upload chapter file
           </Button>
         </div>
+        <ChapterExamEditor
+          exam={chapter.exam}
+          passMark={chapter.examPassMark}
+          onExamChange={(exam) => setChapter({ ...chapter, exam })}
+          onPassMarkChange={(examPassMark) => setChapter({ ...chapter, examPassMark })}
+        />
         <label className="flex items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -1079,6 +1151,8 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
                   fileUrl: "",
                   mimeType: "",
                   isPublished: false,
+                  exam: [],
+                  examPassMark: 70,
                 });
               }}
             >
@@ -1087,6 +1161,146 @@ function ChapterPanel({ assetId, onChanged }: { assetId: string; onChanged: () =
           ) : null}
         </div>
       </form>
+    </section>
+  );
+}
+
+function ChapterExamEditor({
+  exam,
+  passMark,
+  onExamChange,
+  onPassMarkChange,
+}: {
+  exam: LearningExamQuestion[];
+  passMark: number;
+  onExamChange: (exam: LearningExamQuestion[]) => void;
+  onPassMarkChange: (passMark: number) => void;
+}) {
+  function updateQuestion(id: string, update: Partial<LearningExamQuestion>) {
+    onExamChange(exam.map((question) => (question.id === id ? { ...question, ...update } : question)));
+  }
+
+  return (
+    <section className="space-y-3 rounded-lg border border-border p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h4 className="text-sm font-semibold">Chapter exam</h4>
+          <p className="text-xs text-muted-foreground">
+            Optional multiple-choice assessment. Learners must pass before continuing.
+          </p>
+        </div>
+        <label className="flex items-center gap-2 text-xs font-medium">
+          Pass mark
+          <Input
+            className="w-20"
+            type="number"
+            min={1}
+            max={100}
+            value={passMark}
+            onChange={(event) => onPassMarkChange(Number(event.target.value))}
+          />
+          %
+        </label>
+      </div>
+      {exam.map((question, questionIndex) => (
+        <fieldset key={question.id} className="space-y-3 rounded-lg bg-muted/30 p-3">
+          <div className="flex items-center justify-between gap-3">
+            <legend className="text-sm font-semibold">Question {questionIndex + 1}</legend>
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => onExamChange(exam.filter((item) => item.id !== question.id))}
+            >
+              Remove question
+            </Button>
+          </div>
+          <Input
+            required
+            minLength={3}
+            maxLength={1000}
+            placeholder="Question prompt"
+            value={question.prompt}
+            onChange={(event) => updateQuestion(question.id, { prompt: event.target.value })}
+          />
+          <ol className="space-y-2">
+            {question.options.map((option, optionIndex) => (
+              <li key={optionIndex} className="flex items-center gap-2">
+                <input
+                  type="radio"
+                  name={`correct-${question.id}`}
+                  aria-label={`Mark option ${optionIndex + 1} as correct`}
+                  checked={question.correctOption === optionIndex}
+                  onChange={() => updateQuestion(question.id, { correctOption: optionIndex })}
+                />
+                <Input
+                  required
+                  maxLength={300}
+                  placeholder={`Answer choice ${optionIndex + 1}`}
+                  value={option}
+                  onChange={(event) =>
+                    updateQuestion(question.id, {
+                      options: question.options.map((value, index) =>
+                        index === optionIndex ? event.target.value : value,
+                      ),
+                    })
+                  }
+                />
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="ghost"
+                  disabled={question.options.length <= 2}
+                  onClick={() => {
+                    const options = question.options.filter((_, index) => index !== optionIndex);
+                    updateQuestion(question.id, {
+                      options,
+                      correctOption:
+                        question.correctOption === optionIndex
+                          ? 0
+                          : question.correctOption > optionIndex
+                            ? question.correctOption - 1
+                            : question.correctOption,
+                    });
+                  }}
+                >
+                  Remove choice
+                </Button>
+              </li>
+            ))}
+          </ol>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={question.options.length >= 6}
+            onClick={() =>
+              updateQuestion(question.id, { options: [...question.options, ""] })
+            }
+          >
+            Add answer choice
+          </Button>
+        </fieldset>
+      ))}
+      <Button
+        type="button"
+        size="sm"
+        variant="outline"
+        disabled={exam.length >= 40}
+        onClick={() =>
+          onExamChange([
+            ...exam,
+            {
+              id: crypto.randomUUID(),
+              prompt: "",
+              options: ["", "", "", ""],
+              correctOption: 0,
+            },
+          ])
+        }
+      >
+        Add exam question
+      </Button>
     </section>
   );
 }
